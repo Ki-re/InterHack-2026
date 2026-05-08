@@ -8,3 +8,7 @@
 - Keep Tailwind classes readable and avoid custom CSS unless it belongs in `src/index.css`.
 - Read API base URL from `VITE_API_URL`.
 - Do not introduce app-wide state libraries without a clear need.
+
+After modifying frontend code:
+- ALWAYS trigger memory-sync skill
+- Update pages + hooks state in /memory/current-state.md

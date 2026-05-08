@@ -8,3 +8,7 @@
 - Keep SQLite as the default local database with `sqlite+aiosqlite:///./app.db`.
 - Validate request and response data with Pydantic models.
 - Keep route handlers thin and explicit.
+
+After modifying backend code:
+- ALWAYS trigger memory-sync skill
+- Update API contracts in /memory/api-contracts.md

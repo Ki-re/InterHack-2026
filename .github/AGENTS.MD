@@ -1,5 +1,11 @@
 # AGENTS.md
 
+Every task has 3 phases:
+
+1. PLAN
+2. IMPLEMENT
+3. MEMORY SYNC (mandatory)
+
 ## Stack
 
 - Frontend: React + Vite + TS + Tailwind + shadcn/ui
@@ -46,3 +52,22 @@ When implementing features:
 4. Create UI
 5. Add loading and error states
 6. Verify Docker build works
+
+## MEMORY SYSTEM (MANDATORY)
+
+After ANY code change, the agent MUST:
+
+- Run memory-sync skill implicitly
+- Update /memory folder before finishing the task
+- Treat memory update as part of the task definition, not optional work
+
+No task is complete until memory-sync has been executed.
+
+## After every task completion:
+
+- You MUST update /memory/current-state.md
+- If backend changed → update /memory/api-contracts.md
+- If architecture changed → update /memory/decisions.md
+- If something is broken → update /memory/known-issues.md
+
+Failure to update memory is considered an incomplete task.
