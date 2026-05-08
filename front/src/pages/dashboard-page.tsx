@@ -1,6 +1,7 @@
 import { Activity, Box, Database, Server } from "lucide-react";
 
 import { API_BASE_URL } from "@/api/client";
+import { useAuth } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +14,7 @@ import { useHealth } from "@/hooks/use-health";
 
 export function DashboardPage() {
   const health = useHealth();
+  const { user } = useAuth();
   const apiStatus = health.data?.status ?? (health.isLoading ? "checking" : "offline");
   const isHealthy = health.data?.status === "ok";
 
@@ -23,7 +25,8 @@ export function DashboardPage() {
           <p className="text-sm font-medium text-accent">Hackathon workspace</p>
           <h1 className="text-3xl font-semibold text-foreground">Dashboard</h1>
           <p className="text-sm leading-6 text-muted-foreground">
-            A lean React and FastAPI starter with Docker-first local development.
+            Signed in as {user?.email}. A lean React and FastAPI starter with Docker-first
+            local development.
           </p>
         </div>
         <Button asChild>

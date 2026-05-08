@@ -1,6 +1,8 @@
-import { Activity, Database, PanelsTopLeft } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { Database, LogOut, PanelsTopLeft } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
+import { API_BASE_URL } from "@/api/client";
+import { useAuth } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -12,6 +14,14 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   ].join(" ");
 
 export function AppLayout() {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/", { replace: true });
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-card">
@@ -33,17 +43,20 @@ export function AppLayout() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {user ? (
+              <span className="hidden max-w-[220px] truncate text-sm text-muted-foreground md:block">
+                {user.email}
+              </span>
+            ) : null}
             <Button asChild variant="secondary" size="sm">
-              <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">
+              <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noreferrer">
                 <Database className="size-4" aria-hidden="true" />
                 API Docs
               </a>
             </Button>
-            <Button asChild size="sm">
-              <a href="http://localhost:8000/health" target="_blank" rel="noreferrer">
-                <Activity className="size-4" aria-hidden="true" />
-                Health
-              </a>
+            <Button variant="outline" size="sm" type="button" onClick={handleLogout}>
+              <LogOut className="size-4" aria-hidden="true" />
+              Logout
             </Button>
           </div>
         </div>
