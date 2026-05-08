@@ -1,3 +1,8 @@
+---
+name: debug
+description: Use when diagnosing a failure — reproduce, isolate, apply minimal fix, and verify
+---
+
 # Debug
 
 Use this workflow when diagnosing a failure.

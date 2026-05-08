@@ -1,3 +1,8 @@
+---
+name: react-page
+description: Use when adding a new frontend page to the React app — creates the page, registers the route, and wires up API hooks
+---
+
 # React Page
 
 Use this workflow to add a new frontend page.

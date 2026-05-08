@@ -1,3 +1,8 @@
+---
+name: fastapi-crud
+description: Use to add a small CRUD resource to the FastAPI backend — model, schemas, service, routes, router registration, and Alembic migration
+---
+
 # FastAPI CRUD
 
 Use this workflow to add a small CRUD resource.

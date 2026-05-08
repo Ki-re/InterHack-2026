@@ -1,3 +1,8 @@
+---
+name: fullstack-feature
+description: Use when adding a feature that touches both React and FastAPI — covers API contract, backend, migration, frontend, and validation
+---
+
 # Fullstack Feature
 
 Use this workflow when adding a feature that touches both React and FastAPI.

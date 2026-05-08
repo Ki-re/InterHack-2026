@@ -1,3 +1,8 @@
+---
+name: dockerize-service
+description: Use when adding or changing a Dockerized service — covers Dockerfile, Compose config, secrets, and validation
+---
+
 # Dockerize Service
 
 Use this workflow when adding or changing a Dockerized service.

@@ -1,3 +1,8 @@
+---
+name: memory-sync
+description: Always run after any code modification to keep the /memory folder synchronized with the current state of the repository
+---
+
 # memory-sync
 
 This skill is ALWAYS used after any code modification in the repository.
