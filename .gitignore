@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project runtime
+.env
+back/app.db
+*.db
+node_modules/
+front/node_modules/
+dist/
+front/dist/
+build/
+.venv/
+__pycache__/
