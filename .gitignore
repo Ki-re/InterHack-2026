@@ -278,3 +278,5 @@ __pycache__/
 /IA/Datasets.xlsx
 
 /IA/gemini*
+
+!/IA/recompra.pt
