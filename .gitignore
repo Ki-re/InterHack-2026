@@ -221,6 +221,8 @@ __marimo__/
 .env
 back/app.db
 *.db
+/IA/checkpoints*/
+/IA/*.pt
 node_modules/
 front/node_modules/
 dist/
