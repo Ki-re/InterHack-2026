@@ -15,13 +15,14 @@
 ## AI
 - AI models use a multi-head architecture for multi-task learning to prevent gradient interference.
 - Prediction heads are 2-layer MLPs (`Linear -> BN -> SiLU -> Linear`) for increased non-linear capacity.
-- Feature engineering includes:
-    - `log1p` transformation for highly skewed numeric features.
-    - Cyclical encoding (sin/cos) for temporal features (month, day of week).
-    - Interaction ratios (e.g., `ratio_ciclo_compra`, `ratio_recencia_media`, `ratio_gasto_categoria`).
-    - Explicit flags like `is_first_purchase`.
-- Target masking is applied to loss functions and metrics when certain targets (like 'days') are only relevant for a subset of samples (like 'repurchase' class).
-- Accuracy for 'days' prediction is measured with both a static (±3 days) and a relative (10% error) tolerance.
+- Feature engineering:
+    - The dataset is enriched with extensive rolling window features (30d, 90d, 180d, 365d) for spend and purchase frequency.
+    - `log1p` transformation is applied to skewed monetary and count features during training.
+- Training strategy:
+    - **Dynamic Loss Weighting**: Implemented to balance tasks (BCE: 1.0, Days: 5.0, Potential: 2.0) and prioritize harder targets.
+    - **Label Smoothing**: Applied to the 'repurchase' BCE loss (0.05) to prevent overconfidence and gradient domination.
+    - **Masked Loss**: 'Days' loss is only calculated for samples with actual repurchases.
+- Evaluation: 'Days' accuracy is measured with ±3 days and 10% relative tolerance.
 
 ## Auth
 - Email/password auth uses JWT bearer tokens.

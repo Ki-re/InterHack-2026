@@ -162,10 +162,14 @@ def build_features(
     
     # Apply log1p to known highly skewed columns if they exist
     skewed_cols = [
-        "gasto_anual_real_cliente_producto", "gasto_medio_anual_cliente_categoria_producto",
-        "numero_devoluciones_producto", "Valores_H", "numero_compras_anteriores_producto",
-        "total_compras_cliente_otros_productos", "gasto_medio_anual_cliente_categoria",
-        "Unidades"
+        "Valores_H", "Unidades", 
+        "gasto_anual_real_cliente_producto_hasta_fecha", "gasto_anual_real_cliente_categoria_hasta_fecha",
+        "gasto_cliente_30d_previo", "gasto_cliente_producto_30d_previo", "gasto_cliente_categoria_30d_previo",
+        "gasto_cliente_90d_previo", "gasto_cliente_producto_90d_previo", "gasto_cliente_categoria_90d_previo",
+        "gasto_cliente_180d_previo", "gasto_cliente_producto_180d_previo", "gasto_cliente_categoria_180d_previo",
+        "gasto_cliente_365d_previo", "gasto_cliente_producto_365d_previo", "gasto_cliente_categoria_365d_previo",
+        "numero_compras_anteriores_producto", "numero_compras_anteriores_cliente",
+        "numero_compras_anteriores_cliente_otros_productos", "numero_devoluciones_anteriores_producto"
     ]
     
     for col in skewed_cols:
@@ -223,7 +227,9 @@ def build_targets(df: pd.DataFrame) -> torch.Tensor:
 
 
 def compute_loss(pred: torch.Tensor, target: torch.Tensor) -> tuple[torch.Tensor, dict[str, float]]:
-    bce = nn.functional.binary_cross_entropy(pred[:, 0], target[:, 0])
+    # Label smoothing for BCE
+    smooth_target = target[:, 0] * 0.9 + 0.05
+    bce = nn.functional.binary_cross_entropy(pred[:, 0], smooth_target)
     
     # Masked days loss: only compute where vuelve_a_comprar == 1
     mask = target[:, 0] == 1
@@ -233,7 +239,14 @@ def compute_loss(pred: torch.Tensor, target: torch.Tensor) -> tuple[torch.Tensor
         days = torch.tensor(0.0, device=pred.device)
         
     potential = nn.functional.mse_loss(pred[:, 2], target[:, 2])
-    total = bce + days + potential
+    
+    # Weights to balance the gradients (days and potential are much harder)
+    w_bce = 1.0
+    w_days = 5.0
+    w_potential = 2.0
+    
+    total = (bce * w_bce) + (days * w_days) + (potential * w_potential)
+    
     return total, {
         "loss": float(total.detach().cpu()),
         "bce_recompra": float(bce.detach().cpu()),
@@ -391,7 +404,7 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=2048)
     parser.add_argument("--lr", type=float, default=8e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
-    parser.add_argument("--hidden-sizes", type=parse_hidden_sizes, default=parse_hidden_sizes("512,256,128,64"))
+    parser.add_argument("--hidden-sizes", type=parse_hidden_sizes, default=parse_hidden_sizes("1024,512,256,128"))
     parser.add_argument("--dropout", type=float, default=0.15)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="cuda")
@@ -416,32 +429,6 @@ def main() -> None:
         raise ValueError(f"Missing target columns: {missing_targets}")
 
     df = df.dropna(subset=TARGET_COLS).reset_index(drop=True)
-    
-    # Extracción de características temporales
-    if "Fecha" in df.columns:
-        fecha_dt = pd.to_datetime(df["Fecha"], errors="coerce")
-        df["mes"] = fecha_dt.dt.month.fillna(1)
-        df["dia_semana"] = fecha_dt.dt.dayofweek.fillna(0)
-        
-        # Codificación cíclica
-        df["mes_sin"] = np.sin(2 * np.pi * df["mes"] / 12.0)
-        df["mes_cos"] = np.cos(2 * np.pi * df["mes"] / 12.0)
-        df["dia_semana_sin"] = np.sin(2 * np.pi * df["dia_semana"] / 7.0)
-        df["dia_semana_cos"] = np.cos(2 * np.pi * df["dia_semana"] / 7.0)
-        
-    # Variables de interacción
-    if "dias_desde_compra_anterior_producto" in df.columns and "tiempo_medio_entre_compras_dias" in df.columns:
-        df["ratio_ciclo_compra"] = df["dias_desde_compra_anterior_producto"] / (df["tiempo_medio_entre_compras_dias"] + 1.0)
-        
-    if "numero_compras_anteriores_producto" in df.columns:
-        df["is_first_purchase"] = (df["numero_compras_anteriores_producto"] == 0).astype(int)
-        
-    if "dias_desde_compra_anterior_producto" in df.columns and "tiempo_medio_recompra_dias" in df.columns:
-        df["ratio_recencia_media"] = df["dias_desde_compra_anterior_producto"] / (df["tiempo_medio_recompra_dias"] + 1.0)
-        
-    if "gasto_anual_real_cliente_producto" in df.columns and "gasto_medio_anual_cliente_categoria" in df.columns:
-        df["ratio_gasto_categoria"] = df["gasto_anual_real_cliente_producto"] / (df["gasto_medio_anual_cliente_categoria"] + 1.0)
-
     if args.sample_rows > 0:
         if args.sample_rows >= len(df):
             print(f"--sample-rows={args.sample_rows:,} >= dataset rows; using full dataset")
