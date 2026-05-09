@@ -2,32 +2,35 @@ import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
-import { AppLayout } from "@/layouts/app-layout";
-import { DashboardPage } from "@/pages/dashboard-page";
-import { LandingPage } from "@/pages/landing-page";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { LanguageProvider, useTranslation } from "@/contexts/LanguageContext";
+import { Dashboard } from "@/pages/Dashboard";
+import { Login } from "@/pages/Login";
 
 export function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <PublicOnlyRoute>
-            <LandingPage />
-          </PublicOnlyRoute>
-        }
-      />
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Route>
-      <Route path="*" element={<FallbackRedirect />} />
-    </Routes>
+    <LanguageProvider>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicOnlyRoute>
+              <Login />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+        <Route path="*" element={<FallbackRedirect />} />
+      </Routes>
+    </LanguageProvider>
   );
 }
 
@@ -70,9 +73,10 @@ function FallbackRedirect() {
 }
 
 function AuthLoading() {
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 text-sm text-muted-foreground">
-      Loading session...
+      {t("login.entering")}
     </div>
   );
 }

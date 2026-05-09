@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "Alertas INIBSA",
+    "subtitle": "Espacio del delegado de ventas",
+    "logout": "Salir",
+    "alerts": "Alertas",
+    "challenge": "Reto INIBSA"
+  },
+  "login": {
+    "title": "Panel de Alertas de Ventas",
+    "description": "Acceso para Delegado de Ventas. Revisa señales de fuga, propensión de compra y recomendaciones operativas en una vista preparada para integración backend.",
+    "role": "Delegado de Ventas",
+    "mock_login": "Inicio de sesión de prueba. No se requiere autenticación real.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "entering": "Entrando...",
+    "submit": "Entrar al panel",
+    "error_required": "Introduce correo y contraseña para iniciar sesión.",
+    "error_failed": "No se pudo iniciar sesión.",
+    "signals": {
+      "churn": "Riesgo fuga",
+      "buy": "Compra",
+      "clients": "Clientes"
+    }
+  },
+  "dashboard": {
+    "title": "Panel de alertas comerciales",
+    "subtitle": "Vista operativa para detectar riesgo de fuga, oportunidad de compra y próximas acciones sobre clientes priorizados.",
+    "mock_data": "Datos de prueba · Listo para integración backend",
+    "metrics": {
+      "pending": "Pendientes",
+      "pending_desc": "Requieren gestión comercial",
+      "high_risk": "Alta gravedad",
+      "high_risk_desc": "Prioridad de atención",
+      "avg_churn": "Fuga media",
+      "avg_churn_desc": "Promedio de cartera alertada",
+      "attended": "Atendidas",
+      "attended_desc": "Gestiones registradas"
+    },
+    "table": {
+      "title": "Alertas comerciales",
+      "description": "Prioriza clientes con señales de fuga, oportunidad de compra y valor comercial.",
+      "active_alerts": "{{count}} alertas activas",
+      "cols": {
+        "client": "Cliente",
+        "risk": "Prioridad",
+        "churn_prob": "Potencial de fuga",
+        "buy_prop": "Propensión a la compra",
+        "value": "Valor del cliente",
+        "explanation": "Explicación",
+        "churn_type": "Tipo de fuga",
+        "actions": "Acciones"
+      },
+      "row": {
+        "show_explanation": "Ver explicación",
+        "hide_explanation": "Ocultar explicación",
+        "show_detail": "Ver detalle",
+        "hide_detail": "Ocultar detalle",
+        "pending": "Pendiente",
+        "attended": "Atendida",
+        "ask_ai": "Consultar IA",
+        "mark_attended": "Marcar atendida",
+        "full_explanation": "Explicación completa",
+        "status_mgmt": "Estado de gestión",
+        "no_mgmt": "Sin gestión registrada todavía.",
+        "mgmt_result": "Resultado {{result}}. Canal {{channel}}."
+      }
+    }
+  },
+  "risk": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja"
+  },
+  "churn_type": {
+    "total": "Total",
+    "product": "Producto",
+    "segment": "Producto"
+  },
+  "customer_value": {
+    "high": "Alto",
+    "medium": "Medio",
+    "low": "Bajo"
+  },
+  "ai": {
+    "title": "Consultar IA",
+    "description": "Tu asistente de ventas inteligente. Pregúntame lo que necesites sobre este cliente.",
+    "opening": "Hola 👋 Estoy analizando la alerta de {{name}}. Veo un riesgo de fuga del {{churn}}% y una propensión de compra del {{buy}}%. ¿Qué quieres saber? Puedo ayudarte con la siguiente acción recomendada, el motivo del riesgo, un guion de conversación o cualquier otra duda sobre este cliente.",
+    "mock_ai": "INIBSA IA",
+    "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
+    "send": "Enviar",
+    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo.",
+    "action_rec":"Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
+    "why_rec": "El principal motivo de riesgo es: {{explanation}} ¿Te gustaría que profundizara en algún aspecto concreto o que te proponga argumentos para la conversación?",
+    "default_rec": "{{name}} presenta un {{churn}}% de probabilidad de fuga y un {{buy}}% de propensión de compra, una combinación que merece acción rápida. Te recomiendo un contacto comercial conciso y registrar el resultado. ¿Necesitas ayuda para preparar la llamada o la visita?"
+  },
+  "modal": {
+    "risk_label": "Riesgo {{label}} · {{churn}}% fuga",
+    "close": "Cerrar",
+    "explanation": "Explicación"
+  },
+  "form": {
+    "title": "Registrar gestión",
+    "description": "Actualiza el estado de {{name}} y deja una señal para el seguimiento interno.",
+    "handled_label": "¿Cómo se ha gestionado?",
+    "handling": {
+      "phone": "Teléfono",
+      "visit": "Visita presencial",
+      "email": "Correo electrónico",
+      "other": "Otros"
+    },
+    "result_label": "Resultado",
+    "results": {
+      "positive": "Positivo",
+      "neutral": "Neutro",
+      "negative": "Negativo"
+    },
+    "reminder_label": "Notas adicionales",
+    "reminder_placeholder": "Cualquier observación relevante sobre la gestión de este cliente...",
+    "cancel": "Cancelar",
+    "submit": "Marcar como atendida"
+  }
+}

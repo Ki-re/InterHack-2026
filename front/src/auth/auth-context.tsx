@@ -2,22 +2,29 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
-import {
-  getCurrentUser,
-  login as loginRequest,
-  register as registerRequest,
-  type AuthCredentials,
-  type AuthResponse,
-  type AuthUser,
-} from "@/api/auth";
+const STORAGE_KEY = "inibsa.salesDelegateSession";
 
-const STORAGE_KEY = "interhack.accessToken";
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: "Delegado de Ventas";
+};
+
+export type AuthCredentials = {
+  email: string;
+  password: string;
+};
+
+type StoredSession = {
+  token: string;
+  user: AuthUser;
+};
 
 type AuthContextValue = {
   user: AuthUser | null;
@@ -30,87 +37,80 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(STORAGE_KEY));
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(() => Boolean(token));
+function readStoredSession(): StoredSession | null {
+  const rawSession = localStorage.getItem(STORAGE_KEY);
 
-  const clearSession = useCallback(() => {
+  if (!rawSession) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawSession) as StoredSession;
+  } catch {
     localStorage.removeItem(STORAGE_KEY);
-    setToken(null);
-    setUser(null);
-    setIsLoading(false);
-  }, []);
+    return null;
+  }
+}
 
-  const saveSession = useCallback((response: AuthResponse) => {
-    localStorage.setItem(STORAGE_KEY, response.access_token);
-    setToken(response.access_token);
-    setUser(response.user);
-    setIsLoading(false);
-  }, []);
+function createMockUser(email: string): AuthUser {
+  return {
+    id: "delegate-001",
+    name: "Delegado de Ventas",
+    email,
+    role: "Delegado de Ventas",
+  };
+}
 
-  useEffect(() => {
-    let isCurrent = true;
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const storedSession = readStoredSession();
+  const [token, setToken] = useState<string | null>(storedSession?.token ?? null);
+  const [user, setUser] = useState<AuthUser | null>(storedSession?.user ?? null);
 
-    if (!token) {
-      setUser(null);
-      setIsLoading(false);
-      return () => {
-        isCurrent = false;
-      };
-    }
-
-    setIsLoading(true);
-    getCurrentUser(token)
-      .then((currentUser) => {
-        if (isCurrent) {
-          setUser(currentUser);
-        }
-      })
-      .catch(() => {
-        if (isCurrent) {
-          clearSession();
-        }
-      })
-      .finally(() => {
-        if (isCurrent) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isCurrent = false;
+  const saveSession = useCallback((nextUser: AuthUser) => {
+    const nextSession = {
+      token: `mock-token-${Date.now()}`,
+      user: nextUser,
     };
-  }, [clearSession, token]);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSession));
+    setToken(nextSession.token);
+    setUser(nextSession.user);
+  }, []);
 
   const login = useCallback(
     async (credentials: AuthCredentials) => {
-      const response = await loginRequest(credentials);
-      saveSession(response);
-      return response.user;
+      const nextUser = createMockUser(credentials.email.trim() || "delegado@inibsa.local");
+      saveSession(nextUser);
+      return nextUser;
     },
     [saveSession],
   );
 
   const register = useCallback(
     async (credentials: AuthCredentials) => {
-      const response = await registerRequest(credentials);
-      saveSession(response);
-      return response.user;
+      const nextUser = createMockUser(credentials.email.trim() || "delegado@inibsa.local");
+      saveSession(nextUser);
+      return nextUser;
     },
     [saveSession],
   );
+
+  const logout = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setToken(null);
+    setUser(null);
+  }, []);
 
   const value = useMemo(
     () => ({
       user,
       token,
-      isLoading,
+      isLoading: false,
       login,
       register,
-      logout: clearSession,
+      logout,
     }),
-    [clearSession, isLoading, login, register, token, user],
+    [login, logout, register, token, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

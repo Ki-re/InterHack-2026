@@ -31,6 +31,17 @@
   - `401` for invalid email or password.
   - `422` for validation errors.
 
+## `POST /ai/chat`
+- Auth: none (API key is server-side only).
+- Request JSON:
+  - `alert: AlertContext` — `{ clientName, riskLevel, churnProbability, purchasePropensity, customerValue, churnType, explanation }`
+  - `history: ChatMessage[]` — `[{ role: "user"|"assistant", content: string }, ...]` (full prior conversation)
+  - `question: string` — the new user message
+- Response `200`: `{ response: string }`
+- Errors:
+  - `503` if `GEMINI_API_KEY` is not configured.
+  - `502` if the Gemini API call fails.
+
 ## `GET /auth/me`
 - Auth: `Authorization: Bearer <token>`.
 - Request: none.
