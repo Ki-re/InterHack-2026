@@ -1,7 +1,7 @@
 # Known Issues
 
 ## Bugs
-- Host `npm run typecheck` in `front/` fails because `tsc` is unavailable on the host install.
+- Host `npm run typecheck` in `front/` fails because `tsc` is unavailable on the host install. Use `docker compose run --rm frontend npm run typecheck` instead.
 
 ## Incomplete Features
 - No automated backend tests.
@@ -12,4 +12,5 @@
 
 ## Technical Debt
 - JWT secret defaults to development value unless overridden in `.env`.
-- Current INSIBA frontend auth is mocked in `localStorage`; replace with backend auth before production use.
+- Current INIBSA frontend auth is mocked in `localStorage`; replace with backend auth before production use.
+- When adding new npm packages, the Docker named volume `interhack-2026_frontend_node_modules` must be manually removed and the container restarted, otherwise the stale volume shadows the new package.
