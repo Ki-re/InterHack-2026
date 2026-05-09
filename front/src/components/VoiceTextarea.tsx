@@ -98,7 +98,7 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
 
   if (isRecording) {
     return (
-      <div className="flex min-h-24 w-full flex-col gap-2 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
+      <div className="flex h-24 w-full flex-col gap-2 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
         {/* REC badge — inline, never overlaps */}
         <div className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-destructive animate-pulse" />
