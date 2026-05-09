@@ -7,15 +7,15 @@
     "challenge": "Reto INIBSA"
   },
   "login": {
-    "title": "Dashboard de Alertas de Ventas",
+    "title": "Panel de Alertas de Ventas",
     "description": "Acceso para Delegado de Ventas. Revisa señales de fuga, propensión de compra y recomendaciones operativas en una vista preparada para integración backend.",
     "role": "Delegado de Ventas",
     "mock_login": "Inicio de sesión de prueba. No se requiere autenticación real.",
-    "email": "Email",
+    "email": "Correo electrónico",
     "password": "Contraseña",
     "entering": "Entrando...",
-    "submit": "Entrar al dashboard",
-    "error_required": "Introduce email y contraseña para iniciar sesión.",
+    "submit": "Entrar al panel",
+    "error_required": "Introduce correo y contraseña para iniciar sesión.",
     "error_failed": "No se pudo iniciar sesión.",
     "signals": {
       "churn": "Riesgo fuga",
@@ -24,9 +24,9 @@
     }
   },
   "dashboard": {
-    "title": "Dashboard de alertas comerciales",
+    "title": "Panel de alertas comerciales",
     "subtitle": "Vista operativa para detectar riesgo de fuga, oportunidad de compra y próximas acciones sobre clientes priorizados.",
-    "mock_data": "Mock data · Ready for backend integration",
+    "mock_data": "Datos de prueba · Listo para integración backend",
     "metrics": {
       "pending": "Pendientes",
       "pending_desc": "Requieren gestión comercial",
@@ -58,7 +58,7 @@
         "hide_detail": "Ocultar detalle",
         "pending": "Pendiente",
         "attended": "Atendida",
-        "ask_ai": "Ask AI Insight",
+        "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atendida",
         "full_explanation": "Explicación completa",
         "status_mgmt": "Estado de gestión",
@@ -83,10 +83,10 @@
     "low": "Bajo"
   },
   "ai": {
-    "title": "Consultar AI Insight",
+    "title": "Consultar IA",
     "description": "Tu asistente de ventas inteligente. Pregúntame lo que necesites sobre este cliente.",
     "opening": "Hola 👋 Estoy analizando la alerta de {{name}}. Veo un riesgo de fuga del {{churn}}% y una propensión de compra del {{buy}}%. ¿Qué quieres saber? Puedo ayudarte con la siguiente acción recomendada, el motivo del riesgo, un guion de conversación o cualquier otra duda sobre este cliente.",
-    "mock_ai": "INIBSA AI",
+    "mock_ai": "INIBSA IA",
     "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
     "send": "Enviar",
     "action_rec": "Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
@@ -95,7 +95,7 @@
   },
   "modal": {
     "risk_label": "Riesgo {{label}} · {{churn}}% fuga",
-    "close": "Cerrar modal",
+    "close": "Cerrar",
     "explanation": "Explicación"
   },
   "form": {
@@ -105,7 +105,7 @@
     "handling": {
       "phone": "Teléfono",
       "visit": "Visita presencial",
-      "email": "Email",
+      "email": "Correo electrónico",
       "other": "Otros"
     },
     "result_label": "Resultado",

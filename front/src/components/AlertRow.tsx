@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, ChevronRight, MessageSquareText, PhoneCall } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, ClipboardCheck, MessageSquareText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -130,7 +130,7 @@ export function AlertRow({
 
         <td className="min-w-48 px-4 py-4 align-top">
           <div className="flex flex-col gap-2">
-            <Button size="sm" type="button" variant="outline" onClick={() => onAskInsight(alert)}>
+            <Button size="sm" type="button" variant="outline" className="w-full" onClick={() => onAskInsight(alert)}>
               <MessageSquareText className="size-4" aria-hidden="true" />
               {t("dashboard.table.row.ask_ai")}
             </Button>
@@ -139,12 +139,13 @@ export function AlertRow({
               size="sm"
               type="button"
               variant={isAttended ? "secondary" : "default"}
+              className="w-full"
               onClick={() => onAttend(alert)}
             >
               {isAttended ? (
                 <CheckCircle2 className="size-4" aria-hidden="true" />
               ) : (
-                <PhoneCall className="size-4" aria-hidden="true" />
+                <ClipboardCheck className="size-4" aria-hidden="true" />
               )}
               {isAttended ? t("dashboard.table.row.attended") : t("dashboard.table.row.mark_attended")}
             </Button>

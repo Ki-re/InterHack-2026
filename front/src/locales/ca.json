@@ -58,7 +58,7 @@
         "hide_detail": "Ocultar detall",
         "pending": "Pendent",
         "attended": "Atesa",
-        "ask_ai": "Demanar AI Insight",
+        "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atesa",
         "full_explanation": "Explicació completa",
         "status_mgmt": "Estat de gestió",
@@ -83,10 +83,10 @@
     "low": "Baix"
   },
   "ai": {
-    "title": "Consultar AI Insight",
+    "title": "Consultar IA",
     "description": "El teu assistent de vendes intel·ligent. Pregunta'm el que necessitis sobre aquest client.",
     "opening": "Hola 👋 Estic analitzant l'alerta de {{name}}. Veig un risc de fuga del {{churn}}% i una propensió de compra del {{buy}}%. Què vols saber? Puc ajudar-te amb la següent acció recomanada, el motiu del risc, un guió de conversa o qualsevol dubte sobre aquest client.",
-    "mock_ai": "INIBSA AI",
+    "mock_ai": "INIBSA IA",
     "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
     "send": "Enviar",
     "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
@@ -95,7 +95,7 @@
   },
   "modal": {
     "risk_label": "Risc {{label}} · {{churn}}% fuga",
-    "close": "Tancar modal",
+    "close": "Tancar",
     "explanation": "Explicació"
   },
   "form": {
