@@ -312,6 +312,20 @@ def get_device(device_arg: str) -> torch.device:
     return device
 
 
+def describe_device(device: torch.device) -> str:
+    if device.type != "cuda":
+        return "cpu"
+
+    index = device.index if device.index is not None else torch.cuda.current_device()
+    name = torch.cuda.get_device_name(index)
+    capability = torch.cuda.get_device_capability(index)
+    total_memory_gb = torch.cuda.get_device_properties(index).total_memory / (1024**3)
+    return (
+        f"cuda:{index} ({name}, compute {capability[0]}.{capability[1]}, "
+        f"{total_memory_gb:.1f} GB VRAM)"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv", type=Path, default=Path("IA/dataset_modelo.csv"))
@@ -322,7 +336,7 @@ def main() -> None:
     parser.add_argument("--hidden-sizes", type=parse_hidden_sizes, default=parse_hidden_sizes("512,256,128,64"))
     parser.add_argument("--dropout", type=float, default=0.15)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
+    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="cuda")
     parser.add_argument("--checkpoint-dir", type=Path, default=Path("IA/checkpoints_large"))
     parser.add_argument("--checkpoint-every", type=int, default=10)
     parser.add_argument("--num-workers", type=int, default=0)
@@ -376,6 +390,8 @@ def main() -> None:
     print(f"Hidden sizes: {args.hidden_sizes}")
 
     device = get_device(args.device)
+    if device.type == "cuda":
+        torch.backends.cudnn.benchmark = True
     pin_memory = device.type == "cuda"
     loader_kwargs = {
         "num_workers": args.num_workers,
@@ -426,7 +442,7 @@ def main() -> None:
     config_path = args.checkpoint_dir / "run_config.json"
     config_path.write_text(json.dumps(config, indent=2, sort_keys=True), encoding="utf-8")
 
-    print(f"Device: {device}")
+    print(f"Device: {describe_device(device)}")
     print(f"AMP enabled: {amp_enabled}")
     print(f"Checkpoint dir: {args.checkpoint_dir}")
 
