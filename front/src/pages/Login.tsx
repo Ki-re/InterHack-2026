@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { ArrowRight, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
 import inibsaLogo from "@/assets/logo.png";
+import inibsaIcon from "@/assets/icon.png";
 
 export function Login() {
   const { login } = useAuth();
@@ -48,9 +49,9 @@ export function Login() {
           className="max-w-2xl"
         >
           <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm font-medium text-primary shadow-sm">
-            <ShieldCheck className="size-4" aria-hidden="true" />
-            {t("app.challenge")}
-          </div>
+              <img src={inibsaIcon} alt="" className="size-4" aria-hidden="true" />
+              {t("app.challenge")}
+            </div>
           <h1 className="mt-6 text-4xl font-semibold tracking-normal text-slate-950 sm:text-5xl">
             {t("login.title")}
           </h1>
