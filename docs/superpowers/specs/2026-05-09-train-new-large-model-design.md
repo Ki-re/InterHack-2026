@@ -56,6 +56,16 @@ Cada checkpoint incluira:
 
 Tambien guardara `best_model.pt` cuando mejore `val_loss` y `last_model.pt` al final.
 
+## Metricas de validacion y test
+
+Ademas de las perdidas actuales, `train_new.py` calculara metricas interpretables en validation y test:
+
+- `acc_recompra`: accuracy binaria para `vuelve_a_comprar`, usando umbral `0.5` sobre la salida sigmoid.
+- `acc_dias_pm3`: porcentaje de predicciones de `dias_hasta_proxima_compra` con error absoluto menor o igual a `3` dias.
+- `acc_potencial_pm02`: porcentaje de predicciones de `target_potencial_cliente` con error absoluto menor o igual a `0.2`.
+
+Estas metricas se mostraran en cada epoca para validation y al final para test.
+
 ## CLI
 
 Argumentos principales:
@@ -70,6 +80,8 @@ Argumentos principales:
 - `--checkpoint-every`: frecuencia de checkpoints periodicos.
 - `--num-workers`: workers del DataLoader.
 - `--grad-clip`: norma maxima de gradiente.
+- `--metric-days-tolerance`: tolerancia de acierto para dias, por defecto `3`.
+- `--metric-potential-tolerance`: tolerancia de acierto para potencial, por defecto `0.2`.
 
 ## Validacion
 
