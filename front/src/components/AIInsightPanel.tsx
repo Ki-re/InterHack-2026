@@ -43,6 +43,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [mode, setMode] = useState<RecordingMode>("idle");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -217,24 +218,24 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isLoading) return;
+    if (isLoading || isTranscribing) return;
 
     if (mode === "preview" && chunksRef.current.length > 0) {
       previewAudioRef.current?.pause();
       const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current });
       resetRecording();
-      setIsLoading(true);
+      setIsTranscribing(true);
       try {
         const text = await postTranscribe(blob);
         const trimmed = text.trim();
-        setIsLoading(false);
+        setIsTranscribing(false);
         if (trimmed) await sendMessage(trimmed);
       } catch {
         setMessages((prev) => [
           ...prev,
           { id: `error-${Date.now()}`, role: "assistant", content: t("ai.error") },
         ]);
-        setIsLoading(false);
+        setIsTranscribing(false);
       }
       return;
     }
@@ -326,7 +327,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
             <div className="flex gap-2">
               <Button
                 aria-label="Grabar audio"
-                disabled={isLoading}
+                disabled={isLoading || isTranscribing}
                 size="icon"
                 type="button"
                 variant="outline"
@@ -342,9 +343,9 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
               />
-              <Button disabled={isLoading || !question.trim()} type="submit">
-                {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-                {t("ai.send")}
+              <Button disabled={isLoading || isTranscribing || !question.trim()} type="submit">
+                {isLoading || isTranscribing ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                {isTranscribing ? t("ai.transcribing") || "Transcribiendo…" : t("ai.send")}
               </Button>
             </div>
           )}
