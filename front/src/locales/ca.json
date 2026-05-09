@@ -89,6 +89,7 @@
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
     "send": "Enviar",
+    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar.",
     "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
     "why_rec": "El principal motiu de risc és: {{explanation}} T'agradaria que aprofundís en algun aspecte concret o que et proposi arguments per a la conversa?",
     "default_rec": "{{name}} presenta un {{churn}}% de probabilitat de fuga i un {{buy}}% de propensió de compra, una combinació que mereix acció ràpida. Et recomano un contacte comercial concís i registrar el resultat. Necessites ajuda per preparar la trucada o la visita?"

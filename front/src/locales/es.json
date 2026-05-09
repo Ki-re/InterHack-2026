@@ -89,7 +89,8 @@
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
     "send": "Enviar",
-    "action_rec": "Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
+    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo.",
+    "action_rec":"Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
     "why_rec": "El principal motivo de riesgo es: {{explanation}} ¿Te gustaría que profundizara en algún aspecto concreto o que te proponga argumentos para la conversación?",
     "default_rec": "{{name}} presenta un {{churn}}% de probabilidad de fuga y un {{buy}}% de propensión de compra, una combinación que merece acción rápida. Te recomiendo un contacto comercial conciso y registrar el resultado. ¿Necesitas ayuda para preparar la llamada o la visita?"
   },
