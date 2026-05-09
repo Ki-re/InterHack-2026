@@ -57,17 +57,44 @@ class LargePurchaseModel(nn.Module):
                 layers.append(nn.Dropout(dropout))
             in_features = hidden_size
 
-        layers.append(nn.Linear(in_features, len(TARGET_COLS)))
         self.net = nn.Sequential(*layers)
+        
+        head_hidden = max(in_features // 2, 16)
+        
+        self.head_recompra = nn.Sequential(
+            nn.Linear(in_features, head_hidden),
+            nn.BatchNorm1d(head_hidden),
+            nn.SiLU(),
+            nn.Linear(head_hidden, 1)
+        )
+        
+        self.head_days = nn.Sequential(
+            nn.Linear(in_features, head_hidden),
+            nn.BatchNorm1d(head_hidden),
+            nn.SiLU(),
+            nn.Linear(head_hidden, 1)
+        )
+        
+        self.head_potential = nn.Sequential(
+            nn.Linear(in_features, head_hidden),
+            nn.BatchNorm1d(head_hidden),
+            nn.SiLU(),
+            nn.Linear(head_hidden, 1)
+        )
+        
         self.positive = nn.Softplus()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        raw = self.net(x)
+        features = self.net(x)
+        raw_recompra = self.head_recompra(features).squeeze(1)
+        raw_days = self.head_days(features).squeeze(1)
+        raw_potential = self.head_potential(features).squeeze(1)
+        
         return torch.stack(
             [
-                torch.sigmoid(raw[:, 0]),
-                self.positive(raw[:, 1]),
-                torch.tanh(raw[:, 2]),
+                torch.sigmoid(raw_recompra),
+                self.positive(raw_days),
+                torch.tanh(raw_potential),
             ],
             dim=1,
         )
@@ -132,6 +159,20 @@ def build_features(
         for col in train_df.columns
         if col not in TARGET_COLS and col not in ID_OR_LEAKAGE_COLS
     ]
+    
+    # Apply log1p to known highly skewed columns if they exist
+    skewed_cols = [
+        "gasto_anual_real_cliente_producto", "gasto_medio_anual_cliente_categoria_producto",
+        "numero_devoluciones_producto", "Valores_H", "numero_compras_anteriores_producto",
+        "total_compras_cliente_otros_productos", "gasto_medio_anual_cliente_categoria",
+        "Unidades"
+    ]
+    
+    for col in skewed_cols:
+        if col in feature_cols:
+            train_df[col] = np.log1p(train_df[col].clip(lower=0))
+            val_df[col] = np.log1p(val_df[col].clip(lower=0))
+            test_df[col] = np.log1p(test_df[col].clip(lower=0))
 
     combined = pd.concat(
         [
@@ -183,7 +224,14 @@ def build_targets(df: pd.DataFrame) -> torch.Tensor:
 
 def compute_loss(pred: torch.Tensor, target: torch.Tensor) -> tuple[torch.Tensor, dict[str, float]]:
     bce = nn.functional.binary_cross_entropy(pred[:, 0], target[:, 0])
-    days = nn.functional.smooth_l1_loss(torch.log1p(pred[:, 1]), torch.log1p(target[:, 1]))
+    
+    # Masked days loss: only compute where vuelve_a_comprar == 1
+    mask = target[:, 0] == 1
+    if mask.sum() > 0:
+        days = nn.functional.smooth_l1_loss(torch.log1p(pred[mask, 1]), torch.log1p(target[mask, 1]))
+    else:
+        days = torch.tensor(0.0, device=pred.device)
+        
     potential = nn.functional.mse_loss(pred[:, 2], target[:, 2])
     total = bce + days + potential
     return total, {
@@ -204,13 +252,23 @@ def compute_accuracy_metrics(
     recompra_target = target[:, 0].round().clamp(0, 1)
     recompra_pred = (pred[:, 0] >= 0.5).float()
     acc_recompra = (recompra_pred == recompra_target).float().mean()
-    acc_dias_pm3 = (torch.abs(pred[:, 1] - target[:, 1]) <= days_tolerance).float().mean()
+    
+    # Masked days accuracy
+    mask = target[:, 0] == 1
+    if mask.sum() > 0:
+        acc_dias_pm3 = (torch.abs(pred[mask, 1] - target[mask, 1]) <= days_tolerance).float().mean()
+        acc_dias_pct10 = (torch.abs(pred[mask, 1] - target[mask, 1]) <= 0.10 * target[mask, 1]).float().mean()
+    else:
+        acc_dias_pm3 = torch.tensor(0.0, device=pred.device)
+        acc_dias_pct10 = torch.tensor(0.0, device=pred.device)
+        
     acc_potencial_pm02 = (
         torch.abs(pred[:, 2] - target[:, 2]) <= potential_tolerance
     ).float().mean()
     return {
         "acc_recompra": float(acc_recompra.detach().cpu()),
         "acc_dias_pm3": float(acc_dias_pm3.detach().cpu()),
+        "acc_dias_pct10": float(acc_dias_pct10.detach().cpu()),
         "acc_potencial_pm02": float(acc_potencial_pm02.detach().cpu()),
     }
 
@@ -358,6 +416,32 @@ def main() -> None:
         raise ValueError(f"Missing target columns: {missing_targets}")
 
     df = df.dropna(subset=TARGET_COLS).reset_index(drop=True)
+    
+    # Extracción de características temporales
+    if "Fecha" in df.columns:
+        fecha_dt = pd.to_datetime(df["Fecha"], errors="coerce")
+        df["mes"] = fecha_dt.dt.month.fillna(1)
+        df["dia_semana"] = fecha_dt.dt.dayofweek.fillna(0)
+        
+        # Codificación cíclica
+        df["mes_sin"] = np.sin(2 * np.pi * df["mes"] / 12.0)
+        df["mes_cos"] = np.cos(2 * np.pi * df["mes"] / 12.0)
+        df["dia_semana_sin"] = np.sin(2 * np.pi * df["dia_semana"] / 7.0)
+        df["dia_semana_cos"] = np.cos(2 * np.pi * df["dia_semana"] / 7.0)
+        
+    # Variables de interacción
+    if "dias_desde_compra_anterior_producto" in df.columns and "tiempo_medio_entre_compras_dias" in df.columns:
+        df["ratio_ciclo_compra"] = df["dias_desde_compra_anterior_producto"] / (df["tiempo_medio_entre_compras_dias"] + 1.0)
+        
+    if "numero_compras_anteriores_producto" in df.columns:
+        df["is_first_purchase"] = (df["numero_compras_anteriores_producto"] == 0).astype(int)
+        
+    if "dias_desde_compra_anterior_producto" in df.columns and "tiempo_medio_recompra_dias" in df.columns:
+        df["ratio_recencia_media"] = df["dias_desde_compra_anterior_producto"] / (df["tiempo_medio_recompra_dias"] + 1.0)
+        
+    if "gasto_anual_real_cliente_producto" in df.columns and "gasto_medio_anual_cliente_categoria" in df.columns:
+        df["ratio_gasto_categoria"] = df["gasto_anual_real_cliente_producto"] / (df["gasto_medio_anual_cliente_categoria"] + 1.0)
+
     if args.sample_rows > 0:
         if args.sample_rows >= len(df):
             print(f"--sample-rows={args.sample_rows:,} >= dataset rows; using full dataset")
@@ -533,6 +617,7 @@ def main() -> None:
             f"val_potential={val_metrics['mse_potencial']:.4f} "
             f"val_acc_recompra={val_metrics['acc_recompra']:.4f} "
             f"val_acc_dias_pm3={val_metrics['acc_dias_pm3']:.4f} "
+            f"val_acc_dias_pct10={val_metrics['acc_dias_pct10']:.4f} "
             f"val_acc_potencial_pm02={val_metrics['acc_potencial_pm02']:.4f} "
             f"best_epoch={best_epoch:03d}"
         )

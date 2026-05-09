@@ -8,6 +8,7 @@
 - Frontend auth: token persisted in `localStorage`, guarded dashboard route.
 - Landing page: animated shader hero with Register/Login CTAs and inline auth form.
 - Dashboard: authenticated main page with backend health status cards.
+- AI Model: Multi-head `LargePurchaseModel` with masked loss for days prediction (fixes 1500-day bias).
 - Database models: `Team`, `User`.
 
 ## Broken / Incomplete
