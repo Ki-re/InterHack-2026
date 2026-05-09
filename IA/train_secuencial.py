@@ -43,6 +43,7 @@ LEAKAGE_COLS = [
 
 INTERNAL_COLS = [
     "__dataset_source__",
+    "target_class",
 ]
 
 
@@ -304,7 +305,7 @@ def main() -> None:
         "--csv",
         type=Path,
         nargs="+",
-        default=[Path("dataset_modelo.csv"), Path("dataset_modelo_previo.csv")],
+        default=[Path("dataset_modelo.csv")],
     )
     parser.add_argument("--output", type=Path, default=Path("purchase_sequential_potential_model.pt"))
     parser.add_argument("--split", choices=["stratified", "temporal"], default="stratified")
