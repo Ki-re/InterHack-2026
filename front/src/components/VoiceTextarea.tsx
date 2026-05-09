@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Loader2, Mic, MicOff } from "lucide-react";
+import { Loader2, Mic, Square } from "lucide-react";
 
 import { postTranscribe } from "@/api/ai";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,12 @@ type VoiceTextareaProps = {
   disabled?: boolean;
 };
 
+const BARS = 32;
+
 export function VoiceTextarea({ value, onChange, placeholder, className, disabled }: VoiceTextareaProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [waveformBars, setWaveformBars] = useState<number[]>(Array(20).fill(0));
+  const [waveformBars, setWaveformBars] = useState<number[]>(Array(BARS).fill(0));
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -62,7 +64,7 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
         stream.getTracks().forEach((t) => t.stop());
         if (sampleTimerRef.current) clearInterval(sampleTimerRef.current);
         audioCtx.close();
-        setWaveformBars(Array(20).fill(0));
+        setWaveformBars(Array(BARS).fill(0));
         setIsRecording(false);
 
         const blob = new Blob(chunksRef.current, { type: mimeType });
@@ -71,11 +73,9 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
         try {
           const text = await postTranscribe(blob);
           const trimmed = text.trim();
-          if (trimmed) {
-            onChange(value ? `${value} ${trimmed}` : trimmed);
-          }
+          if (trimmed) onChange(value ? `${value} ${trimmed}` : trimmed);
         } catch {
-          // transcription failure non-critical
+          // non-critical
         } finally {
           setIsTranscribing(false);
         }
@@ -94,8 +94,41 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
     mediaRecorderRef.current = null;
   }
 
-  const barH = (v: number) => Math.max(3, Math.min(16, v * 16));
   const busy = disabled || isTranscribing;
+
+  if (isRecording) {
+    return (
+      <div className="relative flex min-h-24 w-full flex-col items-center justify-center gap-3 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
+        {/* Waveform */}
+        <div className="flex w-full flex-1 items-center justify-between gap-px">
+          {waveformBars.map((v, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-full bg-destructive"
+              style={{ height: `${Math.max(3, Math.min(36, v * 36))}px` }}
+            />
+          ))}
+        </div>
+
+        {/* Stop button */}
+        <button
+          aria-label="Parar grabación"
+          type="button"
+          className="flex items-center gap-2 rounded-full bg-destructive px-5 py-2 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
+          onClick={stopRecording}
+        >
+          <Square className="size-3.5 fill-current" />
+          Parar grabación
+        </button>
+
+        {/* Pulsing dot label */}
+        <div className="absolute right-3 top-3 flex items-center gap-1.5">
+          <span className="size-2 rounded-full bg-destructive animate-pulse" />
+          <span className="text-xs font-medium text-destructive">REC</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -104,40 +137,23 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
           "min-h-24 w-full resize-none rounded-md border bg-background px-3 py-2 pr-10 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 disabled:opacity-50",
           className,
         )}
-        disabled={busy || isRecording}
-        placeholder={isRecording ? undefined : placeholder}
+        disabled={busy}
+        placeholder={isTranscribing ? "Transcribiendo…" : placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
 
-      {/* Live waveform overlay while recording */}
-      {isRecording && (
-        <div className="absolute inset-0 flex items-center gap-px rounded-md border border-destructive bg-background px-3 pointer-events-none overflow-hidden">
-          <span className="size-2 shrink-0 rounded-full bg-destructive animate-pulse mr-1" />
-          {waveformBars.map((v, i) => (
-            <div
-              key={i}
-              className="w-1 shrink-0 rounded-full bg-destructive"
-              style={{ height: `${barH(v)}px` }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Mic / stop / spinner button */}
       <Button
-        aria-label={isRecording ? "Parar grabación" : isTranscribing ? "Transcribiendo…" : "Grabar nota de voz"}
+        aria-label={isTranscribing ? "Transcribiendo…" : "Grabar nota de voz"}
         className="absolute bottom-2 right-2 size-7"
         disabled={busy}
         size="icon"
         type="button"
-        variant={isRecording ? "destructive" : "ghost"}
-        onClick={isRecording ? stopRecording : startRecording}
+        variant="ghost"
+        onClick={startRecording}
       >
         {isTranscribing ? (
           <Loader2 className="size-3.5 animate-spin" />
-        ) : isRecording ? (
-          <MicOff className="size-3.5" />
         ) : (
           <Mic className="size-3.5" />
         )}
