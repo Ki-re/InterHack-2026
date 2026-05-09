@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { VoiceTextarea } from "@/components/VoiceTextarea";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { FollowUpRecord, HandlingChannel, InteractionResult } from "@/types/alerts";
 
@@ -80,11 +81,10 @@ export function FollowUpForm({ onCancel, onSubmit }: Omit<FollowUpFormProps, "cl
 
       <label className="block space-y-2">
         <span className="text-sm font-medium text-foreground">{t("form.reminder_label")}</span>
-        <textarea
-          className="min-h-24 w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
+        <VoiceTextarea
           placeholder={t("form.reminder_placeholder")}
           value={reminder}
-          onChange={(event) => setReminder(event.target.value)}
+          onChange={setReminder}
         />
       </label>
 
