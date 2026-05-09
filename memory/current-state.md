@@ -7,7 +7,7 @@
 - Auth: email/password register/login, JWT bearer token, `/auth/me`.
 - Frontend auth for INIBSA MVP: mocked `Delegado de Ventas` session persisted in `localStorage` under key `inibsa.salesDelegateSession`, guarded dashboard route, no backend auth call.
 - Login page: enterprise SaaS mock login for commercial delegates at `/`. Uses `logo.png` in card header and `icon.png` in the challenge badge.
-- Dashboard: INIBSA sales alerts MVP at `/dashboard` with mock alert data (dental clinic clients), table-first workflow, attended questionnaire modal, and AI insight panel with inviting conversational prompts.
+- Dashboard: INIBSA sales alerts MVP at `/dashboard` with mock alert data (dental clinic clients), table-first workflow with pending/attended tab toggle (pending shown first), attended questionnaire modal, and AI insight panel with inviting conversational prompts.
 - Database models: `Team`, `User`.
 - Fixed missing `front/src/lib/utils.ts` utility file for shadcn/ui components.
 - Implemented i18n (Catalan default, Spanish toggle) using React Context. Both locales fully translated — no English terms remain in either locale file.

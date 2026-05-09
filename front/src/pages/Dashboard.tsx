@@ -8,7 +8,7 @@ import { AlertTable } from "@/components/AlertTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { mockAlerts } from "@/data/mock-alerts";
-import type { FollowUpRecord, SalesAlert } from "@/types/alerts";
+import type { AlertStatus, FollowUpRecord, SalesAlert } from "@/types/alerts";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +28,7 @@ const itemVariants = {
 export function Dashboard() {
   const { t } = useTranslation();
   const [alerts, setAlerts] = useState<SalesAlert[]>(mockAlerts);
+  const [activeTab, setActiveTab] = useState<AlertStatus>("pending");
   const [selectedAlert, setSelectedAlert] = useState<SalesAlert | null>(null);
   const [insightAlert, setInsightAlert] = useState<SalesAlert | null>(null);
 
@@ -46,15 +47,16 @@ export function Dashboard() {
     };
   }, [alerts]);
 
+  const filteredAlerts = useMemo(
+    () => alerts.filter((alert) => alert.status === activeTab),
+    [alerts, activeTab],
+  );
+
   function handleSubmitFollowUp(alertId: string, record: FollowUpRecord) {
     setAlerts((currentAlerts) =>
       currentAlerts.map((alert) =>
         alert.id === alertId
-          ? {
-              ...alert,
-              status: "attended",
-              followUp: record,
-            }
+          ? { ...alert, status: "attended", followUp: record }
           : alert,
       ),
     );
@@ -67,6 +69,11 @@ export function Dashboard() {
   const liveInsightAlert = insightAlert
     ? alerts.find((alert) => alert.id === insightAlert.id) ?? insightAlert
     : null;
+
+  const tabs: Array<{ key: AlertStatus; label: string; count: number }> = [
+    { key: "pending", label: t("dashboard.metrics.pending"), count: metrics.pending },
+    { key: "attended", label: t("dashboard.metrics.attended"), count: metrics.attended },
+  ];
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
@@ -112,8 +119,38 @@ export function Dashboard() {
         />
       </motion.section>
 
-      <motion.div variants={itemVariants}>
-        <AlertTable alerts={alerts} onAskInsight={setInsightAlert} onAttend={setSelectedAlert} />
+      <motion.div variants={itemVariants} className="space-y-3">
+        <div className="flex gap-2" role="tablist">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={[
+                "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors",
+                activeTab === tab.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground",
+              ].join(" ")}
+            >
+              {tab.label}
+              <span
+                className={[
+                  "inline-flex size-5 items-center justify-center rounded-full text-xs font-semibold",
+                  activeTab === tab.key
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground",
+                ].join(" ")}
+              >
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <AlertTable alerts={filteredAlerts} onAskInsight={setInsightAlert} onAttend={setSelectedAlert} />
       </motion.div>
 
       <AlertDetailModal

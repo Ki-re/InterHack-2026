@@ -70,7 +70,6 @@ export function AlertDetailModal({ alert, onClose, onSubmit }: AlertDetailModalP
           </div>
 
           <FollowUpForm
-            clientName={alert.clientName}
             onCancel={onClose}
             onSubmit={(record) => onSubmit(alert.id, record)}
           />

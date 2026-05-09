@@ -5,12 +5,11 @@ import { useTranslation } from "@/contexts/LanguageContext";
 import type { FollowUpRecord, HandlingChannel, InteractionResult } from "@/types/alerts";
 
 type FollowUpFormProps = {
-  clientName: string;
   onCancel: () => void;
   onSubmit: (record: FollowUpRecord) => void;
 };
 
-export function FollowUpForm({ clientName, onCancel, onSubmit }: FollowUpFormProps) {
+export function FollowUpForm({ onCancel, onSubmit }: Omit<FollowUpFormProps, "clientName">) {
   const { t } = useTranslation();
   const [handledBy, setHandledBy] = useState<HandlingChannel>("phone");
   const [result, setResult] = useState<InteractionResult>("positive");
@@ -42,13 +41,6 @@ export function FollowUpForm({ clientName, onCancel, onSubmit }: FollowUpFormPro
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
-      <div className="rounded-md border bg-muted/50 px-4 py-3">
-        <p className="text-sm font-medium text-foreground">{t("form.title")}</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("form.description", { name: clientName })}
-        </p>
-      </div>
-
       <label className="block space-y-2">
         <span className="text-sm font-medium text-foreground">{t("form.handled_label")}</span>
         <select
