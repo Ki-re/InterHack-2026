@@ -75,8 +75,7 @@ export function Dashboard() {
         className="flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-end lg:justify-between"
       >
         <div className="max-w-3xl">
-          <p className="text-sm font-medium text-primary">{t("app.title")}</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-normal text-foreground">
+          <h1 className="text-3xl font-semibold tracking-normal text-foreground">
             {t("dashboard.title")}
           </h1>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("dashboard.subtitle")}</p>

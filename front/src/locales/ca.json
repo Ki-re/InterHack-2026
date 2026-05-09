@@ -43,7 +43,7 @@
       "active_alerts": "{{count}} alertes actives",
       "cols": {
         "client": "Client",
-        "risk": "Risc / Prioritat / Gravetat",
+        "risk": "Prioritat",
         "churn_prob": "Potencial de fuga",
         "buy_prop": "Propensió a la compra",
         "value": "Valor del client",

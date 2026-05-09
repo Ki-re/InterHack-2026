@@ -97,12 +97,12 @@ export function AlertRow({
           </span>
         </td>
 
-        <td className="min-w-36 px-4 py-4 align-top">
-          <ProgressValue value={alert.churnProbability} tone="risk" />
+        <td className="min-w-28 px-4 py-4 align-top">
+          <PercentBadge value={alert.churnProbability} tone="risk" />
         </td>
 
-        <td className="min-w-36 px-4 py-4 align-top">
-          <ProgressValue value={alert.purchasePropensity} tone="opportunity" />
+        <td className="min-w-28 px-4 py-4 align-top">
+          <PercentBadge value={alert.purchasePropensity} tone="opportunity" />
         </td>
 
         <td className="px-4 py-4 align-top">
@@ -122,8 +122,8 @@ export function AlertRow({
           </button>
         </td>
 
-        <td className="px-4 py-4 align-top">
-          <span className="inline-flex rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+        <td className="w-28 px-4 py-4 align-top">
+          <span className="inline-block max-w-full rounded-md bg-secondary px-2.5 py-1 text-xs font-medium leading-5 text-secondary-foreground break-words">
             {churnTypeLabel}
           </span>
         </td>
@@ -196,17 +196,25 @@ export function AlertRow({
   );
 }
 
-function ProgressValue({ value, tone }: { value: number; tone: "risk" | "opportunity" }) {
-  const barClassName = tone === "risk" ? "bg-red-500" : "bg-green-600";
+function PercentBadge({ value, tone }: { value: number; tone: "risk" | "opportunity" }) {
+  const level = value >= 67 ? "high" : value >= 34 ? "medium" : "low";
+
+  const className = {
+    risk: {
+      high: "bg-red-50 border-red-200 text-red-700",
+      medium: "bg-amber-50 border-amber-200 text-amber-700",
+      low: "bg-green-50 border-green-200 text-green-700",
+    },
+    opportunity: {
+      high: "bg-green-50 border-green-200 text-green-700",
+      medium: "bg-amber-50 border-amber-200 text-amber-700",
+      low: "bg-red-50 border-red-200 text-red-700",
+    },
+  }[tone][level];
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold text-foreground">{value}%</span>
-      </div>
-      <div className="h-2 rounded-full bg-secondary">
-        <div className={cn("h-2 rounded-full", barClassName)} style={{ width: `${value}%` }} />
-      </div>
-    </div>
+    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 text-sm font-semibold tabular-nums", className)}>
+      {value}%
+    </span>
   );
 }
