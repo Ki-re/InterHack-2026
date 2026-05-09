@@ -21,7 +21,7 @@ type ChatMessage = {
 type RecordingMode = "idle" | "recording" | "preview";
 
 const BARS = 40;
-const SAMPLE_MS = 80;
+const SAMPLE_MS = 50;
 
 function formatDuration(s: number) {
   return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
@@ -124,7 +124,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
       durationTimerRef.current = setInterval(() => { secs++; setRecordingSeconds(secs); }, 1000);
 
       sampleTimerRef.current = setInterval(() => {
-        const amp = Math.min(1, getRms(analyser) * 8);
+        const amp = Math.min(1, getRms(analyser) * 18);
         rollingRef.current = [...rollingRef.current.slice(1), amp];
         setLiveBars([...rollingRef.current]);
       }, SAMPLE_MS);
@@ -367,11 +367,8 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
                   {liveBars.map((v, i) => (
                     <div
                       key={i}
-                      className="w-1 shrink-0 rounded-full bg-destructive transition-all"
-                      style={{
-                        height: `${barHeightPx(v)}px`,
-                        transitionDuration: `${SAMPLE_MS}ms`,
-                      }}
+                      className="w-1 shrink-0 rounded-full bg-destructive"
+                      style={{ height: `${barHeightPx(v)}px` }}
                     />
                   ))}
                 </div>
