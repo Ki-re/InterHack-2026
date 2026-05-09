@@ -432,7 +432,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
                   <div
                     key={i}
                     className={cn(
-                      "w-1 shrink-0 rounded-full transition-colors",
+                      "flex-1 min-w-0 rounded-full transition-colors",
                       i / BARS < playheadProgress ? "bg-primary" : "bg-muted-foreground/25",
                     )}
                     style={{ height: `${barHeightPx(v)}px` }}
