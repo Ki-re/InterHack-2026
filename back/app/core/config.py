@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "change-me-in-development"
     access_token_expire_minutes: int = 1440
     gemini_api_key: str = ""
+    groq_api_key: str = ""
+    eleven_labs_api_key: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
