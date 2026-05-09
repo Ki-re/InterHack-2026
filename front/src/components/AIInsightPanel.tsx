@@ -62,9 +62,16 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   const sampleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const durationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const isMutedRef = useRef(isMuted);
 
-  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+    if (isMuted && ttsAudioRef.current) {
+      ttsAudioRef.current.pause();
+      ttsAudioRef.current = null;
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     if (!alert) return;
@@ -183,9 +190,11 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
     if (isMutedRef.current) return;
     try {
       const blob = await postSynthesize(text);
+      if (isMutedRef.current) return;
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => URL.revokeObjectURL(url);
+      audio.onended = () => { URL.revokeObjectURL(url); ttsAudioRef.current = null; };
+      ttsAudioRef.current = audio;
       await audio.play();
     } catch {
       // non-critical
