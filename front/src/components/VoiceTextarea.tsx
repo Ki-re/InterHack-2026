@@ -98,15 +98,15 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
 
   if (isRecording) {
     return (
-      <div className="flex h-24 w-full flex-col gap-2 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
-        {/* REC badge — inline, never overlaps */}
-        <div className="flex items-center gap-1.5">
+      <div className="w-full rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3 flex flex-col gap-2">
+        {/* REC badge */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <span className="size-2 rounded-full bg-destructive animate-pulse" />
           <span className="text-xs font-medium text-destructive">REC</span>
         </div>
 
-        {/* Waveform */}
-        <div className="flex flex-1 items-center justify-between gap-px">
+        {/* Waveform — fixed height, bars can't push layout */}
+        <div className="flex h-8 shrink-0 items-center justify-between gap-px overflow-hidden">
           {waveformBars.map((v, i) => (
             <div
               key={i}
@@ -116,11 +116,11 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
           ))}
         </div>
 
-        {/* Stop button */}
+        {/* Stop button — always visible, never displaced */}
         <button
           aria-label="Parar grabación"
           type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-destructive py-1.5 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
+          className="flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-destructive py-1.5 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
           onClick={stopRecording}
         >
           <Square className="size-3.5 fill-current" />
