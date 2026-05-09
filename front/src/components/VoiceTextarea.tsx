@@ -98,14 +98,20 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
 
   if (isRecording) {
     return (
-      <div className="relative flex min-h-24 w-full flex-col items-center justify-center gap-3 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
+      <div className="flex min-h-24 w-full flex-col gap-2 rounded-md border-2 border-destructive bg-destructive/5 px-4 py-3">
+        {/* REC badge — inline, never overlaps */}
+        <div className="flex items-center gap-1.5">
+          <span className="size-2 rounded-full bg-destructive animate-pulse" />
+          <span className="text-xs font-medium text-destructive">REC</span>
+        </div>
+
         {/* Waveform */}
-        <div className="flex w-full flex-1 items-center justify-between gap-px">
+        <div className="flex flex-1 items-center justify-between gap-px">
           {waveformBars.map((v, i) => (
             <div
               key={i}
               className="flex-1 rounded-full bg-destructive"
-              style={{ height: `${Math.max(3, Math.min(36, v * 36))}px` }}
+              style={{ height: `${Math.max(3, Math.min(28, v * 28))}px` }}
             />
           ))}
         </div>
@@ -114,18 +120,12 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
         <button
           aria-label="Parar grabación"
           type="button"
-          className="flex items-center gap-2 rounded-full bg-destructive px-5 py-2 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-destructive py-1.5 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
           onClick={stopRecording}
         >
           <Square className="size-3.5 fill-current" />
           Parar grabación
         </button>
-
-        {/* Pulsing dot label */}
-        <div className="absolute right-3 top-3 flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-destructive animate-pulse" />
-          <span className="text-xs font-medium text-destructive">REC</span>
-        </div>
       </div>
     );
   }
