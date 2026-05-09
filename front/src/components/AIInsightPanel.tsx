@@ -137,8 +137,10 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
         if (durationTimerRef.current) clearInterval(durationTimerRef.current);
         audioCtx.close();
 
-        const captured = [...rollingRef.current];
-        setCapturedBars(captured);
+        const raw = [...rollingRef.current];
+        // Normalize so tallest bar always fills max height
+        const peak = Math.max(...raw, 0.01);
+        setCapturedBars(raw.map((v) => v / peak));
 
         const blob = new Blob(chunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
