@@ -31,8 +31,8 @@ def _build_contents(history: list[ChatMessage], question: str) -> list[types.Con
     contents = []
     for msg in history:
         role = "user" if msg.role == "user" else "model"
-        contents.append(types.Content(role=role, parts=[types.Part(text=msg.content)]))
-    contents.append(types.Content(role="user", parts=[types.Part(text=question)]))
+        contents.append(types.Content(role=role, parts=[types.Part.from_text(text=msg.content)]))
+    contents.append(types.Content(role="user", parts=[types.Part.from_text(text=question)]))
     return contents
 
 
@@ -40,7 +40,7 @@ def _call_gemini(system_prompt: str, contents: list[types.Content]) -> str:
     settings = get_settings()
     client = genai.Client(api_key=settings.gemini_api_key)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-3.1-flash-lite",
         contents=contents,
         config=types.GenerateContentConfig(system_instruction=system_prompt),
     )

@@ -119,7 +119,19 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
                   {t("ai.mock_ai")}
                 </div>
               ) : null}
-              {message.content}
+              {message.role === "assistant" ? (
+                <div className="space-y-2">
+                  {message.content
+                    .split(/\n\n+/)
+                    .map((para) => para.trim())
+                    .filter(Boolean)
+                    .map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
+                </div>
+              ) : (
+                message.content
+              )}
             </div>
           ))}
           {isLoading && (
