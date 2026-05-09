@@ -35,7 +35,9 @@
       "avg_churn": "Fuga media",
       "avg_churn_desc": "Promedio de cartera alertada",
       "attended": "Atendidas",
-      "attended_desc": "Gestiones registradas"
+      "attended_desc": "Gestiones registradas",
+      "dismissed": "Descartadas",
+      "dismissed_desc": "Alertas descartadas manualmente"
     },
     "table": {
       "title": "Alertas comerciales",
@@ -58,8 +60,10 @@
         "hide_detail": "Ocultar detalle",
         "pending": "Pendiente",
         "attended": "Atendida",
+        "dismissed": "Descartada",
         "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atendida",
+        "dismiss": "Descartar",
         "full_explanation": "Explicación completa",
         "status_mgmt": "Estado de gestión",
         "no_mgmt": "Sin gestión registrada todavía.",
@@ -109,6 +113,26 @@
       "email": "Correo electrónico",
       "other": "Otros"
     },
+    "answered": {
+      "label": "¿Ha contestado?",
+      "yes": "Contestado",
+      "no": "No contestado"
+    },
+    "visit_ok": {
+      "label": "¿Visita realizada?",
+      "yes": "Visita realizada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "¿Ha respondido?",
+      "yes": "Respuesta recibida",
+      "no": "Sin respuesta"
+    },
+    "keep_open": {
+      "label": "Estado de la alerta",
+      "close": "Cerrar alerta",
+      "keep": "Mantener abierta"
+    },
     "result_label": "Resultado",
     "results": {
       "positive": "Positivo",
@@ -118,6 +142,40 @@
     "reminder_label": "Notas adicionales",
     "reminder_placeholder": "Cualquier observación relevante sobre la gestión de este cliente...",
     "cancel": "Cancelar",
-    "submit": "Marcar como atendida"
+    "submit": "Guardar gestión"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "¿Descartar esta alerta?",
+    "description": "La alerta pasará a la pestaña de descartadas.",
+    "reason_label": "Motivo (opcional)",
+    "reason_placeholder": "Motivo del descarte (opcional)...",
+    "confirm": "Confirmar descarte",
+    "cancel": "Cancelar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestiones",
+    "empty": "Sin historial de gestiones.",
+    "phone": "Llamada",
+    "visit": "Visita",
+    "email": "Correo",
+    "other": "Otros",
+    "answered": "Contestado",
+    "not_answered": "No contestado",
+    "visit_ok": "Visita realizada",
+    "visit_fail": "No disponible",
+    "email_received": "Respuesta recibida",
+    "email_no_response": "Sin respuesta",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "result_positive": "Resultado positivo",
+    "result_neutral": "Resultado neutro",
+    "result_negative": "Resultado negativo",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "event_closed": "Alerta cerrada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
   }
 }

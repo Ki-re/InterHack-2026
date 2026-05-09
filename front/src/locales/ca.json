@@ -35,7 +35,9 @@
       "avg_churn": "Fuga mitjana",
       "avg_churn_desc": "Mitjana de cartera alertada",
       "attended": "Ateses",
-      "attended_desc": "Gestions registrades"
+      "attended_desc": "Gestions registrades",
+      "dismissed": "Descartades",
+      "dismissed_desc": "Alertes descartades manualment"
     },
     "table": {
       "title": "Alertes comercials",
@@ -58,8 +60,10 @@
         "hide_detail": "Ocultar detall",
         "pending": "Pendent",
         "attended": "Atesa",
+        "dismissed": "Descartada",
         "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atesa",
+        "dismiss": "Descartar",
         "full_explanation": "Explicació completa",
         "status_mgmt": "Estat de gestió",
         "no_mgmt": "Sense gestió registrada encara.",
@@ -70,7 +74,7 @@
   "risk": {
     "high": "Alta",
     "medium": "Mitjana",
-    "low": "Baixa"
+    "low": "Baix"
   },
   "churn_type": {
     "total": "Total",
@@ -109,6 +113,26 @@
       "email": "Correu electrònic",
       "other": "Altres"
     },
+    "answered": {
+      "label": "Ha contestat?",
+      "yes": "Contestat",
+      "no": "No contestat"
+    },
+    "visit_ok": {
+      "label": "Visita realitzada?",
+      "yes": "Visita realitzada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "Ha respost?",
+      "yes": "Resposta rebuda",
+      "no": "Sense resposta"
+    },
+    "keep_open": {
+      "label": "Estat de l'alerta",
+      "close": "Tancar alerta",
+      "keep": "Mantenir oberta"
+    },
     "result_label": "Resultat",
     "results": {
       "positive": "Positiu",
@@ -118,6 +142,40 @@
     "reminder_label": "Notes addicionals",
     "reminder_placeholder": "Qualsevol observació rellevant sobre la gestió d'aquest client...",
     "cancel": "Cancel·lar",
-    "submit": "Marcar com a atesa"
+    "submit": "Guardar gestió"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "Descartar aquesta alerta?",
+    "description": "L'alerta passarà a la pestanya de descartades.",
+    "reason_label": "Motiu (opcional)",
+    "reason_placeholder": "Motiu del descart (opcional)...",
+    "confirm": "Confirmar descart",
+    "cancel": "Cancel·lar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestions",
+    "empty": "Sense historial de gestions.",
+    "phone": "Trucada",
+    "visit": "Visita",
+    "email": "Correu",
+    "other": "Altres",
+    "answered": "Contestat",
+    "not_answered": "No contestat",
+    "visit_ok": "Visita realitzada",
+    "visit_fail": "No disponible",
+    "email_received": "Resposta rebuda",
+    "email_no_response": "Sense resposta",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "result_positive": "Resultat positiu",
+    "result_neutral": "Resultat neutre",
+    "result_negative": "Resultat negatiu",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "event_closed": "Alerta tancada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
   }
 }

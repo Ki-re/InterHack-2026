@@ -6,7 +6,7 @@
 ## Incomplete Features
 - No automated backend tests.
 - No frontend route/auth smoke tests.
-- Sales alert data, attended status, follow-up records, and AI responses are mock-only and reset on page refresh.
+- Sales alert data, interaction records, dismiss state, and AI responses are mock-only and reset on page refresh (no backend persistence yet).
 - No password reset or email verification.
 - No refresh token or role/permission model.
 
