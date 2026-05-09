@@ -3,7 +3,10 @@
 ## Folder Structure
 - `front/`: Vite React app.
 - `front/src/pages`: route-level pages.
+- `front/src/components`: sales alert table, modal, AI panel, and layout components.
 - `front/src/components/ui`: shadcn-style reusable UI.
+- `front/src/data`: frontend mock datasets for MVP screens.
+- `front/src/types`: shared frontend TypeScript domain types.
 - `front/src/api`: typed API helpers.
 - `front/src/auth`: auth provider and session state.
 - `back/`: FastAPI app.
@@ -16,10 +19,10 @@
 
 ## Data Flow
 - Browser loads Vite frontend from `http://localhost:5173`.
-- Frontend API helpers call FastAPI at `VITE_API_URL` or `http://localhost:8000`.
-- Auth endpoints return JWT tokens.
-- Auth provider stores token in `localStorage` and calls `/auth/me` on reload.
-- Protected dashboard renders only when a current user is loaded.
+- Current INSIBA sales alerts MVP uses mock frontend data from `front/src/data/mock-alerts.ts`.
+- Mock auth provider stores a delegate session in `localStorage`; protected dashboard renders when that session exists.
+- Alert attended state is held in React state inside the dashboard during the session.
+- Existing frontend API helpers and backend auth endpoints remain in the codebase for future integration, but the MVP alert flow does not call them.
 
 ## Backend Flow
 - FastAPI includes routers from `back/app/api/routes.py`.

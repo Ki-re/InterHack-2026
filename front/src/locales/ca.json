@@ -1,0 +1,122 @@
+{
+  "app": {
+    "title": "Alertes INIBSA",
+    "subtitle": "Espai del delegat de vendes",
+    "logout": "Sortir",
+    "alerts": "Alertes",
+    "challenge": "Repte INIBSA"
+  },
+  "login": {
+    "title": "Dashboard d'Alertes de Vendes",
+    "description": "Accés per al Delegat de Vendes. Revisa senyals de fuga, propensió de compra i recomanacions operatives en una vista preparada per a integració backend.",
+    "role": "Delegat de Vendes",
+    "mock_login": "Inici de sessió de prova. No es requereix autenticació real.",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "entering": "Entrant...",
+    "submit": "Entrar al dashboard",
+    "error_required": "Introdueix correu i contrasenya per iniciar sessió.",
+    "error_failed": "No s'ha pogut iniciar la sessió.",
+    "signals": {
+      "churn": "Risc de fuga",
+      "buy": "Compra",
+      "clients": "Clients"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard d'alertes comercials",
+    "subtitle": "Vista operativa per detectar risc de fuga, oportunitat de compra i pròximes accions sobre clients prioritzats.",
+    "mock_data": "Dades de prova · Llest per a integració backend",
+    "metrics": {
+      "pending": "Pendents",
+      "pending_desc": "Requereixen gestió comercial",
+      "high_risk": "Alta gravetat",
+      "high_risk_desc": "Prioritat d'atenció",
+      "avg_churn": "Fuga mitjana",
+      "avg_churn_desc": "Mitjana de cartera alertada",
+      "attended": "Ateses",
+      "attended_desc": "Gestions registrades"
+    },
+    "table": {
+      "title": "Alertes comercials",
+      "description": "Prioritza clients amb senyals de fuga, oportunitat de compra i valor comercial.",
+      "active_alerts": "{{count}} alertes actives",
+      "cols": {
+        "client": "Client",
+        "risk": "Risc / Prioritat / Gravetat",
+        "churn_prob": "Potencial de fuga",
+        "buy_prop": "Propensió a la compra",
+        "value": "Valor del client",
+        "explanation": "Explicació",
+        "churn_type": "Tipus de fuga",
+        "actions": "Accions"
+      },
+      "row": {
+        "show_explanation": "Veure explicació",
+        "hide_explanation": "Ocultar explicació",
+        "show_detail": "Veure detall",
+        "hide_detail": "Ocultar detall",
+        "pending": "Pendent",
+        "attended": "Atesa",
+        "ask_ai": "Demanar AI Insight",
+        "mark_attended": "Marcar atesa",
+        "full_explanation": "Explicació completa",
+        "status_mgmt": "Estat de gestió",
+        "no_mgmt": "Sense gestió registrada encara.",
+        "mgmt_result": "Resultat {{result}}. Canal {{channel}}."
+      }
+    }
+  },
+  "risk": {
+    "high": "Alta",
+    "medium": "Mitjana",
+    "low": "Baixa"
+  },
+  "churn_type": {
+    "total": "Total",
+    "product": "Producte",
+    "segment": "Segment"
+  },
+  "customer_value": {
+    "high": "Alt",
+    "medium": "Mitjà",
+    "low": "Baix"
+  },
+  "ai": {
+    "title": "Consultar AI Insight",
+    "description": "El teu assistent de vendes intel·ligent. Pregunta'm el que necessitis sobre aquest client.",
+    "opening": "Hola 👋 Estic analitzant l'alerta de {{name}}. Veig un risc de fuga del {{churn}}% i una propensió de compra del {{buy}}%. Què vols saber? Puc ajudar-te amb la següent acció recomanada, el motiu del risc, un guió de conversa o qualsevol dubte sobre aquest client.",
+    "mock_ai": "INIBSA AI",
+    "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
+    "send": "Enviar",
+    "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
+    "why_rec": "El principal motiu de risc és: {{explanation}} T'agradaria que aprofundís en algun aspecte concret o que et proposi arguments per a la conversa?",
+    "default_rec": "{{name}} presenta un {{churn}}% de probabilitat de fuga i un {{buy}}% de propensió de compra, una combinació que mereix acció ràpida. Et recomano un contacte comercial concís i registrar el resultat. Necessites ajuda per preparar la trucada o la visita?"
+  },
+  "modal": {
+    "risk_label": "Risc {{label}} · {{churn}}% fuga",
+    "close": "Tancar modal",
+    "explanation": "Explicació"
+  },
+  "form": {
+    "title": "Registrar gestió",
+    "description": "Actualitza l'estat de {{name}} i deixa un senyal per al seguiment intern.",
+    "handled_label": "Com s'ha gestionat?",
+    "handling": {
+      "phone": "Telèfon",
+      "visit": "Visita presencial",
+      "email": "Correu electrònic",
+      "other": "Altres"
+    },
+    "result_label": "Resultat",
+    "results": {
+      "positive": "Positiu",
+      "neutral": "Neutre",
+      "negative": "Negatiu"
+    },
+    "reminder_label": "Afegir recordatori de seguiment",
+    "reminder_placeholder": "Ex. Trucar divendres per validar proposta comercial",
+    "cancel": "Cancel·lar",
+    "submit": "Marcar com a atesa"
+  }
+}
