@@ -114,8 +114,8 @@
       "neutral": "Neutre",
       "negative": "Negatiu"
     },
-    "reminder_label": "Afegir recordatori de seguiment",
-    "reminder_placeholder": "Ex. Trucar divendres per validar proposta comercial",
+    "reminder_label": "Notes addicionals",
+    "reminder_placeholder": "Qualsevol observació rellevant sobre la gestió d'aquest client...",
     "cancel": "Cancel·lar",
     "submit": "Marcar com a atesa"
   }

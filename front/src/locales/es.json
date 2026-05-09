@@ -114,8 +114,8 @@
       "neutral": "Neutro",
       "negative": "Negativo"
     },
-    "reminder_label": "Añadir recordatorio de seguimiento",
-    "reminder_placeholder": "Ej. Llamar el viernes para validar propuesta comercial",
+    "reminder_label": "Notas adicionales",
+    "reminder_placeholder": "Cualquier observación relevante sobre la gestión de este cliente...",
     "cancel": "Cancelar",
     "submit": "Marcar como atendida"
   }
