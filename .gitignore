@@ -220,6 +220,7 @@ __marimo__/
 
 # Project runtime
 .env
+.env.prod
 back/app.db
 *.db
 node_modules/
@@ -278,3 +279,6 @@ __pycache__/
 run_config.json
 
 /.env.prod
+/IA/Datasets.xlsx
+
+/IA/gemini*
