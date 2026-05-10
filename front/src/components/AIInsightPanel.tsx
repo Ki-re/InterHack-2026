@@ -209,7 +209,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
     const history: AiChatMessage[] = messages.map((m) => ({ role: m.role, content: m.content }));
 
     try {
-      const responseText = await postAiChat(alert!, history, text);
+      const responseText = await postAiChat(alert!, history, text, language);
       setMessages((prev) => [
         ...prev,
         { id: `assistant-${Date.now()}`, role: "assistant", content: responseText },

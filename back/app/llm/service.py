@@ -51,10 +51,14 @@ def _build_context_block(alert: AlertContext) -> str:
     return "Additional context:\n" + "\n".join(f"  {l}" for l in lines)
 
 
-def _load_system_prompt(alert: AlertContext) -> str:
+_LANG_NAMES = {"ca": "Catalan", "es": "Spanish"}
+
+
+def _load_system_prompt(alert: AlertContext, lang: str = "es") -> str:
     with open(_PROMPT_PATH, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     template: str = data["system"]
+    lang_name = _LANG_NAMES.get(lang, "Spanish")
     return template.format(
         client_name=alert.clientName,
         risk_level=alert.riskLevel,
@@ -64,6 +68,7 @@ def _load_system_prompt(alert: AlertContext) -> str:
         churn_type=alert.churnType,
         explanation=alert.explanation,
         context_block=_build_context_block(alert),
+        ui_language=lang_name,
     )
 
 
@@ -92,7 +97,8 @@ async def get_ai_response(
     alert: AlertContext,
     history: list[ChatMessage],
     question: str,
+    lang: str = "es",
 ) -> str:
-    system_prompt = _load_system_prompt(alert)
+    system_prompt = _load_system_prompt(alert, lang)
     contents = _build_contents(history, question)
     return await asyncio.to_thread(_call_gemini, system_prompt, contents)

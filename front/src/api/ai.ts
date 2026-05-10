@@ -26,6 +26,7 @@ type ChatRequest = {
   alert: AlertContext;
   history: AiChatMessage[];
   question: string;
+  lang: string;
 };
 
 type ChatResponse = {
@@ -57,8 +58,9 @@ export async function postAiChat(
   alert: AlertContext,
   history: AiChatMessage[],
   question: string,
+  lang = "es",
 ): Promise<string> {
-  const body: ChatRequest = { alert, history, question };
+  const body: ChatRequest = { alert, history, question, lang };
   const result = await apiRequest<ChatResponse>("/ai/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
