@@ -150,9 +150,6 @@ export function SpainRegionMap({
                 // This region selected, no CCAA — all full
                 opacity = 1;
               } else if (isSelectedCcaa) {
-                // This CCAA selected — highlight border
-                stroke = "#1d4ed8";
-                strokeWidth = 2.5;
                 opacity = 1;
               } else {
                 // Same region, different CCAA — dimmed
