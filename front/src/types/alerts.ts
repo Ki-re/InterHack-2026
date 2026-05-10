@@ -45,4 +45,7 @@ export type SalesAlert = {
   events: SystemEventRecord[];
   dismissReason?: string;
   dismissedAt?: string;
+  alertContextJson?: string;
+  predictedNextPurchase?: string;
+  lastOrderDate?: string;
 };

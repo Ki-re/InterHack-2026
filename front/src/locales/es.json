@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "title": "Alertas INIBSA",
     "subtitle": "Espacio del delegado de ventas",
@@ -36,6 +36,14 @@
     "title": "Panel de alertas comerciales",
     "subtitle": "Vista operativa para detectar riesgo de fuga, oportunidad de compra y próximas acciones sobre clientes priorizados.",
     "mock_data": "Datos de prueba · Listo para integración backend",
+    "delegate_label": "Delegado de ventas",
+    "select_delegate": "Selecciona un delegado",
+    "zone_north": "Norte",
+    "zone_east": "Este",
+    "zone_south": "Sur",
+    "zone_canary": "Canarias",
+    "zone_balearic": "Baleares",
+    "loading_agents": "Cargando delegados...",
     "metrics": {
       "pending": "Pendientes",
       "pending_desc": "Requieren gestión comercial",
@@ -98,14 +106,10 @@
   "ai": {
     "title": "Consultar IA",
     "description": "Tu asistente de ventas inteligente. Pregúntame lo que necesites sobre este cliente.",
-    "opening": "Hola 👋 Estoy analizando la alerta de {{name}}. Veo un riesgo de fuga del {{churn}}% y una propensión de compra del {{buy}}%. ¿Qué quieres saber? Puedo ayudarte con la siguiente acción recomendada, el motivo del riesgo, un guion de conversación o cualquier otra duda sobre este cliente.",
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
     "send": "Enviar",
-    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo.",
-    "action_rec":"Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
-    "why_rec": "El principal motivo de riesgo es: {{explanation}} ¿Te gustaría que profundizara en algún aspecto concreto o que te proponga argumentos para la conversación?",
-    "default_rec": "{{name}} presenta un {{churn}}% de probabilidad de fuga y un {{buy}}% de propensión de compra, una combinación que merece acción rápida. Te recomiendo un contacto comercial conciso y registrar el resultado. ¿Necesitas ayuda para preparar la llamada o la visita?"
+    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo."
   },
   "modal": {
     "risk_label": "Riesgo {{label}} · {{churn}}% fuga",
@@ -237,11 +241,11 @@
     "scope_all": "Todas las regiones",
     "all_regions": "Todas las regiones",
     "regions": {
-      "est": "Este",
+      "east": "Este",
       "north": "Norte",
       "south": "Sur",
-      "baleares": "Baleares",
-      "canarias": "Canarias"
+      "balearic": "Baleares",
+      "canary": "Canarias"
     },
     "status": {
       "good": "Ejecución saludable",

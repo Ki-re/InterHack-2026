@@ -3,7 +3,7 @@ services:
     build:
       context: ./back
     command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "alembic upgrade head && python scripts/seed_demo.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       APP_NAME: ${APP_NAME}
       DATABASE_URL: ${DATABASE_URL}
@@ -13,9 +13,11 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
       ELEVEN_LABS_API_KEY: ${ELEVEN_LABS_API_KEY}
+      ELEVEN_LABS_VOICE_ID_CA: ${ELEVEN_LABS_VOICE_ID_CA}
       ASSEMBLYAI_API_KEY: ${ASSEMBLYAI_API_KEY}
     volumes:
       - ./back:/app
+      - ./IA:/app/ia_data:ro
     ports:
       - "8000:8000"
     healthcheck:

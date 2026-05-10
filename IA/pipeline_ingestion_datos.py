@@ -21,6 +21,7 @@ OUTPUT_COLUMNS = [
     "Num.Fact",
     "Fecha",
     "Id. Cliente",
+    "Provincia",
     "Id. Producto",
     "Unidades",
     "Valores_H",
@@ -105,7 +106,10 @@ def load_excel(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     productos = pd.read_excel(path, sheet_name="Productos")
     ventas = pd.read_excel(path, sheet_name="Ventas")
     clientes = pd.read_excel(path, sheet_name="Clientes")
-    clientes = clientes.drop(columns=[col for col in ["Unnamed: 1", "Provincia"] if col in clientes.columns])
+    if "Provincia" in clientes.columns:
+        clientes = clientes[["Id. Cliente", "Provincia"]].drop_duplicates("Id. Cliente")
+    else:
+        clientes = clientes[["Id. Cliente"]].drop_duplicates("Id. Cliente")
     return ventas, productos, clientes
 
 
@@ -144,7 +148,12 @@ def build_client_product_metrics(ventas: pd.DataFrame) -> pd.DataFrame:
     return metricas
 
 
-def enrich_sales(ventas: pd.DataFrame, productos: pd.DataFrame, metricas_cliente_producto: pd.DataFrame) -> pd.DataFrame:
+def enrich_sales(
+    ventas: pd.DataFrame,
+    productos: pd.DataFrame,
+    clientes: pd.DataFrame,
+    metricas_cliente_producto: pd.DataFrame,
+) -> pd.DataFrame:
     ventas_enriquecidas = ventas.copy()
     ventas_enriquecidas["_orden_original"] = range(len(ventas_enriquecidas))
     ventas_enriquecidas["Fecha"] = pd.to_datetime(ventas_enriquecidas["Fecha"])
@@ -163,6 +172,10 @@ def enrich_sales(ventas: pd.DataFrame, productos: pd.DataFrame, metricas_cliente
         right_on="Id.Prod",
         how="left",
     ).drop(columns=["Id.Prod"])
+    if "Provincia" in clientes.columns:
+        ventas_enriquecidas = ventas_enriquecidas.merge(clientes, on="Id. Cliente", how="left")
+    else:
+        ventas_enriquecidas["Provincia"] = np.nan
 
     ventas_enriquecidas = ventas_enriquecidas.sort_values(
         ["Id. Cliente", "Id. Producto", "Fecha", "Num.Fact", "_orden_original"]
@@ -310,7 +323,7 @@ def add_future_targets(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_fidelization_audit_columns(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
+    df = df.reset_index(drop=True).copy()
     gasto_base_all = np.zeros(len(df), dtype=float)
     gasto_futuro_all = np.zeros(len(df), dtype=float)
     freq_base_all = np.zeros(len(df), dtype=float)
@@ -340,10 +353,10 @@ def add_fidelization_audit_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_dataset(input_path: Path) -> pd.DataFrame:
-    ventas, productos, _clientes = load_excel(input_path)
+    ventas, productos, clientes = load_excel(input_path)
     productos = add_product_repurchase_stats(ventas, productos)
     metricas_cliente_producto = build_client_product_metrics(ventas)
-    ventas_enriquecidas = enrich_sales(ventas, productos, metricas_cliente_producto)
+    ventas_enriquecidas = enrich_sales(ventas, productos, clientes, metricas_cliente_producto)
     dataset = add_future_targets(ventas_enriquecidas)
     dataset = add_fidelization_audit_columns(dataset)
     dataset["target_potencial_cliente"] = recalcular_potencial(dataset)

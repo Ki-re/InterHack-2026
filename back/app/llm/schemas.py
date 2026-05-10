@@ -11,6 +11,9 @@ class AlertContext(BaseModel):
     customerValue: str
     churnType: str
     explanation: str
+    alertContextJson: str | None = None
+    predictedNextPurchase: str | None = None
+    lastOrderDate: str | None = None
 
 
 class ChatMessage(BaseModel):
@@ -22,6 +25,7 @@ class ChatRequest(BaseModel):
     alert: AlertContext
     history: list[ChatMessage] = []
     question: str
+    lang: str = "es"
 
 
 class ChatResponse(BaseModel):

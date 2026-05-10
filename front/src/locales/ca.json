@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "title": "Alertes INIBSA",
     "subtitle": "Espai del delegat de vendes",
@@ -36,6 +36,14 @@
     "title": "Dashboard d'alertes comercials",
     "subtitle": "Vista operativa per detectar risc de fuga, oportunitat de compra i pròximes accions sobre clients prioritzats.",
     "mock_data": "Dades de prova · Llest per a integració backend",
+    "delegate_label": "Delegat de vendes",
+    "select_delegate": "Selecciona un delegat",
+    "zone_north": "Nord",
+    "zone_east": "Est",
+    "zone_south": "Sud",
+    "zone_canary": "Canàries",
+    "zone_balearic": "Balears",
+    "loading_agents": "Carregant delegats...",
     "metrics": {
       "pending": "Pendents",
       "pending_desc": "Requereixen gestió comercial",
@@ -98,14 +106,10 @@
   "ai": {
     "title": "Consultar IA",
     "description": "El teu assistent de vendes intel·ligent. Pregunta'm el que necessitis sobre aquest client.",
-    "opening": "Hola 👋 Estic analitzant l'alerta de {{name}}. Veig un risc de fuga del {{churn}}% i una propensió de compra del {{buy}}%. Què vols saber? Puc ajudar-te amb la següent acció recomanada, el motiu del risc, un guió de conversa o qualsevol dubte sobre aquest client.",
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
     "send": "Enviar",
-    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar.",
-    "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
-    "why_rec": "El principal motiu de risc és: {{explanation}} T'agradaria que aprofundís en algun aspecte concret o que et proposi arguments per a la conversa?",
-    "default_rec": "{{name}} presenta un {{churn}}% de probabilitat de fuga i un {{buy}}% de propensió de compra, una combinació que mereix acció ràpida. Et recomano un contacte comercial concís i registrar el resultat. Necessites ajuda per preparar la trucada o la visita?"
+    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar."
   },
   "modal": {
     "risk_label": "Risc {{label}} · {{churn}}% fuga",
@@ -237,11 +241,11 @@
     "scope_all": "Totes les regions",
     "all_regions": "Totes les regions",
     "regions": {
-      "est": "Est",
+      "east": "Est",
       "north": "Nord",
       "south": "Sud",
-      "baleares": "Balears",
-      "canarias": "Canàries"
+      "balearic": "Balears",
+      "canary": "Canàries"
     },
     "status": {
       "good": "Execució saludable",

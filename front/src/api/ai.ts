@@ -17,12 +17,16 @@ type AlertContext = Pick<
   | "customerValue"
   | "churnType"
   | "explanation"
+  | "alertContextJson"
+  | "predictedNextPurchase"
+  | "lastOrderDate"
 >;
 
 type ChatRequest = {
   alert: AlertContext;
   history: AiChatMessage[];
   question: string;
+  lang: string;
 };
 
 type ChatResponse = {
@@ -39,12 +43,12 @@ export async function postTranscribe(audioBlob: Blob): Promise<string> {
   return result.text;
 }
 
-export async function postSynthesize(text: string): Promise<Blob> {
+export async function postSynthesize(text: string, lang = "es"): Promise<Blob> {
   const VITE_API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
   const res = await fetch(`${VITE_API_URL}/audio/synthesize`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, lang }),
   });
   if (!res.ok) throw new Error("TTS failed");
   return res.blob();
@@ -54,8 +58,9 @@ export async function postAiChat(
   alert: AlertContext,
   history: AiChatMessage[],
   question: string,
+  lang = "es",
 ): Promise<string> {
-  const body: ChatRequest = { alert, history, question };
+  const body: ChatRequest = { alert, history, question, lang };
   const result = await apiRequest<ChatResponse>("/ai/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

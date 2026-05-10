@@ -17,7 +17,8 @@
 - `back/app/models`: SQLAlchemy models.
 - `back/app/schemas`: Pydantic schemas.
 - `back/app/services`: reusable backend logic.
-- `back/alembic/versions`: database migrations.
+- `back/alembic/versions`: database migrations (0001–0008).
+- `back/scripts/`: utility scripts run at container startup (e.g. `seed_demo.py`).
 - `memory/`: mandatory AI workflow state.
 
 ## Data Flow

@@ -34,7 +34,7 @@
 ## `POST /ai/chat`
 - Auth: none (API key is server-side only).
 - Request JSON:
-  - `alert: AlertContext` — `{ clientName, riskLevel, churnProbability, purchasePropensity, customerValue, churnType, explanation }`
+  - `alert: AlertContext` — `{ clientName, riskLevel, churnProbability, purchasePropensity, customerValue, churnType, explanation, alertContextJson?, predictedNextPurchase?, lastOrderDate? }`
   - `history: ChatMessage[]` — `[{ role: "user"|"assistant", content: string }, ...]` (full prior conversation)
   - `question: string` — the new user message
 - Response `200`: `{ response: string }`
@@ -61,10 +61,46 @@
   - Manager summaries include `agents`.
   - Agent summaries include assigned `clients`.
   - Client rows include customer metadata, `kpis`, and alert execution rows.
-- Seeded regions:
-  - `catalonia_valencia`
-  - `north`
-  - `south`
+- Seeded regions (after migration 0005):
+  - `north` — Nord
+  - `east` — Est
+  - `south` — Sud
+  - `canary` — Illes Canàries
+  - `balearic` — Illes Balears
+
+## `GET /alerts`
+- Auth: none for current MVP.
+- Query params: `agent_id?: int` — filter alerts to a specific sales agent.
+- Response `200`: `SalesAlertResponse[]`
+- `SalesAlertResponse`:
+  - `id: string`
+  - `clientName: string`
+  - `riskLevel: "low" | "medium" | "high"` (mapped from DB "high"/"medium"/"low")
+  - `churnProbability: int`
+  - `purchasePropensity: int`
+  - `customerValue: "low" | "medium" | "high"`
+  - `explanation: string`
+  - `churnType: string` (e.g. "Total", "Producto 4566", "Combinat")
+  - `status: "pending" | "attended" | "dismissed"` (from DB — seeded by demo script)
+  - `interactions: InteractionRecord[]` — deserialized from `interactions_json` column; empty array if null
+  - `events: SystemEventRecord[]` — deserialized from `events_json` column; empty array if null
+  - `dismissReason: string | null`
+  - `dismissedAt: string | null` (ISO datetime)
+  - `alertContextJson: string | null` (JSON blob of ML ctx_* fields for LLM enrichment)
+  - `predictedNextPurchase: string | null` (ISO date string)
+  - `lastOrderDate: string | null` (ISO date string)
+- Data source: `regional_alerts` JOIN `clients`, ordered by `created_at DESC`. Filtered by `clients.agent_id` if `agent_id` query param provided.
+
+## `GET /agents`
+- Auth: none for current MVP.
+- Request: none.
+- Response `200`: `AgentResponse[]`
+  - `id: int`
+  - `name: string`
+  - `email: string`
+  - `zone: "north" | "east" | "south" | "canary" | "balearic"`
+  - `managerId: int`
+- Data source: `sales_agents` JOIN `regional_managers` JOIN `regions`, ordered by agent id.
 
 ## `GET /auth/me`
 - Auth: `Authorization: Bearer <token>`.

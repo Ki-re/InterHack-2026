@@ -39,7 +39,7 @@ function getRms(analyser: AnalyserNode): number {
 }
 
 export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -189,7 +189,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   async function playTTS(text: string) {
     if (isMutedRef.current) return;
     try {
-      const blob = await postSynthesize(text);
+      const blob = await postSynthesize(text, language);
       if (isMutedRef.current) return;
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
@@ -209,7 +209,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
     const history: AiChatMessage[] = messages.map((m) => ({ role: m.role, content: m.content }));
 
     try {
-      const responseText = await postAiChat(alert!, history, text);
+      const responseText = await postAiChat(alert!, history, text, language);
       setMessages((prev) => [
         ...prev,
         { id: `assistant-${Date.now()}`, role: "assistant", content: responseText },

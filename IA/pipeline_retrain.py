@@ -38,6 +38,7 @@ ID_OR_LEAKAGE_COLS = [
     "Num.Fact",
     "Fecha",
     "Id. Cliente",
+    "Provincia",
     "Id. Producto",
     "gasto_base_anual_fidelizacion",
     "gasto_futuro_anual_fidelizacion",
