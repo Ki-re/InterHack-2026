@@ -45,6 +45,9 @@ _INE_COD_TO_CCAA: dict[str, str] = {
     "17": "La Rioja",
 }
 
+# Reverse: Spanish CCAA name → INE code (used to key ccaaKpis by client's CCAA)
+_CCAA_TO_INE: dict[str, str] = {v: k for k, v in _INE_COD_TO_CCAA.items()}
+
 
 async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None = None) -> RegionalDashboardResponse:
     regions = list(
@@ -100,9 +103,11 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
                     client_alerts = alerts_by_client.get(client.id, [])
                     agent_alerts.extend(client_alerts)
                     client_summaries.append(_build_client(client, client_alerts))
+                    # Group by client's actual CCAA (matches ccaa_filter behaviour)
+                    ine_cod = _CCAA_TO_INE.get(client.comunidad_autonoma or "")
+                    if ine_cod:
+                        alerts_by_ccaa.setdefault(ine_cod, []).extend(client_alerts)
 
-                if agent.cod_ccaa:
-                    alerts_by_ccaa.setdefault(agent.cod_ccaa, []).extend(agent_alerts)
                 agent_kpis = _calculate_kpis(agent_alerts)
                 agent_summaries.append(
                     AgentPerformance(

@@ -93,7 +93,7 @@ export function RegionalDashboard() {
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
       <motion.div variants={itemVariants}>
         <RegionalKpiCards
           kpis={selectedRegion ? selectedRegion.kpis : activeData?.kpis ?? globalDashboard.data.kpis}
@@ -101,14 +101,14 @@ export function RegionalDashboard() {
         />
       </motion.div>
 
-      <motion.section variants={itemVariants} className="space-y-5">
+      <motion.section variants={itemVariants} className="space-y-4">
         {/* Top row: fr columns fill the full width (same as KPI row above).
             items-stretch makes all cells the same height.
             Estat and Focus wrappers use position:relative + overflow:hidden so their
             absolutely-positioned content has 0 normal-flow height contribution →
             only the Map card determines the row height.
             Focus inner card uses h-full + flex-col + overflow-y-auto for inner scroll. */}
-        <div className="grid gap-5 xl:grid-cols-[1.6fr_0.7fr_1fr] xl:items-stretch">
+        <div className="grid gap-4 xl:grid-cols-[1.6fr_0.7fr_1fr] xl:items-stretch">
           {/* Map — direct grid item, natural height sets the row */}
           <SpainRegionMap
             regions={globalDashboard.data.regions}
