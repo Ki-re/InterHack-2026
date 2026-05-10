@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from generar_dataset_previo_potencial_nuevo import recalcular_potencial
-
 
 HORIZONTE_FIDELIZACION_DIAS = 365
 DEFAULT_NO_RECOMPRA_DIAS = 1500
+PESO_CRECIMIENTO_GASTO = 0.6
+PESO_CRECIMIENTO_FRECUENCIA = 0.4
+PESO_SCORE_CRECIMIENTO = 0.75
+PESO_NIVEL_GASTO = 0.25
+PERCENTIL_REFERENCIA_GASTO = 0.95
+ESCALA_POTENCIAL = 1.0
 
 OUTPUT_COLUMNS = [
     "Num.Fact",
@@ -45,6 +50,55 @@ OUTPUT_COLUMNS = [
     "frecuencia_base_anual_fidelizacion",
     "frecuencia_futura_anual_fidelizacion",
 ]
+
+
+def recalcular_potencial(df: pd.DataFrame) -> pd.Series:
+    required = [
+        "gasto_base_anual_fidelizacion",
+        "gasto_futuro_anual_fidelizacion",
+        "frecuencia_base_anual_fidelizacion",
+        "frecuencia_futura_anual_fidelizacion",
+    ]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+    if "gasto_anual_real_cliente_producto" in df.columns:
+        gasto_referencia_series = df["gasto_anual_real_cliente_producto"]
+    else:
+        gasto_referencia_series = df[
+            ["gasto_base_anual_fidelizacion", "gasto_futuro_anual_fidelizacion"]
+        ].max(axis=1)
+
+    gasto_referencia = max(
+        float(
+            gasto_referencia_series.replace([np.inf, -np.inf], np.nan)
+            .dropna()
+            .clip(lower=0)
+            .quantile(PERCENTIL_REFERENCIA_GASTO)
+        ),
+        1.0,
+    )
+    log_ref = max(math.log1p(gasto_referencia), 1e-9)
+
+    gasto_base = df["gasto_base_anual_fidelizacion"].fillna(0).astype(float)
+    gasto_futuro = df["gasto_futuro_anual_fidelizacion"].fillna(0).astype(float)
+    freq_base = df["frecuencia_base_anual_fidelizacion"].fillna(0).astype(float)
+    freq_futura = df["frecuencia_futura_anual_fidelizacion"].fillna(0).astype(float)
+
+    crecimiento_gasto = (gasto_futuro - gasto_base) / np.maximum(np.abs(gasto_base), 1e-9)
+    crecimiento_frecuencia = (freq_futura - freq_base) / np.maximum(np.abs(freq_base), 1e-9)
+    score_crecimiento = (
+        PESO_CRECIMIENTO_GASTO * crecimiento_gasto
+        + PESO_CRECIMIENTO_FRECUENCIA * crecimiento_frecuencia
+    )
+
+    gasto_anual_cliente_producto = pd.concat([gasto_base, gasto_futuro], axis=1).max(axis=1)
+    nivel_gasto = np.tanh(np.log1p(gasto_anual_cliente_producto.clip(lower=0)) / log_ref)
+    score = (PESO_SCORE_CRECIMIENTO * score_crecimiento) + (PESO_NIVEL_GASTO * nivel_gasto)
+    target = pd.Series(np.tanh(score / ESCALA_POTENCIAL), index=df.index).clip(-1, 1)
+    target.loc[freq_futura.eq(0)] = -1.0
+    return target
 
 
 def load_excel(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

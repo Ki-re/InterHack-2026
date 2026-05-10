@@ -275,8 +275,6 @@ __pycache__/
 /opencode.json
 # END AI Agent Symlinks
 
-/IA/Datasets.xlsx
-
 /IA/gemini*
 
 *.pt
