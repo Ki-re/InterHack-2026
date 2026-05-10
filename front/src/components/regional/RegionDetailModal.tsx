@@ -8,11 +8,12 @@ import type { AgentPerformance, ManagerPerformance, RegionSummary } from "@/type
 
 type RegionDetailModalProps = {
   region: RegionSummary;
+  ccaaName?: string;
   onClose: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
 
-export function RegionDetailModal({ region, onClose, t }: RegionDetailModalProps) {
+export function RegionDetailModal({ region, ccaaName, onClose, t }: RegionDetailModalProps) {
   const [selectedManager, setSelectedManager] = useState<ManagerPerformance | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<AgentPerformance | null>(null);
 
@@ -52,7 +53,9 @@ export function RegionDetailModal({ region, onClose, t }: RegionDetailModalProps
                 {t("regional_dashboard.managers.title")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {t("regional_dashboard.region_prefix") + getRegionLabel(region.slug, t)}
+                {ccaaName
+                  ? `${getRegionLabel(region.slug, t)} › ${ccaaName}`
+                  : t("regional_dashboard.region_prefix") + getRegionLabel(region.slug, t)}
               </p>
             </div>
           </div>
