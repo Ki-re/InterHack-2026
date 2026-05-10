@@ -30,6 +30,7 @@ const itemVariants = {
 export function RegionalDashboard() {
   const { t } = useTranslation();
   const [selectedRegionSlug, setSelectedRegionSlug] = useState<RegionSlug | null>(null);
+  const [selectedCcaa, setSelectedCcaa] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const dashboard = useQuery({
     queryKey: ["regional-dashboard"],
@@ -42,14 +43,14 @@ export function RegionalDashboard() {
   }, [dashboard.data?.regions, selectedRegionSlug]);
 
   function handleSelectRegion(slug: RegionSlug) {
-    // Clicking the already-selected region deselects it (shows global view)
-    setSelectedRegionSlug((prev) => {
-      if (prev === slug) {
-        setDetailOpen(false);
-        return null;
-      }
-      return slug;
-    });
+    if (selectedRegionSlug === slug) {
+      setSelectedRegionSlug(null);
+      setSelectedCcaa(null);
+      setDetailOpen(false);
+    } else {
+      setSelectedRegionSlug(slug);
+      setSelectedCcaa(null);
+    }
   }
 
   if (dashboard.isLoading) {
@@ -91,7 +92,9 @@ export function RegionalDashboard() {
           <SpainRegionMap
             regions={dashboard.data.regions}
             selectedSlug={selectedRegionSlug}
+            selectedCcaa={selectedCcaa}
             onSelect={handleSelectRegion}
+            onSelectCcaa={setSelectedCcaa}
             onOpenDetail={selectedRegion ? () => setDetailOpen(true) : undefined}
             t={t}
           />
@@ -101,6 +104,7 @@ export function RegionalDashboard() {
             <div className="absolute inset-0">
               <RegionSnapshot
                 regionName={selectedRegion ? getRegionLabel(selectedRegion.slug, t) : t("regional_dashboard.all_regions")}
+                ccaaName={selectedCcaa ? t(`ccaa.${selectedCcaa}`) : undefined}
                 kpis={selectedRegion ? selectedRegion.kpis : dashboard.data.kpis}
                 t={t}
               />
@@ -134,10 +138,12 @@ export function RegionalDashboard() {
 function RegionSnapshot({
   kpis,
   regionName,
+  ccaaName,
   t,
 }: {
   kpis: ExecutionKpis;
   regionName: string;
+  ccaaName?: string;
   t: (path: string, params?: Record<string, string | number>) => string;
 }) {
   const scoreColor =
@@ -160,7 +166,20 @@ function RegionSnapshot({
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("regional_dashboard.snapshot.title")}
         </p>
-        <h2 className="mt-0.5 text-lg font-semibold text-foreground">{regionName}</h2>
+        {ccaaName ? (
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">
+            <span className="text-muted-foreground">{regionName}</span>
+            {" › "}
+            {ccaaName}
+          </h2>
+        ) : (
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{regionName}</h2>
+        )}
+        {ccaaName && (
+          <p className="mt-1 inline-block rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">
+            {t("regional_dashboard.snapshot.region_data_note")}
+          </p>
+        )}
 
         {/* Score gauge */}
         <div className="mt-3 flex items-center gap-3">

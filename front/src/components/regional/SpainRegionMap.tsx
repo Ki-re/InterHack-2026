@@ -10,7 +10,9 @@ import spainGeoJson from "@/data/spain-communities.json";
 type SpainRegionMapProps = {
   regions: RegionSummary[];
   selectedSlug: RegionSlug | null;
+  selectedCcaa: string | null;
   onSelect: (slug: RegionSlug) => void;
+  onSelectCcaa: (cod: string | null) => void;
   onOpenDetail?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
@@ -18,7 +20,6 @@ type SpainRegionMapProps = {
 const WIDTH = 560;
 const HEIGHT = 310;
 
-// geoMercator projection centred on Spain's peninsula
 const projection = geoMercator()
   .center([-3.5, 40.4])
   .scale(1600)
@@ -26,11 +27,9 @@ const projection = geoMercator()
 
 const pathGen = geoPath().projection(projection);
 
-// Maps cod_ccaa from the GeoJSON → one of our 3 business region slugs.
-// null = skip (islands, enclaves).
 const CCAA_TO_REGION: Record<string, RegionSlug | null> = {
   "01": "south",   // Andalucía
-  "02": "est",     // Aragón (moved to Est group)
+  "02": "est",     // Aragón
   "03": "north",   // Asturias
   "04": null,      // Baleares — skip
   "05": null,      // Canarias — skip
@@ -50,9 +49,40 @@ const CCAA_TO_REGION: Record<string, RegionSlug | null> = {
   "19": null,      // Melilla — skip
 };
 
-export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, t }: SpainRegionMapProps) {
+export function SpainRegionMap({
+  regions,
+  selectedSlug,
+  selectedCcaa,
+  onSelect,
+  onSelectCcaa,
+  onOpenDetail,
+  t,
+}: SpainRegionMapProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const features = useMemo(() => (spainGeoJson as any).features as any[], []);
+
+  function handlePathClick(cod: string, slug: RegionSlug) {
+    if (!selectedSlug) {
+      // Level 1: no region selected → select region
+      onSelect(slug);
+      return;
+    }
+    if (selectedSlug !== slug) {
+      // Clicked a different region → switch region, clear CCAA
+      onSelect(slug);
+      return;
+    }
+    // Same region: toggle CCAA selection
+    if (selectedCcaa === cod) {
+      onSelectCcaa(null);
+    } else {
+      onSelectCcaa(cod);
+    }
+  }
+
+  function getCcaaLabel(cod: string) {
+    return t(`ccaa.${cod}`);
+  }
 
   return (
     <Card className="overflow-hidden">
@@ -62,7 +92,6 @@ export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, 
           <p className="mt-1 text-sm text-muted-foreground">{t("regional_dashboard.map.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Detail button — shown only when a region is selected, takes the place of the icon */}
           {selectedSlug && onOpenDetail ? (
             <button
               type="button"
@@ -80,15 +109,19 @@ export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, 
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        {/* Full-width SVG map — p-3 gives a slight uniform margin on all sides */}
         <div className="rounded-none bg-sky-50 p-3">
           <svg
             viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
             className="mx-auto h-auto w-full"
             role="img"
             aria-label={t("regional_dashboard.map.aria")}
+            onClick={(e) => {
+              // Click on SVG background (not a path) → deselect CCAA
+              if ((e.target as SVGElement).tagName === "svg" && selectedCcaa) {
+                onSelectCcaa(null);
+              }
+            }}
           >
-            {/* Pass 1 — fills + thin white community borders (subtle) */}
             {features.map((feature) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const cod: string = (feature as any).properties?.cod_ccaa ?? "";
@@ -96,37 +129,65 @@ export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, 
               if (!slug) return null;
 
               const region = regions.find((r) => r.slug === slug);
-              const isSelected = selectedSlug === slug;
+              const isSelectedRegion = selectedSlug === slug;
+              const isSelectedCcaa = selectedCcaa === cod;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const d = pathGen(feature as any);
               if (!d) return null;
+
+              // Visual states
+              let opacity = 1;
+              let stroke = "white";
+              let strokeWidth = 0.8;
+
+              if (selectedSlug === null) {
+                // No selection — all normal
+                opacity = 1;
+              } else if (!isSelectedRegion) {
+                // Different region — dimmed
+                opacity = 0.3;
+              } else if (selectedCcaa === null) {
+                // This region selected, no CCAA — all full
+                opacity = 1;
+              } else if (isSelectedCcaa) {
+                // This CCAA selected — highlight border
+                stroke = "#1d4ed8";
+                strokeWidth = 2.5;
+                opacity = 1;
+              } else {
+                // Same region, different CCAA — dimmed
+                opacity = 0.45;
+              }
+
+              const label = selectedSlug === slug
+                ? `${getCcaaLabel(cod)} — ${t("regional_dashboard.map.score", { score: region?.kpis.executionScore ?? 0 })}`
+                : getRegionLabel(slug, t);
 
               return (
                 <path
                   key={cod}
                   d={d}
                   fill={region ? getStatusFill(region.kpis.status) : "#e2e8f0"}
-                  stroke="white"
-                  strokeWidth={0.8}
-                  opacity={selectedSlug === null || isSelected ? 1 : 0.65}
+                  stroke={stroke}
+                  strokeWidth={strokeWidth}
+                  opacity={opacity}
                   style={{ cursor: "pointer" }}
-                  onClick={() => onSelect(slug)}
+                  onClick={() => handlePathClick(cod, slug)}
                   onKeyDown={(e: React.KeyboardEvent) => {
-                    if (e.key === "Enter" || e.key === " ") onSelect(slug);
+                    if (e.key === "Enter" || e.key === " ") handlePathClick(cod, slug);
                   }}
                   tabIndex={0}
                   role="button"
-                  aria-label={getRegionLabel(slug, t)}
-                  aria-pressed={isSelected}
-                  className="transition-opacity duration-150 hover:opacity-95 focus:outline-none"
+                  aria-label={label}
+                  aria-pressed={isSelectedCcaa || (!selectedCcaa && isSelectedRegion)}
+                  className="focus:outline-none"
                 />
               );
             })}
-
           </svg>
         </div>
 
-        {/* Region buttons — below the map, matching p-3 margins on all sides */}
+        {/* Region buttons */}
         <div className="flex flex-wrap gap-2 px-3 pb-3 pt-2">
           {regions.map((region) => (
             <button
