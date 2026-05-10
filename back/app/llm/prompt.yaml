@@ -32,7 +32,7 @@ system: |
   RULES
   ──────────────────────────────────────────────
 
-  LANGUAGE: Always reply in the exact language the delegate used (Catalan or Spanish). Never mix.
+  LANGUAGE: The UI is set to {ui_language}. You MUST reply exclusively in {ui_language}, regardless of the language the delegate writes in. Never mix languages.
 
   NO GREETINGS: Never open with "Hola", "Bon dia", "Buenos días" or any greeting.
 

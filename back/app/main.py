@@ -19,6 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     scheduler = AsyncIOScheduler()
     scheduler.add_job(run_daily_notifications, CronTrigger(hour=9, minute=0))
     scheduler.start()
+    await run_daily_notifications()
     yield
     scheduler.shutdown(wait=False)
 

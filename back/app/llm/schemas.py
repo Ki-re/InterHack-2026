@@ -25,6 +25,7 @@ class ChatRequest(BaseModel):
     alert: AlertContext
     history: list[ChatMessage] = []
     question: str
+    lang: str = "es"
 
 
 class ChatResponse(BaseModel):
