@@ -189,6 +189,8 @@
     "01": "Andalucía",
     "02": "Aragón",
     "03": "Asturias",
+    "04": "Islas Baleares",
+    "05": "Canarias",
     "06": "Cantabria",
     "07": "Castilla y León",
     "08": "Castilla-La Mancha",
@@ -237,7 +239,9 @@
     "regions": {
       "est": "Este",
       "north": "Norte",
-      "south": "Sur"
+      "south": "Sur",
+      "baleares": "Baleares",
+      "canarias": "Canarias"
     },
     "status": {
       "good": "Ejecución saludable",
