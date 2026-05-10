@@ -6,11 +6,11 @@ import type {
   AgentPerformance,
   ClientExecution,
   ManagerPerformance,
+  RegionSummary,
 } from "@/types/regional-dashboard";
 
 type RegionalPerformanceTablesProps = {
   region: RegionSummary;
-  selectedCcaa?: string;
   selectedManager: ManagerPerformance | null;
   selectedAgent: AgentPerformance | null;
   onSelectManager: (manager: ManagerPerformance) => void;
@@ -22,7 +22,6 @@ type RegionalPerformanceTablesProps = {
 
 export function RegionalPerformanceTables({
   region,
-  selectedCcaa,
   selectedAgent,
   selectedManager,
   onResetAgent,
@@ -31,17 +30,10 @@ export function RegionalPerformanceTables({
   onSelectManager,
   t,
 }: RegionalPerformanceTablesProps) {
-  // Filter managers/agents by CCAA when one is selected
-  const visibleManagers = selectedCcaa
-    ? region.managers
-        .map((m) => ({ ...m, agents: m.agents.filter((a) => a.codCcaa === selectedCcaa) }))
-        .filter((m) => m.agents.length > 0)
-    : region.managers;
-
   return (
     <div className="space-y-0">
       <ManagersTable
-        managers={visibleManagers}
+        managers={region.managers}
         regionName={region.name}
         selectedManager={selectedManager}
         selectedAgent={selectedAgent}

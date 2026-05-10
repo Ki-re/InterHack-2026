@@ -146,11 +146,11 @@ export function RegionalDashboard() {
       </motion.section>
 
       {/* Region detail modal */}
-      {detailOpen && selectedRegionSlug && (
+      {detailOpen && selectedRegion && (
         <RegionDetailModal
-          region={globalDashboard.data.regions.find((r) => r.slug === selectedRegionSlug)!}
-          selectedCcaa={selectedCcaa ?? undefined}
+          region={selectedRegion}
           ccaaName={selectedCcaa ? t(`ccaa.${selectedCcaa}`) : undefined}
+          isFetching={selectedCcaa !== null && dashboard.isFetching}
           onClose={() => setDetailOpen(false)}
           t={t}
         />

@@ -8,13 +8,13 @@ import type { AgentPerformance, ManagerPerformance, RegionSummary } from "@/type
 
 type RegionDetailModalProps = {
   region: RegionSummary;
-  selectedCcaa?: string;
   ccaaName?: string;
+  isFetching?: boolean;
   onClose: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
 
-export function RegionDetailModal({ region, selectedCcaa, ccaaName, onClose, t }: RegionDetailModalProps) {
+export function RegionDetailModal({ region, ccaaName, isFetching, onClose, t }: RegionDetailModalProps) {
   const [selectedManager, setSelectedManager] = useState<ManagerPerformance | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<AgentPerformance | null>(null);
 
@@ -72,17 +72,22 @@ export function RegionDetailModal({ region, selectedCcaa, ccaaName, onClose, t }
 
         {/* Scrollable body */}
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
-          <RegionalPerformanceTables
-            region={region}
-            selectedCcaa={selectedCcaa}
-            selectedManager={selectedManager}
-            selectedAgent={selectedAgent}
-            onSelectManager={handleSelectManager}
-            onSelectAgent={setSelectedAgent}
-            onResetManager={handleResetManager}
-            onResetAgent={() => setSelectedAgent(null)}
-            t={t}
-          />
+          {isFetching ? (
+            <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+              {t("regional_dashboard.loading")}
+            </div>
+          ) : (
+            <RegionalPerformanceTables
+              region={region}
+              selectedManager={selectedManager}
+              selectedAgent={selectedAgent}
+              onSelectManager={handleSelectManager}
+              onSelectAgent={setSelectedAgent}
+              onResetManager={handleResetManager}
+              onResetAgent={() => setSelectedAgent(null)}
+              t={t}
+            />
+          )}
         </div>
       </div>
     </div>
