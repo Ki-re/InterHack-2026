@@ -106,14 +106,10 @@
   "ai": {
     "title": "Consultar IA",
     "description": "El teu assistent de vendes intel·ligent. Pregunta'm el que necessitis sobre aquest client.",
-    "opening": "Hola 👋 Estic analitzant l'alerta de {{name}}. Veig un risc de fuga del {{churn}}% i una propensió de compra del {{buy}}%. Què vols saber? Puc ajudar-te amb la següent acció recomanada, el motiu del risc, un guió de conversa o qualsevol dubte sobre aquest client.",
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
     "send": "Enviar",
-    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar.",
-    "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
-    "why_rec": "El principal motiu de risc és: {{explanation}} T'agradaria que aprofundís en algun aspecte concret o que et proposi arguments per a la conversa?",
-    "default_rec": "{{name}} presenta un {{churn}}% de probabilitat de fuga i un {{buy}}% de propensió de compra, una combinació que mereix acció ràpida. Et recomano un contacte comercial concís i registrar el resultat. Necessites ajuda per preparar la trucada o la visita?"
+    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar."
   },
   "modal": {
     "risk_label": "Risc {{label}} · {{churn}}% fuga",
