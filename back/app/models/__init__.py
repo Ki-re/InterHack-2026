@@ -1,3 +1,4 @@
+from app.models.notification import Notification
 from app.models.regional_dashboard import (
     Client,
     Region,
@@ -10,6 +11,7 @@ from app.models.user import User
 
 __all__ = [
     "Client",
+    "Notification",
     "Region",
     "RegionalAlert",
     "RegionalManager",

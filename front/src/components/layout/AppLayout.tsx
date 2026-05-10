@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useTranslation } from "@/contexts/LanguageContext";
 import inibsaLogo from "@/assets/logo.png";
 
@@ -26,6 +27,7 @@ export function AppLayout() {
           </div>
 
           <div className="flex min-w-0 items-center gap-2">
+            <NotificationBell />
             <div className="flex items-center gap-1 rounded-md border bg-background p-1">
               <Button
                 variant={language === "ca" ? "secondary" : "ghost"}
