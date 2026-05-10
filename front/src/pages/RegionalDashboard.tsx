@@ -54,6 +54,15 @@ export function RegionalDashboard() {
     return activeData?.regions.find((region) => region.slug === selectedRegionSlug) ?? null;
   }, [activeData?.regions, selectedRegionSlug]);
 
+  function handleDeselect() {
+    if (selectedCcaa) {
+      setSelectedCcaa(null);
+    } else if (selectedRegionSlug) {
+      setSelectedRegionSlug(null);
+      setDetailOpen(false);
+    }
+  }
+
   function handleSelectRegion(slug: RegionSlug) {
     if (selectedRegionSlug === slug) {
       setSelectedRegionSlug(null);
@@ -107,6 +116,7 @@ export function RegionalDashboard() {
             selectedCcaa={selectedCcaa}
             onSelect={handleSelectRegion}
             onSelectCcaa={setSelectedCcaa}
+            onDeselect={handleDeselect}
             onOpenDetail={selectedRegion ? () => setDetailOpen(true) : undefined}
             t={t}
           />

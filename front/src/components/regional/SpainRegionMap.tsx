@@ -13,6 +13,7 @@ type SpainRegionMapProps = {
   selectedCcaa: string | null;
   onSelect: (slug: RegionSlug) => void;
   onSelectCcaa: (cod: string | null) => void;
+  onDeselect?: () => void;
   onOpenDetail?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
@@ -69,6 +70,7 @@ export function SpainRegionMap({
   selectedCcaa,
   onSelect,
   onSelectCcaa,
+  onDeselect,
   onOpenDetail,
   t,
 }: SpainRegionMapProps) {
@@ -204,8 +206,8 @@ export function SpainRegionMap({
             role="img"
             aria-label={t("regional_dashboard.map.aria")}
             onClick={(e) => {
-              if ((e.target as SVGElement).tagName === "svg" && selectedCcaa) {
-                onSelectCcaa(null);
+              if ((e.target as SVGElement).tagName === "svg") {
+                onDeselect?.();
               }
             }}
           >
