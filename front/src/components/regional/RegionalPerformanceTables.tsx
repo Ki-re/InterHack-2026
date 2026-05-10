@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type {
   AgentPerformance,
@@ -33,7 +33,7 @@ export function RegionalPerformanceTables({
   return (
     <div className="space-y-0">
       <ManagersTable
-        region={region}
+        managers={region.managers}
         selectedManager={selectedManager}
         selectedAgent={selectedAgent}
         onSelectManager={onSelectManager}
@@ -47,7 +47,7 @@ export function RegionalPerformanceTables({
 }
 
 function ManagersTable({
-  region,
+  managers,
   selectedManager,
   selectedAgent,
   onSelectManager,
@@ -56,7 +56,7 @@ function ManagersTable({
   onResetAgent,
   t,
 }: {
-  region: RegionSummary;
+  managers: ManagerPerformance[];
   selectedManager: ManagerPerformance | null;
   selectedAgent: AgentPerformance | null;
   onSelectManager: (m: ManagerPerformance) => void;
@@ -67,10 +67,6 @@ function ManagersTable({
 }) {
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle>{t("regional_dashboard.managers.title")}</CardTitle>
-        <p className="mt-1 text-sm text-muted-foreground">{region.name}</p>
-      </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-left">
@@ -85,7 +81,7 @@ function ManagersTable({
               </tr>
             </thead>
             <tbody>
-              {region.managers.map((manager) => {
+              {managers.map((manager) => {
                 const isExpanded = selectedManager?.id === manager.id;
                 return (
                   <>
