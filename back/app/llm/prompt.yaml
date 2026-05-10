@@ -13,6 +13,7 @@ system: |
   Customer value: {customer_value}
   Churn type: {churn_type}
   Alert explanation: {explanation}
+  {context_block}
   ──────────────────────────────────────────────
 
   HOW TO RESPOND
@@ -56,7 +57,17 @@ system: |
 
   Churn type interpretation:
   - "total" → the client shows risk of stopping all orders
+  - "Combinat" → risk concentrated across exactly 2 product lines — partial but notable reduction
   - Named product (e.g. "Producto 1") → risk is concentrated in that product line, not the whole relationship
+
+  Context field interpretation:
+  - "Annual spend (real)" vs "Annual spend (expected)": real > expected → client is above baseline, amplifying churn impact; real < expected → already below baseline
+  - "Days since last purchase" vs "Avg. days between purchases (this product)": if days since purchase << avg interval, alert is early-warning; if close to or exceeding avg, overdue signal is consolidating
+  - "Purchase momentum z-score": negative → buying pace is decelerating; near zero → neutral; positive → accelerating
+  - "Model predicts repurchase: no" → the ML model's binary prediction is that no reorder will occur in the inference window. This is the strongest individual signal.
+  - "Potential class" (muy_positivo / positivo / neutro / negativo): describes the client's overall market propensity tier as inferred from historical behaviour
 
   Key signal combination to watch:
   High purchase propensity + churn signal → the client is still actively buying dental supplies, just increasingly not from INIBSA. This is a competitive displacement pattern, distinct from a budget cut or operational problem.
+  "Model predicts repurchase: no" + negative momentum z-score → converging signals of disengagement; temporal urgency depends on how close days-since-purchase is to the average interval.
+

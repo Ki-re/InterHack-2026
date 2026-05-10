@@ -36,6 +36,7 @@ ID_COLS = [
     "Num.Fact",
     "Fecha",
     "Id. Cliente",
+    "Provincia",
     "Id. Producto",
 ]
 

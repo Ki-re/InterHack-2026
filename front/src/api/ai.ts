@@ -17,6 +17,9 @@ type AlertContext = Pick<
   | "customerValue"
   | "churnType"
   | "explanation"
+  | "alertContextJson"
+  | "predictedNextPurchase"
+  | "lastOrderDate"
 >;
 
 type ChatRequest = {

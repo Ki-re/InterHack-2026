@@ -1,4 +1,5 @@
 import asyncio
+import json
 from pathlib import Path
 
 import yaml
@@ -9,6 +10,45 @@ from app.core.config import get_settings
 from app.llm.schemas import AlertContext, ChatMessage
 
 _PROMPT_PATH = Path(__file__).parent / "prompt.yaml"
+
+
+def _build_context_block(alert: AlertContext) -> str:
+    """Build optional supplementary context lines from ML fields."""
+    lines = []
+    if alert.predictedNextPurchase:
+        lines.append(f"Predicted next purchase: {alert.predictedNextPurchase}")
+    if alert.lastOrderDate:
+        lines.append(f"Last order date: {alert.lastOrderDate}")
+    if alert.alertContextJson:
+        try:
+            ctx = json.loads(alert.alertContextJson)
+            if ctx.get("ctx_gasto_anual_real"):
+                lines.append(f"Annual spend (real): {ctx['ctx_gasto_anual_real']}€")
+            if ctx.get("ctx_gasto_esperado"):
+                lines.append(f"Annual spend (expected): {ctx['ctx_gasto_esperado']}€")
+            if ctx.get("ctx_dias_desde_compra"):
+                lines.append(f"Days since last purchase: {ctx['ctx_dias_desde_compra']}")
+            if ctx.get("ctx_tiempo_medio_recompra"):
+                try:
+                    avg_days = round(float(ctx["ctx_tiempo_medio_recompra"]))
+                    lines.append(f"Avg. days between purchases (this product): {avg_days}")
+                except (ValueError, TypeError):
+                    pass
+            if ctx.get("ctx_zscore_momento"):
+                lines.append(f"Purchase momentum z-score: {ctx['ctx_zscore_momento']}")
+            if ctx.get("ctx_potencial_clase"):
+                lines.append(f"Potential class: {ctx['ctx_potencial_clase']}")
+            if ctx.get("ctx_num_compras_anteriores"):
+                lines.append(f"Prior purchases (this product): {ctx['ctx_num_compras_anteriores']}")
+            vuelve = ctx.get("ctx_vuelve_a_comprar", "")
+            if vuelve != "":
+                repurchase = "yes" if str(vuelve) == "1" else "no"
+                lines.append(f"Model predicts repurchase: {repurchase}")
+        except (json.JSONDecodeError, TypeError):
+            pass
+    if not lines:
+        return ""
+    return "Additional context:\n" + "\n".join(f"  {l}" for l in lines)
 
 
 def _load_system_prompt(alert: AlertContext) -> str:
@@ -23,6 +63,7 @@ def _load_system_prompt(alert: AlertContext) -> str:
         customer_value=alert.customerValue,
         churn_type=alert.churnType,
         explanation=alert.explanation,
+        context_block=_build_context_block(alert),
     )
 
 
@@ -40,7 +81,7 @@ def _call_gemini(system_prompt: str, contents: list[types.Content]) -> str:
     settings = get_settings()
     client = genai.Client(api_key=settings.gemini_api_key)
     response = client.models.generate_content(
-        model="gemini-3-flash-preview",
+        model="gemini-2.5-flash",
         contents=contents,
         config=types.GenerateContentConfig(system_instruction=system_prompt),
     )

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +22,29 @@ from app.schemas.regional_dashboard import (
     Underperformer,
 )
 
+# Maps INE 2-digit numeric codes (used on the map SVG) to the Spanish CCAA
+# names stored in clients.comunidad_autonoma. Must stay in sync with
+# PROVINCIA_TO_CCAA in IA/generate_alerts.py.
+_INE_COD_TO_CCAA: dict[str, str] = {
+    "01": "Andalucía",
+    "02": "Aragón",
+    "03": "Asturias",
+    "04": "Illes Balears",
+    "05": "Canarias",
+    "06": "Cantabria",
+    "07": "Castilla y León",
+    "08": "Castilla-La Mancha",
+    "09": "Cataluña",
+    "10": "Comunitat Valenciana",
+    "11": "Extremadura",
+    "12": "Galicia",
+    "13": "Comunidad de Madrid",
+    "14": "Región de Murcia",
+    "15": "Navarra",
+    "16": "País Vasco",
+    "17": "La Rioja",
+}
+
 
 async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None = None) -> RegionalDashboardResponse:
     regions = list(
@@ -41,7 +64,16 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
     )
 
     if ccaa_filter:
-        agents = [a for a in agents if a.cod_ccaa == ccaa_filter]
+        # Translate INE numeric code → Spanish CCAA name stored in clients table.
+        # This correctly handles provinces like Galicia (cod=12) whose clients
+        # are served by agents from other provinces in the same zone.
+        ccaa_name = _INE_COD_TO_CCAA.get(ccaa_filter)
+        if ccaa_name:
+            clients = [c for c in clients if c.comunidad_autonoma == ccaa_name]
+        else:
+            # Fallback: if code not in dict, try matching agent cod_ccaa directly.
+            filtered_agent_ids = {a.id for a in agents if a.cod_ccaa == ccaa_filter}
+            clients = [c for c in clients if c.agent_id in filtered_agent_ids]
 
     alerts_by_client = _group_by(alerts, "client_id")
     clients_by_agent = _group_by(clients, "agent_id")
@@ -172,6 +204,13 @@ def _build_client(client: Client, alerts: list[RegionalAlert]) -> ClientExecutio
     )
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """Return a timezone-aware UTC datetime regardless of whether dt has tzinfo."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 def _calculate_kpis(alerts: list[RegionalAlert]) -> ExecutionKpis:
     total_alerts = len(alerts)
     pending_alerts = sum(1 for alert in alerts if alert.status == "pending")
@@ -180,12 +219,12 @@ def _calculate_kpis(alerts: list[RegionalAlert]) -> ExecutionKpis:
     high_risk_backlog = sum(
         1 for alert in alerts if alert.status == "pending" and alert.risk_level == "high"
     )
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     overdue_followups = sum(
-        1 for alert in alerts if alert.status == "pending" and alert.due_at < now
+        1 for alert in alerts if alert.status == "pending" and _as_utc(alert.due_at) < now
     )
     response_hours = [
-        (alert.attended_at - alert.created_at).total_seconds() / 3600
+        (_as_utc(alert.attended_at) - _as_utc(alert.created_at)).total_seconds() / 3600
         for alert in alerts
         if alert.status == "attended" and alert.attended_at is not None
     ]

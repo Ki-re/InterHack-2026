@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "title": "Alertas INIBSA",
     "subtitle": "Espacio del delegado de ventas",
@@ -36,6 +36,14 @@
     "title": "Panel de alertas comerciales",
     "subtitle": "Vista operativa para detectar riesgo de fuga, oportunidad de compra y próximas acciones sobre clientes priorizados.",
     "mock_data": "Datos de prueba · Listo para integración backend",
+    "delegate_label": "Delegado de ventas",
+    "select_delegate": "Selecciona un delegado",
+    "zone_north": "Norte",
+    "zone_east": "Este",
+    "zone_south": "Sur",
+    "zone_canary": "Canarias",
+    "zone_balearic": "Baleares",
+    "loading_agents": "Cargando delegados...",
     "metrics": {
       "pending": "Pendientes",
       "pending_desc": "Requieren gestión comercial",
@@ -237,11 +245,11 @@
     "scope_all": "Todas las regiones",
     "all_regions": "Todas las regiones",
     "regions": {
-      "est": "Este",
+      "east": "Este",
       "north": "Norte",
       "south": "Sur",
-      "baleares": "Baleares",
-      "canarias": "Canarias"
+      "balearic": "Baleares",
+      "canary": "Canarias"
     },
     "status": {
       "good": "Ejecución saludable",

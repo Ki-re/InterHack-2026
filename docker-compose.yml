@@ -16,6 +16,7 @@ services:
       ASSEMBLYAI_API_KEY: ${ASSEMBLYAI_API_KEY}
     volumes:
       - ./back:/app
+      - ./IA:/app/ia_data:ro
     ports:
       - "8000:8000"
     healthcheck:
