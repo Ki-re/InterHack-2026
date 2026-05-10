@@ -12,10 +12,12 @@ from app.core.config import get_settings
 router = APIRouter(prefix="/audio", tags=["audio"])
 
 ELEVENLABS_VOICE_ID = "RwzBDEn5f6FIgpAjH9YN"
+ELEVENLABS_MODEL = "eleven_multilingual_v2"
 
 
 class SynthesizeRequest(BaseModel):
     text: str
+    lang: str = "es"
 
 
 @router.post("/transcribe")
@@ -52,6 +54,8 @@ async def synthesize(body: SynthesizeRequest) -> StreamingResponse:
         chunks = client.text_to_speech.convert(
             voice_id=ELEVENLABS_VOICE_ID,
             text=body.text,
+            model_id=ELEVENLABS_MODEL,
+            language_code=body.lang,
         )
         return b"".join(chunks)
 
