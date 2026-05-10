@@ -260,13 +260,13 @@ export function SpainRegionMap({
         </div>
 
         {/* Region buttons */}
-        <div className="flex flex-wrap gap-2 px-3 pb-3 pt-2">
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3 pt-2 sm:grid-cols-3">
           {regions.map((region) => (
             <button
               key={region.slug}
               type="button"
               className={cn(
-                "flex flex-1 items-center justify-between gap-2 rounded-md border px-3 py-2 text-left transition-colors",
+                "flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-left transition-colors",
                 selectedSlug === region.slug
                   ? "border-primary bg-primary/5"
                   : "bg-background hover:bg-secondary",
@@ -274,7 +274,7 @@ export function SpainRegionMap({
               onClick={() => onSelect(region.slug)}
             >
               <div className="min-w-0">
-                <span className="block truncate text-sm font-medium text-foreground">
+                <span className="block text-sm font-medium text-foreground">
                   {t("regional_dashboard.region_prefix") + getRegionLabel(region.slug, t)}
                 </span>
               </div>
