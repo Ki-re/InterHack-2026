@@ -13,6 +13,18 @@
 - shadcn UI components live in `front/src/components/ui` via the `@/components/ui` alias.
 - i18n is implemented via a lightweight React Context (`LanguageContext`) and JSON locale files in `front/src/locales`.
 
+## AI
+- AI models use a multi-head architecture for multi-task learning to prevent gradient interference.
+- Prediction heads are 2-layer MLPs (`Linear -> BN -> SiLU -> Linear`) for increased non-linear capacity.
+- Feature engineering:
+    - The dataset is enriched with extensive rolling window features (30d, 90d, 180d, 365d) for spend and purchase frequency.
+    - `log1p` transformation is applied to skewed monetary and count features during training.
+- Training strategy:
+    - **Dynamic Loss Weighting**: Implemented to balance tasks (BCE: 1.0, Days: 5.0, Potential: 2.0) and prioritize harder targets.
+    - **Label Smoothing**: Applied to the 'repurchase' BCE loss (0.05) to prevent overconfidence and gradient domination.
+    - **Masked Loss**: 'Days' loss is only calculated for samples with actual repurchases.
+- Evaluation: 'Days' accuracy is measured with ±3 days and 10% relative tolerance.
+
 ## Auth
 - Email/password auth uses JWT bearer tokens.
 - Frontend stores the access token in `localStorage`.
