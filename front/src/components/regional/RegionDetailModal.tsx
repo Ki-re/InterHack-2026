@@ -8,12 +8,13 @@ import type { AgentPerformance, ManagerPerformance, RegionSummary } from "@/type
 
 type RegionDetailModalProps = {
   region: RegionSummary;
+  selectedCcaa?: string;
   ccaaName?: string;
   onClose: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
 
-export function RegionDetailModal({ region, ccaaName, onClose, t }: RegionDetailModalProps) {
+export function RegionDetailModal({ region, selectedCcaa, ccaaName, onClose, t }: RegionDetailModalProps) {
   const [selectedManager, setSelectedManager] = useState<ManagerPerformance | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<AgentPerformance | null>(null);
 
@@ -73,6 +74,7 @@ export function RegionDetailModal({ region, ccaaName, onClose, t }: RegionDetail
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
           <RegionalPerformanceTables
             region={region}
+            selectedCcaa={selectedCcaa}
             selectedManager={selectedManager}
             selectedAgent={selectedAgent}
             onSelectManager={handleSelectManager}

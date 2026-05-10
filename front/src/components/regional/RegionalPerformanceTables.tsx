@@ -6,11 +6,11 @@ import type {
   AgentPerformance,
   ClientExecution,
   ManagerPerformance,
-  RegionSummary,
 } from "@/types/regional-dashboard";
 
 type RegionalPerformanceTablesProps = {
   region: RegionSummary;
+  selectedCcaa?: string;
   selectedManager: ManagerPerformance | null;
   selectedAgent: AgentPerformance | null;
   onSelectManager: (manager: ManagerPerformance) => void;
@@ -22,6 +22,7 @@ type RegionalPerformanceTablesProps = {
 
 export function RegionalPerformanceTables({
   region,
+  selectedCcaa,
   selectedAgent,
   selectedManager,
   onResetAgent,
@@ -30,10 +31,18 @@ export function RegionalPerformanceTables({
   onSelectManager,
   t,
 }: RegionalPerformanceTablesProps) {
+  // Filter managers/agents by CCAA when one is selected
+  const visibleManagers = selectedCcaa
+    ? region.managers
+        .map((m) => ({ ...m, agents: m.agents.filter((a) => a.codCcaa === selectedCcaa) }))
+        .filter((m) => m.agents.length > 0)
+    : region.managers;
+
   return (
     <div className="space-y-0">
       <ManagersTable
-        region={region}
+        managers={visibleManagers}
+        regionName={region.name}
         selectedManager={selectedManager}
         selectedAgent={selectedAgent}
         onSelectManager={onSelectManager}
@@ -47,7 +56,8 @@ export function RegionalPerformanceTables({
 }
 
 function ManagersTable({
-  region,
+  managers,
+  regionName,
   selectedManager,
   selectedAgent,
   onSelectManager,
@@ -56,7 +66,8 @@ function ManagersTable({
   onResetAgent,
   t,
 }: {
-  region: RegionSummary;
+  managers: ManagerPerformance[];
+  regionName: string;
   selectedManager: ManagerPerformance | null;
   selectedAgent: AgentPerformance | null;
   onSelectManager: (m: ManagerPerformance) => void;
@@ -69,7 +80,7 @@ function ManagersTable({
     <Card>
       <CardHeader className="pb-2">
         <CardTitle>{t("regional_dashboard.managers.title")}</CardTitle>
-        <p className="mt-1 text-sm text-muted-foreground">{region.name}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{regionName}</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -85,7 +96,7 @@ function ManagersTable({
               </tr>
             </thead>
             <tbody>
-              {region.managers.map((manager) => {
+              {managers.map((manager) => {
                 const isExpanded = selectedManager?.id === manager.id;
                 return (
                   <>
