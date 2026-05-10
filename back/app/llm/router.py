@@ -20,6 +20,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
             alert=request.alert,
             history=request.history,
             question=request.question,
+            lang=request.lang,
         )
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

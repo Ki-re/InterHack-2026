@@ -47,9 +47,9 @@ function NotificationItem({
   );
 }
 
-export function NotificationBell() {
+export function NotificationBell({ agentId }: { agentId: number | null }) {
   const [open, setOpen] = useState(false);
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications(agentId);
   const panelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 

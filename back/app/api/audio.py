@@ -11,7 +11,6 @@ from app.core.config import get_settings
 
 router = APIRouter(prefix="/audio", tags=["audio"])
 
-ELEVENLABS_VOICE_ID = "RwzBDEn5f6FIgpAjH9YN"
 ELEVENLABS_MODEL = "eleven_multilingual_v2"
 
 
@@ -50,12 +49,12 @@ async def synthesize(body: SynthesizeRequest) -> StreamingResponse:
         raise HTTPException(status_code=503, detail="TTS not configured")
 
     def _synthesize() -> bytes:
+        voice_id = settings.eleven_labs_voice_id_ca if body.lang == "ca" else settings.eleven_labs_voice_id_es
         client = ElevenLabs(api_key=settings.eleven_labs_api_key)
         chunks = client.text_to_speech.convert(
-            voice_id=ELEVENLABS_VOICE_ID,
+            voice_id=voice_id,
             text=body.text,
             model_id=ELEVENLABS_MODEL,
-            language_code=body.lang,
         )
         return b"".join(chunks)
 
