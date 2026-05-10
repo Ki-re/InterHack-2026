@@ -57,6 +57,7 @@ system: |
 
   Churn type interpretation:
   - "total" → the client shows risk of stopping all orders
+  - "Combinat" → risk concentrated across exactly 2 product lines — partial but notable reduction
   - Named product (e.g. "Producto 1") → risk is concentrated in that product line, not the whole relationship
 
   Key signal combination to watch:

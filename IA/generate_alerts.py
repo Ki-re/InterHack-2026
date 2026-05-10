@@ -12,8 +12,13 @@ The pipeline:
      Orders outside this window are excluded (too fresh or too stale).
   2. Takes the LATEST prediction row per (client, product) within the window.
   3. Classifies each client's value tier (Alto / Medio / Bajo) by total spend.
+  3b. Computes percentile rank of score_riesgo_0_100 within the candidate set,
+      so risk scores are uniformly distributed (0-100) instead of border-heavy.
   4. Computes a combined alert score per (client, product).
-  5. Decides alert type per client: "Total" (≥N products alerting) or "Producto X".
+  5. Decides alert type per client:
+       "Total"    → ≥ MULTI_PRODUCT_THRESHOLD products trigger
+       "Combinat" → COMBINED_ALERT_MIN_PRODUCTS ≤ n < MULTI_PRODUCT_THRESHOLD
+       "Producto X" → only 1 product triggers
   6. Assigns alert risk level (Alto / Medio / Bajo).
   7. Maps provincia → Comunidad Autónoma → commercial zone → agent ID.
   8. Generates a human-readable explanation for the LLM context.
@@ -80,14 +85,20 @@ VALUE_MULTIPLIERS = {
     "Bajo":  0.4,
 }
 
-# --- Alert type (Total vs per-product) -------------------------------------
+# --- Alert type (Total vs Combined vs per-product) -------------------------
 
 # If a client has at least this many products crossing its tier risk threshold,
 # collapse them into a single "Total" alert.
 MULTI_PRODUCT_THRESHOLD = 3
 
-# For clients with fewer triggering products, limit individual product alerts.
-MAX_PRODUCT_ALERTS_PER_CLIENT = 2
+# If a client has at least this many triggering products (but fewer than
+# MULTI_PRODUCT_THRESHOLD), collapse them into a single "Combined" alert
+# instead of emitting one alert per product. This reduces alert flooding.
+# Must be ≥ 2 and < MULTI_PRODUCT_THRESHOLD.
+COMBINED_ALERT_MIN_PRODUCTS = 2  # 2 products → one "Combinat" alert
+
+# For clients with only 1 triggering product, emit a single per-product alert.
+MAX_PRODUCT_ALERTS_PER_CLIENT = 1  # kept for safety; effectively always 1 now
 
 # --- Per-tier alert caps (prevents flooding from any single tier) -----------
 MAX_ALERTS_ALTO  = 250
@@ -255,17 +266,18 @@ def classify_client_value(total_spend: float, p25: float, p75: float) -> str:
     return "Medio"
 
 
-def compute_alert_score(risk: float, propensity: float, value_class: str) -> float:
+def compute_alert_score(risk_percentile: float, propensity: float, value_class: str) -> float:
     """
     Combined priority score (used for SORTING alerts, not for filtering).
-    Higher = surface first. Rewards high churn risk and high purchase propensity.
+    Higher = surface first. Uses risk_percentile (0-100, uniform) rather than
+    the raw score_riesgo_0_100 to avoid border clustering.
     """
     mult = VALUE_MULTIPLIERS.get(value_class, 0.5)
-    return risk * (1.0 + propensity / 100.0) * mult
+    return risk_percentile * (1.0 + propensity / 100.0) * mult
 
 
 def get_risk_threshold(value_class: str) -> float:
-    """Return minimum score_riesgo required to trigger an alert for this tier."""
+    """Return minimum risk PERCENTILE required to trigger an alert for this tier."""
     return {
         "Alto":  RISK_THRESHOLD_ALTO,
         "Medio": RISK_THRESHOLD_MEDIO,
@@ -273,13 +285,13 @@ def get_risk_threshold(value_class: str) -> float:
     }.get(value_class, RISK_THRESHOLD_BAJO)
 
 
-def assign_risk_level(risk_score: float, propensity: float, client_value: str) -> str:
+def assign_risk_level(risk_percentile: float, propensity: float, client_value: str) -> str:
     """
-    Alert risk label based on a composite of churn risk, purchase propensity,
-    and client value tier — as requested.
+    Alert risk label based on a composite of churn risk PERCENTILE, purchase
+    propensity, and client value tier.
 
     Composite formula (0–100 scale):
-      50% weight → score_riesgo
+      50% weight → risk_percentile  (uniform 0-100 rank within candidate set)
       30% weight → score_potencial
       20% weight → client value tier (Alto=100, Medio=60, Bajo=25)
 
@@ -289,7 +301,7 @@ def assign_risk_level(risk_score: float, propensity: float, client_value: str) -
       else                                      → "Bajo"
     """
     value_score = {"Alto": 100.0, "Medio": 60.0, "Bajo": 25.0}.get(client_value, 50.0)
-    composite = risk_score * 0.50 + propensity * 0.30 + value_score * 0.20
+    composite = risk_percentile * 0.50 + propensity * 0.30 + value_score * 0.20
     if composite >= HIGH_ALERT_RISK_THRESHOLD:
         return "Alto"
     if composite >= MEDIUM_ALERT_RISK_THRESHOLD:
@@ -372,6 +384,11 @@ def build_explanation(row: pd.Series, alert_type: str) -> str:
             "El risc afecta múltiples línies de producte, "
             "la qual cosa apunta a un canvi global en la relació comercial."
         )
+    elif alert_type == "Combinat":
+        parts.append(
+            "El risc afecta diverses línies de producte, "
+            "indicant una reducció parcial de la relació comercial."
+        )
 
     return " ".join(parts) if parts else "Alerta basada en risc de fuga i propensió de compra."
 
@@ -431,26 +448,38 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
         lambda s: classify_client_value(s, p25, p75)
     )
 
+    # ── Step 3b: Percentile-rank the risk score ──────────────────────────────
+    # Replace raw score_riesgo_0_100 with its percentile rank within the
+    # candidate universe so scores are uniformly distributed across 0-100
+    # and not clustered at the high end.
+    print("[4b] Computing risk percentile ranks within window candidates…")
+    latest["risk_percentile"] = latest["score_riesgo_0_100"].rank(pct=True) * 100
+    print(f"      risk_percentile distribution — "
+          f"P25: {latest['risk_percentile'].quantile(0.25):.1f}  "
+          f"P50: {latest['risk_percentile'].quantile(0.50):.1f}  "
+          f"P75: {latest['risk_percentile'].quantile(0.75):.1f}  "
+          f"P90: {latest['risk_percentile'].quantile(0.90):.1f}")
+
     # ── Step 4: Per-tier alert scoring & filtering ───────────────────────────
     print("[5/8] Filtering candidates with per-tier risk thresholds…")
     latest["alert_score"] = latest.apply(
         lambda r: compute_alert_score(
-            r["score_riesgo_0_100"],
+            r["risk_percentile"],
             r["score_potencial_0_100"],
             r["client_value"],
         ),
         axis=1,
     )
-    # Apply per-tier risk threshold (and optional propensity filter)
+    # Apply per-tier risk threshold using percentile rank (and optional propensity filter)
     latest["_tier_threshold"] = latest["client_value"].apply(get_risk_threshold)
     candidates = latest[
-        (latest["score_riesgo_0_100"] >= latest["_tier_threshold"]) &
+        (latest["risk_percentile"] >= latest["_tier_threshold"]) &
         (latest["score_potencial_0_100"] >= MIN_PROPENSITY_THRESHOLD)
     ].copy()
     for tier in ["Alto", "Medio", "Bajo"]:
         n = (candidates["client_value"] == tier).sum()
         thr = get_risk_threshold(tier)
-        print(f"      {tier}: {n:,} pairs (risk≥{thr})")
+        print(f"      {tier}: {n:,} pairs (risk_percentile≥{thr})")
 
     # ── Step 5: Zone + agent ─────────────────────────────────────────────────
     print("[6/8] Mapping province → CCAA → zone → agent…")
@@ -471,7 +500,7 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
     )
 
     # ── Step 6: Decide alert type per client ─────────────────────────────────
-    print("[7/8] Deciding alert type (Total vs Producto X) per client…")
+    print("[7/8] Deciding alert type (Total / Combinat / Producto X) per client…")
     records = []
 
     for client_id, group in candidates.groupby("Id. Cliente"):
@@ -488,10 +517,10 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
         client_name = get_client_name(int(client_id))
 
         if n_products >= MULTI_PRODUCT_THRESHOLD:
-            # ── TOTAL alert — use average risk/propensity across triggered products
-            avg_risk = group["score_riesgo_0_100"].mean()
+            # ── TOTAL alert — use average risk percentile/propensity across products
+            avg_risk_pct = group["risk_percentile"].mean()
             avg_prop = group["score_potencial_0_100"].mean()
-            risk_level = assign_risk_level(avg_risk, avg_prop, client_value)
+            risk_level = assign_risk_level(avg_risk_pct, avg_prop, client_value)
             product_list = sorted(group["Id. Producto"].astype(str).tolist())
             explanation = build_explanation(rep, "Total")
             rec = {
@@ -506,8 +535,51 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
                 "alert_type":             "Total",
                 "risk_level":             risk_level,
                 "client_value":           client_value,
-                "churn_probability":      round(rep["score_riesgo_0_100"], 2),
-                "purchase_propensity":    round(rep["score_potencial_0_100"], 2),
+                "churn_probability":      round(avg_risk_pct, 2),
+                "purchase_propensity":    round(avg_prop, 2),
+                "predicted_next_purchase": rep["prediccion_fecha_proxima_compra"],
+                "last_order_date":        rep["Fecha"].strftime("%Y-%m-%d")
+                                          if pd.notna(rep["Fecha"]) else None,
+                "alert_score":            round(rep["alert_score"], 2),
+                "explanation":            explanation,
+                # Context fields for LLM
+                "ctx_productos_afectados":   ", ".join(product_list),
+                "ctx_n_productos":           n_products,
+                "ctx_gasto_anual_real":      round(rep.get("gasto_anual_real_cliente_producto", 0) or 0, 2),
+                "ctx_gasto_esperado":        round(rep.get("gasto_medio_anual_cliente_categoria_producto", 0) or 0, 2),
+                "ctx_dias_desde_compra":     rep.get("dias_desde_compra_anterior_producto", None),
+                "ctx_tiempo_medio_recompra": rep.get("tiempo_medio_recompra_dias", None),
+                "ctx_zscore_momento":        round(rep.get("zscore_momento_cliente_producto", 0) or 0, 3),
+                "ctx_potencial_clase":       rep.get("potencial_clase_predicha", None),
+                "ctx_num_compras_anteriores": rep.get("numero_compras_anteriores_producto", None),
+                "ctx_total_compras_otros":   rep.get("total_compras_cliente_otros_productos", None),
+                "ctx_vuelve_a_comprar":      rep.get("vuelve_a_comprar", None),
+            }
+            records.append(rec)
+
+        elif n_products >= COMBINED_ALERT_MIN_PRODUCTS:
+            # ── COMBINED alert — 2+ products but below Total threshold ──
+            # Collapse into a single alert to avoid flooding the dashboard.
+            avg_risk_pct = group["risk_percentile"].mean()
+            avg_prop = group["score_potencial_0_100"].mean()
+            risk_level = assign_risk_level(avg_risk_pct, avg_prop, client_value)
+            product_list = sorted(group["Id. Producto"].astype(str).tolist())
+            alert_type = "Combinat"
+            explanation = build_explanation(rep, "Combinat")
+            rec = {
+                "alert_id":               make_alert_id(int(client_id), "combined", 0),
+                "client_id":              int(client_id),
+                "client_name":            client_name,
+                "provincia":              provincia,
+                "comunidad_autonoma":     ccaa,
+                "zone":                   zone,
+                "agent_id":               agent_id,
+                "product_id":             "Combinat",
+                "alert_type":             alert_type,
+                "risk_level":             risk_level,
+                "client_value":           client_value,
+                "churn_probability":      round(avg_risk_pct, 2),
+                "purchase_propensity":    round(avg_prop, 2),
                 "predicted_next_purchase": rep["prediccion_fecha_proxima_compra"],
                 "last_order_date":        rep["Fecha"].strftime("%Y-%m-%d")
                                           if pd.notna(rep["Fecha"]) else None,
@@ -529,50 +601,48 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
             records.append(rec)
 
         else:
-            # ── PER-PRODUCT alerts (capped) ──
-            for i, (_, row) in enumerate(group.iterrows()):
-                if i >= MAX_PRODUCT_ALERTS_PER_CLIENT:
-                    break
-                product_id = row["Id. Producto"]
-                risk_level = assign_risk_level(
-                    row["score_riesgo_0_100"],
-                    row["score_potencial_0_100"],
-                    client_value,
-                )
-                explanation = build_explanation(row, f"Producto {product_id}")
-                rec = {
-                    "alert_id":               make_alert_id(int(client_id), product_id, i),
-                    "client_id":              int(client_id),
-                    "client_name":            client_name,
-                    "provincia":              provincia,
-                    "comunidad_autonoma":     ccaa,
-                    "zone":                   zone,
-                    "agent_id":               agent_id,
-                    "product_id":             int(product_id),
-                    "alert_type":             f"Producto {product_id}",
-                    "risk_level":             risk_level,
-                    "client_value":           client_value,
-                    "churn_probability":      round(row["score_riesgo_0_100"], 2),
-                    "purchase_propensity":    round(row["score_potencial_0_100"], 2),
-                    "predicted_next_purchase": row["prediccion_fecha_proxima_compra"],
-                    "last_order_date":        row["Fecha"].strftime("%Y-%m-%d")
-                                              if pd.notna(row["Fecha"]) else None,
-                    "alert_score":            round(row["alert_score"], 2),
-                    "explanation":            explanation,
-                    # Context fields for LLM
-                    "ctx_productos_afectados":   str(product_id),
-                    "ctx_n_productos":           1,
-                    "ctx_gasto_anual_real":      round(row.get("gasto_anual_real_cliente_producto", 0) or 0, 2),
-                    "ctx_gasto_esperado":        round(row.get("gasto_medio_anual_cliente_categoria_producto", 0) or 0, 2),
-                    "ctx_dias_desde_compra":     row.get("dias_desde_compra_anterior_producto", None),
-                    "ctx_tiempo_medio_recompra": row.get("tiempo_medio_recompra_dias", None),
-                    "ctx_zscore_momento":        round(row.get("zscore_momento_cliente_producto", 0) or 0, 3),
-                    "ctx_potencial_clase":       row.get("potencial_clase_predicha", None),
-                    "ctx_num_compras_anteriores": row.get("numero_compras_anteriores_producto", None),
-                    "ctx_total_compras_otros":   row.get("total_compras_cliente_otros_productos", None),
-                    "ctx_vuelve_a_comprar":      row.get("vuelve_a_comprar", None),
-                }
-                records.append(rec)
+            # ── PER-PRODUCT alert — only 1 product triggering ──
+            row = group.iloc[0]
+            product_id = row["Id. Producto"]
+            risk_level = assign_risk_level(
+                row["risk_percentile"],
+                row["score_potencial_0_100"],
+                client_value,
+            )
+            explanation = build_explanation(row, f"Producto {product_id}")
+            rec = {
+                "alert_id":               make_alert_id(int(client_id), product_id, 0),
+                "client_id":              int(client_id),
+                "client_name":            client_name,
+                "provincia":              provincia,
+                "comunidad_autonoma":     ccaa,
+                "zone":                   zone,
+                "agent_id":               agent_id,
+                "product_id":             int(product_id),
+                "alert_type":             f"Producto {product_id}",
+                "risk_level":             risk_level,
+                "client_value":           client_value,
+                "churn_probability":      round(row["risk_percentile"], 2),
+                "purchase_propensity":    round(row["score_potencial_0_100"], 2),
+                "predicted_next_purchase": row["prediccion_fecha_proxima_compra"],
+                "last_order_date":        row["Fecha"].strftime("%Y-%m-%d")
+                                          if pd.notna(row["Fecha"]) else None,
+                "alert_score":            round(row["alert_score"], 2),
+                "explanation":            explanation,
+                # Context fields for LLM
+                "ctx_productos_afectados":   str(product_id),
+                "ctx_n_productos":           1,
+                "ctx_gasto_anual_real":      round(row.get("gasto_anual_real_cliente_producto", 0) or 0, 2),
+                "ctx_gasto_esperado":        round(row.get("gasto_medio_anual_cliente_categoria_producto", 0) or 0, 2),
+                "ctx_dias_desde_compra":     row.get("dias_desde_compra_anterior_producto", None),
+                "ctx_tiempo_medio_recompra": row.get("tiempo_medio_recompra_dias", None),
+                "ctx_zscore_momento":        round(row.get("zscore_momento_cliente_producto", 0) or 0, 3),
+                "ctx_potencial_clase":       row.get("potencial_clase_predicha", None),
+                "ctx_num_compras_anteriores": row.get("numero_compras_anteriores_producto", None),
+                "ctx_total_compras_otros":   row.get("total_compras_cliente_otros_productos", None),
+                "ctx_vuelve_a_comprar":      row.get("vuelve_a_comprar", None),
+            }
+            records.append(rec)
 
     alerts_df = pd.DataFrame(records)
     print(f"      Generated {len(alerts_df):,} raw alerts")
