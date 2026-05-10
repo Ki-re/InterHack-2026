@@ -29,7 +29,7 @@ async def transcribe(file: UploadFile) -> dict[str, str]:
     def _transcribe() -> str:
         aai.settings.api_key = settings.assemblyai_api_key
         config = aai.TranscriptionConfig(
-            speech_models=["universal-3-pro", "universal-2"],
+            speech_model=aai.SpeechModel.best,
             language_detection=True,
         )
         transcript = aai.Transcriber(config=config).transcribe(io.BytesIO(audio_bytes))
