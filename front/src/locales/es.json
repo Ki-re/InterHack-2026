@@ -88,7 +88,7 @@
   "churn_type": {
     "total": "Total",
     "product": "Producto",
-    "segment": "Producto"
+    "segment": "Segmento"
   },
   "customer_value": {
     "high": "Alto",
@@ -181,24 +181,46 @@
     "result_positive": "Resultado positivo",
     "result_neutral": "Resultado neutro",
     "result_negative": "Resultado negativo",
-    "kept_open": "Alerta mantenida abierta",
-    "closed": "Alerta cerrada",
     "event_closed": "Alerta cerrada",
     "event_dismissed": "Alerta descartada",
     "event_reopened": "Alerta recuperada"
+  },
+  "time": {
+    "minutes_ago": "hace {{n}}m",
+    "hours_ago": "hace {{n}}h",
+    "days_ago": "hace {{n}}d"
+  },
+  "notification": {
+    "bell_aria": "Notificaciones",
+    "title": "Notificaciones",
+    "mark_all_read": "Marcar todas como leídas",
+    "empty": "No hay notificaciones"
+  },
+  "audio": {
+    "record": "Grabar audio",
+    "stop": "Parar grabación",
+    "cancel": "Descartar audio",
+    "send": "Enviar audio",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "mute": "Silenciar audio",
+    "unmute": "Activar audio",
+    "transcribing": "Transcribiendo…",
+    "record_note": "Grabar nota de voz"
   },
   "regional_dashboard": {
     "title": "Panel de dirección regional",
     "subtitle": "Control ejecutivo de las alertas por región, mánagers, agentes y clientes.",
     "loading": "Cargando datos regionales...",
     "error": "No se han podido cargar los datos regionales.",
+    "region_prefix": "Región ",
     "scope": "Área seleccionada · {{region}}",
     "scope_all": "Todas las regiones",
     "all_regions": "Todas las regiones",
     "regions": {
-      "est": "Est",
-      "north": "Nord",
-      "south": "Sud"
+      "est": "Este",
+      "north": "Norte",
+      "south": "Sur"
     },
     "status": {
       "good": "Ejecución saludable",
@@ -206,6 +228,7 @@
       "critical": "Riesgo operativo"
     },
     "kpis": {
+      "total_alerts": "Total",
       "execution_score": "Eficiencia de respuesta",
       "pending": "Pendientes",
       "pending_desc": "Alertas todavía abiertas",
@@ -239,6 +262,7 @@
     "underperformers": {
       "title": "Focos de riesgo",
       "subtitle": "Equipos que necesitan revisión prioritaria.",
+      "manager_label": "Mán.",
       "manager_level": "Mánager regional",
       "role_manager": "Mánager",
       "role_agent": "Delegado"

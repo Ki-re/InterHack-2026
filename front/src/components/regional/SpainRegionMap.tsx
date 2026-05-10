@@ -142,7 +142,7 @@ export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, 
             >
               <div className="min-w-0">
                 <span className="block truncate text-sm font-medium text-foreground">
-                  {"Regió " + getRegionLabel(region.slug, t)}
+                  {t("regional_dashboard.region_prefix") + getRegionLabel(region.slug, t)}
                 </span>
               </div>
               <span className={cn("size-2.5 shrink-0 rounded-full", getStatusDot(region.kpis.status))} />

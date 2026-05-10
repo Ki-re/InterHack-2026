@@ -44,7 +44,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [mode, setMode] = useState<RecordingMode>("idle");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [liveBars, setLiveBars] = useState<number[]>(Array(BARS).fill(0));
@@ -274,7 +274,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
           </div>
           <div className="flex items-center gap-1">
             <Button
-              aria-label={isMuted ? "Activar audio" : "Silenciar audio"}
+              aria-label={isMuted ? t("audio.unmute") : t("audio.mute")}
               size="icon"
               type="button"
               variant={isMuted ? "secondary" : "ghost"}
@@ -335,7 +335,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
           {mode === "idle" && (
             <div className="flex gap-2">
               <Button
-                aria-label="Grabar audio"
+                aria-label={t("audio.record")}
                 disabled={isLoading || isTranscribing}
                 size="icon"
                 type="button"
@@ -354,7 +354,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
               />
               <Button disabled={isLoading || isTranscribing || !question.trim()} type="submit">
                 {isLoading || isTranscribing ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-                {isTranscribing ? t("ai.transcribing") || "Transcribiendo…" : t("ai.send")}
+                {isTranscribing ? t("audio.transcribing") : t("ai.send")}
               </Button>
             </div>
           )}
@@ -363,7 +363,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
           {mode === "recording" && (
             <div className="flex items-center gap-2">
               <Button
-                aria-label="Cancelar"
+                aria-label={t("form.cancel")}
                 size="icon"
                 type="button"
                 variant="ghost"
@@ -390,7 +390,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
               </div>
 
               <Button
-                aria-label="Parar grabación"
+                aria-label={t("audio.stop")}
                 size="icon"
                 type="button"
                 variant="destructive"
@@ -406,7 +406,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
           {mode === "preview" && (
             <div className="flex items-center gap-2">
               <Button
-                aria-label="Descartar audio"
+                aria-label={t("audio.cancel")}
                 size="icon"
                 type="button"
                 variant="ghost"
@@ -417,7 +417,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
               </Button>
 
               <Button
-                aria-label={isPlayingPreview ? "Pausar" : "Reproducir"}
+                aria-label={isPlayingPreview ? t("audio.pause") : t("audio.play")}
                 size="icon"
                 type="button"
                 variant="outline"
@@ -448,7 +448,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
                 type="submit"
                 size="icon"
                 className="shrink-0 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
-                aria-label="Enviar audio"
+                aria-label={t("audio.send")}
               >
                 {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
               </Button>

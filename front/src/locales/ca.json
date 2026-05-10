@@ -83,7 +83,7 @@
   "risk": {
     "high": "Alta",
     "medium": "Mitjana",
-    "low": "Baix"
+    "low": "Baixa"
   },
   "churn_type": {
     "total": "Total",
@@ -181,17 +181,39 @@
     "result_positive": "Resultat positiu",
     "result_neutral": "Resultat neutre",
     "result_negative": "Resultat negatiu",
-    "kept_open": "Alerta mantinguda oberta",
-    "closed": "Alerta tancada",
     "event_closed": "Alerta tancada",
     "event_dismissed": "Alerta descartada",
     "event_reopened": "Alerta recuperada"
+  },
+  "time": {
+    "minutes_ago": "fa {{n}}m",
+    "hours_ago": "fa {{n}}h",
+    "days_ago": "fa {{n}}d"
+  },
+  "notification": {
+    "bell_aria": "Notificacions",
+    "title": "Notificacions",
+    "mark_all_read": "Marcar totes com llegides",
+    "empty": "No hi ha notificacions"
+  },
+  "audio": {
+    "record": "Gravar àudio",
+    "stop": "Parar gravació",
+    "cancel": "Descartar àudio",
+    "send": "Enviar àudio",
+    "play": "Reproduir",
+    "pause": "Pausar",
+    "mute": "Silenciar àudio",
+    "unmute": "Activar àudio",
+    "transcribing": "Transcrivint…",
+    "record_note": "Gravar nota de veu"
   },
   "regional_dashboard": {
     "title": "Dashboard de direcció regional",
     "subtitle": "Control executiu de les alertes per regió, mànagers, agents i clients.",
     "loading": "Carregant dades regionals...",
     "error": "No s'han pogut carregar les dades regionals.",
+    "region_prefix": "Regió ",
     "scope": "Àrea seleccionada · {{region}}",
     "scope_all": "Totes les regions",
     "all_regions": "Totes les regions",
@@ -206,6 +228,7 @@
       "critical": "Risc operatiu"
     },
     "kpis": {
+      "total_alerts": "Total",
       "execution_score": "Eficiència de resposta",
       "pending": "Pendents",
       "pending_desc": "Alertes encara obertes",
@@ -239,6 +262,7 @@
     "underperformers": {
       "title": "Focus de risc",
       "subtitle": "Equips que necessiten revisió prioritària.",
+      "manager_label": "Màn.",
       "manager_level": "Mànager regional",
       "role_manager": "Mànager",
       "role_agent": "Delegat"

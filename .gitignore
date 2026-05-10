@@ -223,6 +223,8 @@ __marimo__/
 .env.prod
 back/app.db
 *.db
+/IA/checkpoints*/
+/IA/*.pt
 node_modules/
 front/node_modules/
 dist/
@@ -275,8 +277,17 @@ __pycache__/
 /opencode.json
 # END AI Agent Symlinks
 
+/IA/gemini*
+
+*.pt
+
+!/IA/models/fuga_model.pt
+!/IA/models/potencial_model.pt
+!/IA/models/dias_model.pt
 *.pt
 run_config.json
+
+/.env.prod
 /IA/Datasets.xlsx
 
 /IA/gemini*

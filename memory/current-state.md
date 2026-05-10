@@ -5,10 +5,14 @@
 - Backend: FastAPI, async SQLAlchemy 2.0, SQLite, Alembic.
 - Docker Compose runs backend on `8000` and frontend on `5173`.
 - Auth: email/password register/login, JWT bearer token, `/auth/me`.
+- Frontend auth: token persisted in `localStorage`, guarded dashboard route.
+- Landing page: animated shader hero with Register/Login CTAs and inline auth form.
+- Dashboard: authenticated main page with backend health status cards.
+- AI Model: Multi-head `LargePurchaseModel` with masked loss for days prediction (fixes 1500-day bias).
 - Frontend auth for INIBSA MVP: mocked role-based session persisted in `localStorage` under key `inibsa.salesDelegateSession`, guarded dashboard routes, no backend auth call. Roles: sales delegate and regional manager.
 - Login page: enterprise SaaS mock login at `/` with role selector. Sales delegate routes to `/dashboard`; regional manager routes to `/regional-dashboard`. Uses `logo.png` in card header and `icon.png` in the challenge badge.
 - Dashboard: INIBSA sales alerts MVP at `/dashboard` with mock alert data (dental clinic clients), table-first workflow with **pending / attended / dismissed** tab toggle (pending shown first), channel-aware attended form, dismiss with inline confirm, changelog in expanded rows, and AI insight panel connected to Gemini API via `POST /ai/chat` (real LLM, no mock responses).
-- LLM module: `back/app/llm/` with `prompt.yaml` (INIBSA system prompt with alert context injection, guardrails, multilingual, no recommendations, no contact-history references, short-paragraph rules), `schemas.py`, `service.py` (Gemini 2.5 Flash via `google-genai` SDK, async via `asyncio.to_thread`), `router.py` (`POST /ai/chat`). Requires `GEMINI_API_KEY` env var in `.env`.
+- LLM module: `back/app/llm/` with `prompt.yaml` (diagnostic analyst persona — interprets data without giving orders; answers the specific question asked; translates numbers into plain business reality; bilingual CA/ES; short-paragraph structure; churn type context; competitive vs. budget displacement reasoning), `schemas.py`, `service.py` (Gemini **2.5 Flash** via `google-genai` SDK, async via `asyncio.to_thread`), `router.py` (`POST /ai/chat`). Requires `GEMINI_API_KEY` env var in `.env`.
 - `AIInsightPanel`: real backend call; loading spinner; errors inline; assistant replies rendered as separated `<p>` paragraphs split on `\n\n+`.
 - **Alert interaction model**: `InteractionRecord` replaces `FollowUpRecord`. Each alert carries `interactions: InteractionRecord[]` and `events: SystemEventRecord[]`. `keepOpen: boolean` on the record controls whether status becomes "attended" or stays "pending". Closing appends a `"closed"` system event; dismissing appends `"dismissed"`; recovering appends `"reopened"`. `dismissed` status with optional `dismissReason` + `dismissedAt`.
 - **Channel-aware follow-up form** (`FollowUpForm.tsx`): phone (answered/not), visit (successful/not), email (response/not). Result + Notes shown only when contact was made. keepOpen toggle always shown.

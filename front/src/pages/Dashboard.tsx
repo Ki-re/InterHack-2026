@@ -119,20 +119,6 @@ export function Dashboard() {
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
-      <motion.section
-        variants={itemVariants}
-        className="flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-end lg:justify-between"
-      >
-        <div className="max-w-3xl">
-          <h1 className="text-3xl font-semibold tracking-normal text-foreground">
-            {t("dashboard.title")}
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("dashboard.subtitle")}</p>
-        </div>
-        <div className="rounded-md border bg-card px-4 py-3 text-sm text-muted-foreground shadow-sm">
-          {t("dashboard.mock_data")}
-        </div>
-      </motion.section>
 
       <motion.section variants={itemVariants} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
