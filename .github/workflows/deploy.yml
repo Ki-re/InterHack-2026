@@ -23,11 +23,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVEN_LABS_API_KEY: ${{ secrets.ELEVEN_LABS_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
         with:
           host: ${{ secrets.VULTR_HOST }}
           username: ${{ secrets.VULTR_USER }}
           key: ${{ secrets.VULTR_SSH_KEY }}
-          envs: APP_NAME,DATABASE_URL,FRONTEND_ORIGIN,JWT_SECRET_KEY,ACCESS_TOKEN_EXPIRE_MINUTES,VITE_API_URL,GEMINI_API_KEY,ELEVEN_LABS_API_KEY,GROQ_API_KEY
+          envs: APP_NAME,DATABASE_URL,FRONTEND_ORIGIN,JWT_SECRET_KEY,ACCESS_TOKEN_EXPIRE_MINUTES,VITE_API_URL,GEMINI_API_KEY,ELEVEN_LABS_API_KEY,GROQ_API_KEY,ASSEMBLYAI_API_KEY
           script: |
             set -e
 
@@ -45,6 +46,7 @@ jobs:
             printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" >> .env.prod
             printf 'ELEVEN_LABS_API_KEY=%s\n' "$ELEVEN_LABS_API_KEY" >> .env.prod
             printf 'GROQ_API_KEY=%s\n' "$GROQ_API_KEY" >> .env.prod
+            printf 'ASSEMBLYAI_API_KEY=%s\n' "$ASSEMBLYAI_API_KEY" >> .env.prod
             chmod 600 .env.prod
 
             # Build and restart services
