@@ -1,18 +1,11 @@
-import { BarChart3, LogOut, MapPinned, UserRound } from "lucide-react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { LogOut, UserRound } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/LanguageContext";
 import inibsaLogo from "@/assets/logo.png";
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  [
-    "inline-flex h-9 items-center rounded-md px-3 text-sm font-medium transition-colors",
-    isActive
-      ? "bg-primary text-primary-foreground"
-      : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground",
-  ].join(" ");
 
 export function AppLayout() {
   const { logout, user } = useAuth();
@@ -31,21 +24,6 @@ export function AppLayout() {
           <div className="flex min-w-0 items-center gap-3">
             <img src={inibsaLogo} alt="INIBSA" className="h-8 w-auto shrink-0" />
           </div>
-
-          <nav className="hidden items-center gap-2 lg:flex" aria-label="Main navigation">
-            {user?.role !== "regional_manager" && (
-              <NavLink to="/dashboard" className={navLinkClass}>
-                <BarChart3 className="mr-2 size-4" aria-hidden="true" />
-                {t("app.delegate_dashboard")}
-              </NavLink>
-            )}
-            {user?.role === "regional_manager" && (
-              <NavLink to="/regional-dashboard" className={navLinkClass}>
-                <MapPinned className="mr-2 size-4" aria-hidden="true" />
-                {t("app.regional_dashboard")}
-              </NavLink>
-            )}
-          </nav>
 
           <div className="flex min-w-0 items-center gap-2">
             <div className="flex items-center gap-1 rounded-md border bg-background p-1">

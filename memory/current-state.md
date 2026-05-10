@@ -21,13 +21,16 @@
 - Regional dashboard frontend: `/regional-dashboard` — full regional dashboard with KPI cards (reactive to selected region), interactive Spain map, inline drill-down tables, and CA/ES translations.
   - Map: `d3-geo` + `spain-communities.json` module + `topojson-server`/`topojson-client` for exact inter-region boundaries. Scale 1800, HEIGHT 310, peninsula only. Region buttons below SVG (full-width flex-wrap row). SVG: pass 1 = white 0.8px subtle community borders; inter-region boundary drawn as a pre-computed topojson mesh path in neutral dark (#334155) — exact geographic boundary, not status-dependent, always visible regardless of region status colors.
   - Layout: fr-based 3-col grid `xl:grid-cols-[1.6fr_0.7fr_1fr] xl:items-stretch` fills full row width (same as KPI row). Estat and Focus use `relative overflow-hidden` wrappers with `absolute inset-0` inner divs — the wrappers contribute 0 height to grid track sizing (no normal-flow children), so only the Map sets the row height. Estat/Focus cards are `h-full` and exactly match the map height.
-  - Map: SVG wrapper changed to `p-3` (uniform 12px margin all around). Topojson imports/variables/border paths removed — no divisor line between region groups. Only the subtle white 0.8px community borders remain.
+  - When a region is selected, an "Info" button appears inside the map card (below SVG, above region buttons). Clicking opens `RegionDetailModal` — a wide (`max-w-5xl`, `90vh`) overlay with the full manager→agent→client drill-down. Modal state (`selectedManager`, `selectedAgent`) is self-contained. Clicking outside or the X closes it. Deselecting a region also closes the modal.
+  - Expand actions in `RegionalPerformanceTables` replaced from text+icon Button to icon-only ghost chevron buttons (matches Delegat dashboard pattern).
+  - Below-map `<RegionalPerformanceTables>` block removed from `RegionalDashboard.tsx`; details now live exclusively in the modal.
 - Fixed missing `front/src/lib/utils.ts` utility file for shadcn/ui components.
 - Implemented i18n (Catalan default, Spanish toggle) using React Context. Both locales fully translated — no English terms remain in either locale file.
 - Enhanced Dashboard layout to fix horizontal scrolling on desktop (widened container to `max-w-[1440px]`).
 - Added subtle UI animations using Framer Motion (fade-ins, staggered lists, smooth row expansion).
 - Branding: INIBSA full logo (`front/src/assets/logo.png`) used in AppLayout header and Login card. Icon only (`front/src/assets/icon.png`) used as favicon (`front/public/icon.png`) and in login badge. Page title is "INIBSA".
 - "Alertas" nav button removed. App subtitle hidden from AppLayout header.
+- Role nav links (Delegats / Direcció Regional) removed from AppLayout header entirely — each role only has one page so the nav links are unnecessary.
 - "Alertes INIBSA" eyebrow label removed from dashboard page header.
 - ChurnType is open-ended (`"total" | string`); mock data uses "total", "Producto 1", "Producto 2".
 - Percentage columns (churn risk, purchase propensity) display as color-coded pill badges (red/amber/green) instead of progress bars.

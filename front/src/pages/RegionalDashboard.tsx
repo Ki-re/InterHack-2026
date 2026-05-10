@@ -5,16 +5,14 @@ import { AlertCircle, RefreshCcw, ShieldAlert } from "lucide-react";
 
 import { getRegionalDashboard } from "@/api/regional-dashboard";
 import { RegionalKpiCards } from "@/components/regional/RegionalKpiCards";
-import { RegionalPerformanceTables } from "@/components/regional/RegionalPerformanceTables";
+import { RegionDetailModal } from "@/components/regional/RegionDetailModal";
 import { getRegionLabel, SpainRegionMap } from "@/components/regional/SpainRegionMap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type {
-  AgentPerformance,
   ExecutionKpis,
-  ManagerPerformance,
   RegionSlug,
   Underperformer,
 } from "@/types/regional-dashboard";
@@ -32,8 +30,7 @@ const itemVariants = {
 export function RegionalDashboard() {
   const { t } = useTranslation();
   const [selectedRegionSlug, setSelectedRegionSlug] = useState<RegionSlug | null>(null);
-  const [selectedManager, setSelectedManager] = useState<ManagerPerformance | null>(null);
-  const [selectedAgent, setSelectedAgent] = useState<AgentPerformance | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const dashboard = useQuery({
     queryKey: ["regional-dashboard"],
     queryFn: getRegionalDashboard,
@@ -46,14 +43,13 @@ export function RegionalDashboard() {
 
   function handleSelectRegion(slug: RegionSlug) {
     // Clicking the already-selected region deselects it (shows global view)
-    setSelectedRegionSlug((prev) => (prev === slug ? null : slug));
-    setSelectedManager(null);
-    setSelectedAgent(null);
-  }
-
-  function handleSelectManager(manager: ManagerPerformance) {
-    setSelectedManager(manager);
-    setSelectedAgent(null);
+    setSelectedRegionSlug((prev) => {
+      if (prev === slug) {
+        setDetailOpen(false);
+        return null;
+      }
+      return slug;
+    });
   }
 
   if (dashboard.isLoading) {
@@ -73,10 +69,6 @@ export function RegionalDashboard() {
       />
     );
   }
-
-  const scopeLabel = selectedRegion
-    ? t("regional_dashboard.scope", { region: getRegionLabel(selectedRegion.slug, t) })
-    : t("regional_dashboard.scope_all");
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
@@ -100,6 +92,7 @@ export function RegionalDashboard() {
             regions={dashboard.data.regions}
             selectedSlug={selectedRegionSlug}
             onSelect={handleSelectRegion}
+            onOpenDetail={selectedRegion ? () => setDetailOpen(true) : undefined}
             t={t}
           />
 
@@ -124,24 +117,16 @@ export function RegionalDashboard() {
             </div>
           </div>
         </div>
-
-        {/* Managers table — full width below map row */}
-        {selectedRegion && (
-          <RegionalPerformanceTables
-            region={selectedRegion}
-            selectedManager={selectedManager}
-            selectedAgent={selectedAgent}
-            onSelectManager={handleSelectManager}
-            onSelectAgent={setSelectedAgent}
-            onResetManager={() => {
-              setSelectedManager(null);
-              setSelectedAgent(null);
-            }}
-            onResetAgent={() => setSelectedAgent(null)}
-            t={t}
-          />
-        )}
       </motion.section>
+
+      {/* Region detail modal */}
+      {detailOpen && selectedRegion && (
+        <RegionDetailModal
+          region={selectedRegion}
+          onClose={() => setDetailOpen(false)}
+          t={t}
+        />
+      )}
     </motion.div>
   );
 }

@@ -249,6 +249,8 @@
     },
     "actions": {
       "zoom": "Aprofundir",
+      "collapse": "Col·lapsar",
+      "open_detail": "Veure detalls",
       "back_region": "Tornar a l'àrea",
       "back_manager": "Tornar al mànager",
       "retry": "Reintentar"

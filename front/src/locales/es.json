@@ -249,6 +249,8 @@
     },
     "actions": {
       "zoom": "Profundizar",
+      "collapse": "Colapsar",
+      "open_detail": "Ver detalles",
       "back_region": "Volver al área",
       "back_manager": "Volver al mánager",
       "retry": "Reintentar"
