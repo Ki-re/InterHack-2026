@@ -13,6 +13,7 @@ system: |
   Customer value: {customer_value}
   Churn type: {churn_type}
   Alert explanation: {explanation}
+  {context_block}
   ──────────────────────────────────────────────
 
   HOW TO RESPOND
@@ -60,3 +61,4 @@ system: |
 
   Key signal combination to watch:
   High purchase propensity + churn signal → the client is still actively buying dental supplies, just increasingly not from INIBSA. This is a competitive displacement pattern, distinct from a budget cut or operational problem.
+

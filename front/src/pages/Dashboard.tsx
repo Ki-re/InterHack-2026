@@ -1,5 +1,5 @@
-import { useMemo, useState, type ReactNode } from "react";
-import { AlertTriangle, CheckCircle2, TrendingUp, Users } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { AlertTriangle, CheckCircle2, Loader2, TrendingUp, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { AIInsightPanel } from "@/components/AIInsightPanel";
@@ -8,7 +8,7 @@ import { AlertTable } from "@/components/AlertTable";
 import { DismissModal } from "@/components/DismissModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { mockAlerts } from "@/data/mock-alerts";
+import { useAlerts } from "@/hooks/useAlerts";
 import type { AlertStatus, InteractionRecord, SalesAlert, SystemEventRecord } from "@/types/alerts";
 
 const containerVariants = {
@@ -23,11 +23,19 @@ const itemVariants = {
 
 export function Dashboard() {
   const { t } = useTranslation();
-  const [alerts, setAlerts] = useState<SalesAlert[]>(mockAlerts);
+  const { data: fetchedAlerts, isLoading } = useAlerts();
+  const [alerts, setAlerts] = useState<SalesAlert[]>([]);
   const [activeTab, setActiveTab] = useState<AlertStatus>("pending");
   const [selectedAlert, setSelectedAlert] = useState<SalesAlert | null>(null);
   const [dismissTarget, setDismissTarget] = useState<SalesAlert | null>(null);
   const [insightAlert, setInsightAlert] = useState<SalesAlert | null>(null);
+
+  // Seed local state once when API data arrives; preserves local mutations on re-renders
+  useEffect(() => {
+    if (fetchedAlerts && fetchedAlerts.length > 0) {
+      setAlerts(fetchedAlerts);
+    }
+  }, [fetchedAlerts]);
 
   const metrics = useMemo(() => {
     const pending = alerts.filter((a) => a.status === "pending").length;
@@ -120,6 +128,15 @@ export function Dashboard() {
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
 
+      {isLoading && (
+        <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
+          <Loader2 className="size-5 animate-spin" />
+          <span className="text-sm">{t("dashboard.loading") ?? "Carregant alertes..."}</span>
+        </div>
+      )}
+
+      {!isLoading && (
+      <>
       <motion.section variants={itemVariants} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={<AlertTriangle className="size-5 text-red-600" />}
@@ -186,6 +203,8 @@ export function Dashboard() {
           onRecover={handleRecover}
         />
       </motion.div>
+      </>
+      )}
 
       <AlertDetailModal
         alert={liveSelectedAlert}

@@ -11,17 +11,19 @@
 - AI Model: Multi-head `LargePurchaseModel` with masked loss for days prediction (fixes 1500-day bias).
 - Frontend auth for INIBSA MVP: mocked role-based session persisted in `localStorage` under key `inibsa.salesDelegateSession`, guarded dashboard routes, no backend auth call. Roles: sales delegate and regional manager.
 - Login page: enterprise SaaS mock login at `/` with role selector. Sales delegate routes to `/dashboard`; regional manager routes to `/regional-dashboard`. Uses `logo.png` in card header and `icon.png` in the challenge badge.
-- Dashboard: INIBSA sales alerts MVP at `/dashboard` with mock alert data (dental clinic clients), table-first workflow with **pending / attended / dismissed** tab toggle (pending shown first), channel-aware attended form, dismiss with inline confirm, changelog in expanded rows, and AI insight panel connected to Gemini API via `POST /ai/chat` (real LLM, no mock responses).
-- LLM module: `back/app/llm/` with `prompt.yaml` (diagnostic analyst persona — interprets data without giving orders; answers the specific question asked; translates numbers into plain business reality; bilingual CA/ES; short-paragraph structure; churn type context; competitive vs. budget displacement reasoning), `schemas.py`, `service.py` (Gemini **2.5 Flash** via `google-genai` SDK, async via `asyncio.to_thread`), `router.py` (`POST /ai/chat`). Requires `GEMINI_API_KEY` env var in `.env`.
+- Dashboard: INIBSA sales alerts MVP at `/dashboard`. Alert data now loaded from **real backend API** (`GET /alerts`) backed by `IA/alerts.csv` (600 real ML pipeline alerts). Table-first workflow with **pending / attended / dismissed** tab toggle (pending shown first), channel-aware attended form, dismiss with popup modal, changelog in expanded rows, and AI insight panel connected to Gemini API via `POST /ai/chat` (real LLM, no mock responses).
+- LLM module: `back/app/llm/` with `prompt.yaml` (diagnostic analyst persona — interprets data without giving orders; answers the specific question asked; BREVITY rule; bilingual CA/ES; churn type context; competitive vs. budget displacement reasoning), `schemas.py`, `service.py` (Gemini **2.5 Flash** via `google-genai` SDK, async via `asyncio.to_thread`), `router.py` (`POST /ai/chat`). Requires `GEMINI_API_KEY` env var in `.env`. `AlertContext` now includes `alertContextJson`, `predictedNextPurchase`, `lastOrderDate`. `service.py` builds a `context_block` from these (annual spend, days since purchase, potential class, order dates).
 - `AIInsightPanel`: real backend call; loading spinner; errors inline; assistant replies rendered as separated `<p>` paragraphs split on `\n\n+`.
 - **Alert interaction model**: `InteractionRecord` replaces `FollowUpRecord`. Each alert carries `interactions: InteractionRecord[]` and `events: SystemEventRecord[]`. `keepOpen: boolean` on the record controls whether status becomes "attended" or stays "pending". Closing appends a `"closed"` system event; dismissing appends `"dismissed"`; recovering appends `"reopened"`. `dismissed` status with optional `dismissReason` + `dismissedAt`.
 - **Channel-aware follow-up form** (`FollowUpForm.tsx`): phone (answered/not), visit (successful/not), email (response/not). Result + Notes shown only when contact was made. keepOpen toggle always shown.
 - **Dismiss modal** (`DismissModal.tsx`): proper popup overlay (same style as AlertDetailModal) with alert name in header, description, labelled reason textarea, Cancel + destructive Confirm buttons. State managed at Dashboard level (`dismissTarget`). `AlertRow` dismiss button calls `onOpenDismiss(alert)` instead of managing inline confirm state.
 - **Changelog** in expanded row: unified timeline merging `interactions[]` and `events[]` sorted newest-first. Interaction entries show channel icon, outcome badge, result badge, notes (no keepOpen line). System event entries show colored icon + label + optional reason. `keepOpen` line removed from interaction display.
 - **Dismissed tab** added to Dashboard alongside pending/attended; metrics include dismissed count.
-- Database models: `Team`, `User`.
-- Regional dashboard backend: Alembic `0003_create_regional_dashboard` adds `regions`, `regional_managers`, `sales_agents`, `clients`, and `regional_alerts` with deterministic seed data for Est, North, and South regions (3 managers, 9 agents, 27 clients, 54 alerts). Seed runs inside `upgrade()` — guaranteed on any fresh environment.
-- `docker-compose.yml` backend `command` runs `alembic upgrade head` before uvicorn, so migrations + seed run automatically on every `docker compose up` regardless of DB state. `start.ps1` also explicitly runs migrations before starting compose (double safety).
+- Database models: `Team`, `User`, `Region`, `RegionalManager`, `SalesAgent`, `Client` (now with `provincia`, `comunidad_autonoma`, `zone`), `RegionalAlert` (now with `explanation`, `churn_type`, `dismiss_reason`, `predicted_next_purchase`, `last_order_date`, `alert_context_json`).
+- Regional dashboard backend: Alembic migrations:
+  - `0003_create_regional_dashboard`: creates tables, seeds 3-region mock data (legacy, overridden by 0005).
+  - `0005_load_alerts_from_csv`: alters both tables adding new columns; clears old mock data; re-seeds **5 regions** (north/east/south/canary/balearic), **5 managers**, **13 agents**; loads **unique clients** and **600 alerts** from `/app/ia_data/alerts.csv`.
+- `docker-compose.yml` and `docker-compose.prod.yml` mount `./IA:/app/ia_data:ro` so migration 0005 can read `alerts.csv`.
 - **Alerting pipeline** (`IA/generate_alerts.py`): reads `predicciones.csv`, takes the latest prediction row per (client, product), classifies client value as Alto/Medio/Bajo by total historical spend (P25/P75 percentiles), applies per-tier risk thresholds (Alto≥75, Medio≥82, Bajo≥90 for score_riesgo), computes a combined priority score, decides alert type (Total if ≥3 products trigger, else per-product up to 2), assigns risk level (Alto/Medio/Bajo) via composite (risk×0.5 + propensity×0.3 + value_score×0.2), maps provincia→CCAA→zone→agent (north 1-3, east 4-6, south 7-9, canary 10-12, balearic 13), generates a Catalan explanation per alert, outputs `IA/alerts.csv` (600 alerts by default, 250 Alto + 250 Medio + 100 Bajo client value caps). All thresholds are global variables at top of file. Fully deterministic/idempotent.
 - **Deanonymize module** (`IA/deanonymize.py`): deterministic synthetic dental clinic names from client IDs, seeded by ID for coherence across runs. Vocabulary: 10 prefixes, 47 adjectives/words, 60 surnames, 7 name templates. Public API: `get_client_name(id)` and `build_name_dict(ids)`.
 
@@ -51,18 +53,11 @@
 ## Broken / Incomplete
 - Host `front/npm run typecheck` cannot find `tsc` if not in path; Docker typecheck or local `npm run typecheck` (if tsc installed) works.
 - No automated backend test suite yet.
-- Sales alerts are frontend mock data only; no alert API or persistence exists yet. Interactions and dismiss state reset on page refresh.
-- Regional dashboard data is seeded backend data, not production ingestion yet.
+- **Interactions and dismiss state reset on page refresh** — frontend-only local state; no persistence API for interactions/dismissals.
 - No password reset, email verification, refresh tokens, roles, or rate limiting.
 
 ## Current Sprint Goal
-- Add backend-backed regional manager visibility while preserving the delegate alert dashboard.
-
-## Next Tasks
-- Add frontend smoke coverage for login, dashboard routing, attended flow, and AI panel.
-- Add tests for `GET /regional-dashboard` aggregation and frontend regional drill-down.
-- Define backend alert API contracts when delegate alert persistence starts.
-- Replace development `JWT_SECRET_KEY` before any shared deployment if backend auth is reintroduced in the frontend flow.
+- DB integration complete: 600 real alerts from ML pipeline load automatically via Alembic migration 0005 on `docker compose up`.
 
 ## Active Endpoints
 - `GET /health`
@@ -70,8 +65,9 @@
 - `POST /auth/login`
 - `GET /auth/me`
 - `GET /regional-dashboard`
+- `GET /alerts` ← NEW (returns list of SalesAlertResponse from DB)
 
 ## Active Frontend Pages
 - `/` public mock login page for `Delegado de Ventas`.
-- `/dashboard` protected sales alerts dashboard with mocked dental clinic alerts.
+- `/dashboard` protected sales alerts dashboard — **real data from `GET /alerts`** (600 ML pipeline alerts).
 - `/regional-dashboard` protected regional manager dashboard backed by seeded backend hierarchy/KPI data.
