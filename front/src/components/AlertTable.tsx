@@ -7,9 +7,11 @@ type AlertTableProps = {
   alerts: SalesAlert[];
   onAskInsight: (alert: SalesAlert) => void;
   onAttend: (alert: SalesAlert) => void;
+  onOpenDismiss: (alert: SalesAlert) => void;
+  onRecover: (alertId: string) => void;
 };
 
-export function AlertTable({ alerts, onAskInsight, onAttend }: AlertTableProps) {
+export function AlertTable({ alerts, onAskInsight, onAttend, onOpenDismiss, onRecover }: AlertTableProps) {
   const { t } = useTranslation();
   const [expandedAlertId, setExpandedAlertId] = useState<string | null>(null);
 
@@ -53,6 +55,8 @@ export function AlertTable({ alerts, onAskInsight, onAttend }: AlertTableProps) 
                 isExpanded={expandedAlertId === alert.id}
                 onAskInsight={onAskInsight}
                 onAttend={onAttend}
+                onOpenDismiss={onOpenDismiss}
+                onRecover={onRecover}
                 onToggleExpanded={handleToggleExpanded}
               />
             ))}

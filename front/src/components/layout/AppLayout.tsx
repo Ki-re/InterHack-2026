@@ -1,18 +1,11 @@
-import { LogOut, UserRound, Languages } from "lucide-react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { LogOut, UserRound } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/LanguageContext";
 import inibsaLogo from "@/assets/logo.png";
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  [
-    "inline-flex h-9 items-center rounded-md px-3 text-sm font-medium transition-colors",
-    isActive
-      ? "bg-primary text-primary-foreground"
-      : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground",
-  ].join(" ");
 
 export function AppLayout() {
   const { logout, user } = useAuth();

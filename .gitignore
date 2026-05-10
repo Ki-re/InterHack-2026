@@ -220,6 +220,7 @@ __marimo__/
 
 # Project runtime
 .env
+.env.prod
 back/app.db
 *.db
 node_modules/
@@ -274,6 +275,8 @@ __pycache__/
 /opencode.json
 # END AI Agent Symlinks
 
+*.pt
+run_config.json
 /IA/Datasets.xlsx
 
 /IA/gemini*

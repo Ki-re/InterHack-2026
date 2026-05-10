@@ -18,10 +18,13 @@
 - Frontend stores the access token in `localStorage`.
 - Password hashes use stdlib PBKDF2-HMAC SHA-256.
 - No OAuth, session cookies, refresh tokens, or roles in the starter auth flow.
-- INIBSA frontend MVP temporarily uses mocked localStorage auth for `Delegado de Ventas` (key: `inibsa.salesDelegateSession`) and does not call backend auth endpoints.
+- INIBSA frontend MVP temporarily uses mocked localStorage auth with role selection (`sales_delegate`, `regional_manager`) and does not call backend auth endpoints.
 
 ## INIBSA MVP
 - Sales alerts are mocked in the frontend until backend alert endpoints are defined.
+- Regional dashboard uses real backend tables and deterministic seed data as the bridge from mockups to future production data.
+- Regional manager performance is alert-execution centered: pending load, attended rate, high-risk backlog, overdue follow-ups, dismissals, and response time.
+- The interactive Spain map is a custom SVG with three commercial areas; no chart/map package is added for this MVP.
 - React local state is sufficient for attended status, follow-up questionnaire data, and AI insight panel messages.
 - The UI direction is clean enterprise SaaS: neutral surfaces, dense table-first workflow, and restrained blue/green/red status accents.
 - Mock clients are dental clinics with dental supply context.
