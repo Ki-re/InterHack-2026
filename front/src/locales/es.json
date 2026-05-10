@@ -1,0 +1,259 @@
+{
+  "app": {
+    "title": "Alertas INIBSA",
+    "subtitle": "Espacio del delegado de ventas",
+    "logout": "Salir",
+    "alerts": "Alertas",
+    "challenge": "Reto INIBSA",
+    "delegate_dashboard": "Delegados",
+    "regional_dashboard": "Dirección regional"
+  },
+  "login": {
+    "title": "Panel de Alertas de Ventas",
+    "description": "Acceso para Delegado de Ventas. Revisa señales de fuga, propensión de compra y recomendaciones operativas en una vista preparada para integración backend.",
+    "role": "Delegado de Ventas",
+    "mock_login": "Inicio de sesión de prueba. No se requiere autenticación real.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "entering": "Entrando...",
+    "submit": "Entrar al panel",
+    "error_required": "Introduce correo y contraseña para iniciar sesión.",
+    "error_failed": "No se pudo iniciar sesión.",
+    "signals": {
+      "churn": "Riesgo fuga",
+      "buy": "Compra",
+      "clients": "Clientes"
+    },
+    "role_selector": {
+      "label": "Perfil de acceso",
+      "regional": "Dirección regional",
+      "regional_desc": "Vista agregada por zona, mánagers y agentes.",
+      "delegate": "Delegado de ventas",
+      "delegate_desc": "Gestión operativa de alertas de clientes."
+    }
+  },
+  "dashboard": {
+    "title": "Panel de alertas comerciales",
+    "subtitle": "Vista operativa para detectar riesgo de fuga, oportunidad de compra y próximas acciones sobre clientes priorizados.",
+    "mock_data": "Datos de prueba · Listo para integración backend",
+    "metrics": {
+      "pending": "Pendientes",
+      "pending_desc": "Requieren gestión comercial",
+      "high_risk": "Alta gravedad",
+      "high_risk_desc": "Prioridad de atención",
+      "avg_churn": "Fuga media",
+      "avg_churn_desc": "Promedio de cartera alertada",
+      "attended": "Atendidas",
+      "attended_desc": "Gestiones registradas",
+      "dismissed": "Descartadas",
+      "dismissed_desc": "Alertas descartadas manualmente"
+    },
+    "table": {
+      "title": "Alertas comerciales",
+      "description": "Prioriza clientes con señales de fuga, oportunidad de compra y valor comercial.",
+      "active_alerts": "{{count}} alertas activas",
+      "cols": {
+        "client": "Cliente",
+        "risk": "Prioridad",
+        "churn_prob": "Potencial de fuga",
+        "buy_prop": "Propensión a la compra",
+        "value": "Valor del cliente",
+        "explanation": "Explicación",
+        "churn_type": "Tipo de fuga",
+        "actions": "Acciones"
+      },
+      "row": {
+        "show_explanation": "Ver explicación",
+        "hide_explanation": "Ocultar explicación",
+        "show_detail": "Ver detalle",
+        "hide_detail": "Ocultar detalle",
+        "pending": "Pendiente",
+        "attended": "Atendida",
+        "dismissed": "Descartada",
+        "ask_ai": "Consultar IA",
+        "mark_attended": "Marcar atendida",
+        "dismiss": "Descartar",
+        "full_explanation": "Explicación completa",
+        "status_mgmt": "Estado de gestión",
+        "no_mgmt": "Sin gestión registrada todavía.",
+        "mgmt_result": "Resultado {{result}}. Canal {{channel}}."
+      }
+    }
+  },
+  "risk": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja"
+  },
+  "churn_type": {
+    "total": "Total",
+    "product": "Producto",
+    "segment": "Producto"
+  },
+  "customer_value": {
+    "high": "Alto",
+    "medium": "Medio",
+    "low": "Bajo"
+  },
+  "ai": {
+    "title": "Consultar IA",
+    "description": "Tu asistente de ventas inteligente. Pregúntame lo que necesites sobre este cliente.",
+    "opening": "Hola 👋 Estoy analizando la alerta de {{name}}. Veo un riesgo de fuga del {{churn}}% y una propensión de compra del {{buy}}%. ¿Qué quieres saber? Puedo ayudarte con la siguiente acción recomendada, el motivo del riesgo, un guion de conversación o cualquier otra duda sobre este cliente.",
+    "mock_ai": "INIBSA IA",
+    "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
+    "send": "Enviar",
+    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo.",
+    "action_rec":"Mi recomendación para {{name}}: contáctale hoy mismo. Empieza reconociendo su patrón de compra reciente y propón una oferta de retención adaptada al tipo de fuga detectado. ¿Quieres que te prepare un guion de conversación?",
+    "why_rec": "El principal motivo de riesgo es: {{explanation}} ¿Te gustaría que profundizara en algún aspecto concreto o que te proponga argumentos para la conversación?",
+    "default_rec": "{{name}} presenta un {{churn}}% de probabilidad de fuga y un {{buy}}% de propensión de compra, una combinación que merece acción rápida. Te recomiendo un contacto comercial conciso y registrar el resultado. ¿Necesitas ayuda para preparar la llamada o la visita?"
+  },
+  "modal": {
+    "risk_label": "Riesgo {{label}} · {{churn}}% fuga",
+    "close": "Cerrar",
+    "explanation": "Explicación"
+  },
+  "form": {
+    "title": "Registrar gestión",
+    "description": "Actualiza el estado de {{name}} y deja una señal para el seguimiento interno.",
+    "handled_label": "¿Cómo se ha gestionado?",
+    "handling": {
+      "phone": "Teléfono",
+      "visit": "Visita presencial",
+      "email": "Correo electrónico",
+      "other": "Otros"
+    },
+    "answered": {
+      "label": "¿Ha contestado?",
+      "yes": "Contestado",
+      "no": "No contestado"
+    },
+    "visit_ok": {
+      "label": "¿Visita realizada?",
+      "yes": "Visita realizada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "¿Ha respondido?",
+      "yes": "Respuesta recibida",
+      "no": "Sin respuesta"
+    },
+    "keep_open": {
+      "label": "Estado de la alerta",
+      "close": "Cerrar alerta",
+      "keep": "Mantener abierta"
+    },
+    "result_label": "Resultado",
+    "results": {
+      "positive": "Positivo",
+      "neutral": "Neutro",
+      "negative": "Negativo"
+    },
+    "reminder_label": "Notas adicionales",
+    "reminder_placeholder": "Cualquier observación relevante sobre la gestión de este cliente...",
+    "cancel": "Cancelar",
+    "submit": "Guardar gestión"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "¿Descartar esta alerta?",
+    "description": "La alerta pasará a la pestaña de descartadas.",
+    "reason_label": "Motivo (opcional)",
+    "reason_placeholder": "Motivo del descarte (opcional)...",
+    "confirm": "Confirmar descarte",
+    "cancel": "Cancelar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestiones",
+    "empty": "Sin historial de gestiones.",
+    "phone": "Llamada",
+    "visit": "Visita",
+    "email": "Correo",
+    "other": "Otros",
+    "answered": "Contestado",
+    "not_answered": "No contestado",
+    "visit_ok": "Visita realizada",
+    "visit_fail": "No disponible",
+    "email_received": "Respuesta recibida",
+    "email_no_response": "Sin respuesta",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "result_positive": "Resultado positivo",
+    "result_neutral": "Resultado neutro",
+    "result_negative": "Resultado negativo",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "event_closed": "Alerta cerrada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
+  },
+  "regional_dashboard": {
+    "title": "Panel de dirección regional",
+    "subtitle": "Control ejecutivo de las alertas por región, mánagers, agentes y clientes.",
+    "loading": "Cargando datos regionales...",
+    "error": "No se han podido cargar los datos regionales.",
+    "scope": "Área seleccionada · {{region}}",
+    "scope_all": "Todas las regiones",
+    "all_regions": "Todas las regiones",
+    "regions": {
+      "est": "Est",
+      "north": "Nord",
+      "south": "Sud"
+    },
+    "status": {
+      "good": "Ejecución saludable",
+      "warning": "Requiere seguimiento",
+      "critical": "Riesgo operativo"
+    },
+    "kpis": {
+      "execution_score": "Eficiencia de respuesta",
+      "pending": "Pendientes",
+      "pending_desc": "Alertas todavía abiertas",
+      "attended_rate": "Tasa de atención",
+      "attended_desc": "Porcentaje de alertas atendidas",
+      "overdue": "Vencidas",
+      "overdue_desc": "Seguimientos fuera de plazo",
+      "response_time": "Tiempo respuesta",
+      "response_desc": "Media hasta primera gestión",
+      "high_risk": "Alto riesgo"
+    },
+    "map": {
+      "title": "Mapa Regional",
+      "subtitle": "Selecciona un área para ver el detalle operativo.",
+      "aria": "Mapa interactivo de España por zonas comerciales",
+      "score": "Índice {{score}}"
+    },
+    "snapshot": {
+      "title": "Estado del área"
+    },
+    "managers": {
+      "title": "Mánagers del área"
+    },
+    "agents": {
+      "title": "Agentes del mánager"
+    },
+    "clients": {
+      "title": "Clientes del agente",
+      "alerts": "Alertas"
+    },
+    "underperformers": {
+      "title": "Focos de riesgo",
+      "subtitle": "Equipos que necesitan revisión prioritaria.",
+      "manager_level": "Mánager regional",
+      "role_manager": "Mánager",
+      "role_agent": "Delegado"
+    },
+    "table": {
+      "name": "Nombre",
+      "action": "Acción"
+    },
+    "actions": {
+      "zoom": "Profundizar",
+      "collapse": "Colapsar",
+      "open_detail": "Ver detalles",
+      "back_region": "Volver al área",
+      "back_manager": "Volver al mánager",
+      "retry": "Reintentar"
+    }
+  }
+}

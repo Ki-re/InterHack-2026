@@ -31,6 +31,41 @@
   - `401` for invalid email or password.
   - `422` for validation errors.
 
+## `POST /ai/chat`
+- Auth: none (API key is server-side only).
+- Request JSON:
+  - `alert: AlertContext` — `{ clientName, riskLevel, churnProbability, purchasePropensity, customerValue, churnType, explanation }`
+  - `history: ChatMessage[]` — `[{ role: "user"|"assistant", content: string }, ...]` (full prior conversation)
+  - `question: string` — the new user message
+- Response `200`: `{ response: string }`
+- Errors:
+  - `503` if `GEMINI_API_KEY` is not configured.
+  - `502` if the Gemini API call fails.
+
+## `GET /regional-dashboard`
+- Auth: none for current MVP; frontend access is controlled by mocked role routing.
+- Request: none.
+- Response `200`:
+  - `generatedAt: datetime`
+  - `kpis: ExecutionKpis`
+  - `regions: RegionSummary[]`
+  - `underperformers: Underperformer[]`
+- `ExecutionKpis`:
+  - `totalAlerts`, `pendingAlerts`, `attendedAlerts`, `dismissedAlerts`
+  - `attendedRate`, `dismissalRate`, `highRiskBacklog`, `overdueFollowups`
+  - `averageResponseHours: number | null`
+  - `executionScore: number`
+  - `status: "good" | "warning" | "critical"`
+- Region hierarchy:
+  - `RegionSummary` includes `slug`, `name`, `kpis`, and `managers`.
+  - Manager summaries include `agents`.
+  - Agent summaries include assigned `clients`.
+  - Client rows include customer metadata, `kpis`, and alert execution rows.
+- Seeded regions:
+  - `catalonia_valencia`
+  - `north`
+  - `south`
+
 ## `GET /auth/me`
 - Auth: `Authorization: Bearer <token>`.
 - Request: none.

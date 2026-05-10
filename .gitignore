@@ -16,6 +16,7 @@ eggs/
 .eggs/
 lib/
 lib64/
+!front/src/lib/
 parts/
 sdist/
 var/
@@ -219,6 +220,7 @@ __marimo__/
 
 # Project runtime
 .env
+.env.prod
 back/app.db
 *.db
 /IA/checkpoints*/
@@ -282,3 +284,10 @@ __pycache__/
 !/IA/models/fuga_model.pt
 !/IA/models/potencial_model.pt
 !/IA/models/dias_model.pt
+*.pt
+run_config.json
+
+/.env.prod
+/IA/Datasets.xlsx
+
+/IA/gemini*

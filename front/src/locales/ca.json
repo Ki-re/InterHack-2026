@@ -1,0 +1,259 @@
+{
+  "app": {
+    "title": "Alertes INIBSA",
+    "subtitle": "Espai del delegat de vendes",
+    "logout": "Sortir",
+    "alerts": "Alertes",
+    "challenge": "Repte INIBSA",
+    "delegate_dashboard": "Delegats",
+    "regional_dashboard": "Direcció regional"
+  },
+  "login": {
+    "title": "Dashboard d'Alertes de Vendes",
+    "description": "Accés per al Delegat de Vendes. Revisa senyals de fuga, propensió de compra i recomanacions operatives en una vista preparada per a integració backend.",
+    "role": "Delegat de Vendes",
+    "mock_login": "Inici de sessió de prova. No es requereix autenticació real.",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "entering": "Entrant...",
+    "submit": "Entrar al dashboard",
+    "error_required": "Introdueix correu i contrasenya per iniciar sessió.",
+    "error_failed": "No s'ha pogut iniciar la sessió.",
+    "signals": {
+      "churn": "Risc de fuga",
+      "buy": "Compra",
+      "clients": "Clients"
+    },
+    "role_selector": {
+      "label": "Perfil d'accés",
+      "regional": "Direcció regional",
+      "regional_desc": "Visió agregada per zona, mànagers i agents.",
+      "delegate": "Delegat de vendes",
+      "delegate_desc": "Gestió operativa d'alertes de clients."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard d'alertes comercials",
+    "subtitle": "Vista operativa per detectar risc de fuga, oportunitat de compra i pròximes accions sobre clients prioritzats.",
+    "mock_data": "Dades de prova · Llest per a integració backend",
+    "metrics": {
+      "pending": "Pendents",
+      "pending_desc": "Requereixen gestió comercial",
+      "high_risk": "Alta gravetat",
+      "high_risk_desc": "Prioritat d'atenció",
+      "avg_churn": "Fuga mitjana",
+      "avg_churn_desc": "Mitjana de cartera alertada",
+      "attended": "Ateses",
+      "attended_desc": "Gestions registrades",
+      "dismissed": "Descartades",
+      "dismissed_desc": "Alertes descartades manualment"
+    },
+    "table": {
+      "title": "Alertes comercials",
+      "description": "Prioritza clients amb senyals de fuga, oportunitat de compra i valor comercial.",
+      "active_alerts": "{{count}} alertes actives",
+      "cols": {
+        "client": "Client",
+        "risk": "Prioritat",
+        "churn_prob": "Potencial de fuga",
+        "buy_prop": "Propensió a la compra",
+        "value": "Valor del client",
+        "explanation": "Explicació",
+        "churn_type": "Tipus de fuga",
+        "actions": "Accions"
+      },
+      "row": {
+        "show_explanation": "Veure explicació",
+        "hide_explanation": "Ocultar explicació",
+        "show_detail": "Veure detall",
+        "hide_detail": "Ocultar detall",
+        "pending": "Pendent",
+        "attended": "Atesa",
+        "dismissed": "Descartada",
+        "ask_ai": "Consultar IA",
+        "mark_attended": "Marcar atesa",
+        "dismiss": "Descartar",
+        "full_explanation": "Explicació completa",
+        "status_mgmt": "Estat de gestió",
+        "no_mgmt": "Sense gestió registrada encara.",
+        "mgmt_result": "Resultat {{result}}. Canal {{channel}}."
+      }
+    }
+  },
+  "risk": {
+    "high": "Alta",
+    "medium": "Mitjana",
+    "low": "Baix"
+  },
+  "churn_type": {
+    "total": "Total",
+    "product": "Producte",
+    "segment": "Segment"
+  },
+  "customer_value": {
+    "high": "Alt",
+    "medium": "Mitjà",
+    "low": "Baix"
+  },
+  "ai": {
+    "title": "Consultar IA",
+    "description": "El teu assistent de vendes intel·ligent. Pregunta'm el que necessitis sobre aquest client.",
+    "opening": "Hola 👋 Estic analitzant l'alerta de {{name}}. Veig un risc de fuga del {{churn}}% i una propensió de compra del {{buy}}%. Què vols saber? Puc ajudar-te amb la següent acció recomanada, el motiu del risc, un guió de conversa o qualsevol dubte sobre aquest client.",
+    "mock_ai": "INIBSA IA",
+    "placeholder": "Pregunta'm qualsevol cosa sobre aquest client...",
+    "send": "Enviar",
+    "error": "No he pogut obtenir resposta. Si us plau, torna-ho a intentar.",
+    "action_rec": "La meva recomanació per a {{name}}: contacta'l avui mateix. Comença reconeixent el seu patró de compra recent i proposa una oferta de retenció adaptada al tipus de fuga detectat. Vols que et prepari un guió de conversa?",
+    "why_rec": "El principal motiu de risc és: {{explanation}} T'agradaria que aprofundís en algun aspecte concret o que et proposi arguments per a la conversa?",
+    "default_rec": "{{name}} presenta un {{churn}}% de probabilitat de fuga i un {{buy}}% de propensió de compra, una combinació que mereix acció ràpida. Et recomano un contacte comercial concís i registrar el resultat. Necessites ajuda per preparar la trucada o la visita?"
+  },
+  "modal": {
+    "risk_label": "Risc {{label}} · {{churn}}% fuga",
+    "close": "Tancar",
+    "explanation": "Explicació"
+  },
+  "form": {
+    "title": "Registrar gestió",
+    "description": "Actualitza l'estat de {{name}} i deixa un senyal per al seguiment intern.",
+    "handled_label": "Com s'ha gestionat?",
+    "handling": {
+      "phone": "Telèfon",
+      "visit": "Visita presencial",
+      "email": "Correu electrònic",
+      "other": "Altres"
+    },
+    "answered": {
+      "label": "Ha contestat?",
+      "yes": "Contestat",
+      "no": "No contestat"
+    },
+    "visit_ok": {
+      "label": "Visita realitzada?",
+      "yes": "Visita realitzada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "Ha respost?",
+      "yes": "Resposta rebuda",
+      "no": "Sense resposta"
+    },
+    "keep_open": {
+      "label": "Estat de l'alerta",
+      "close": "Tancar alerta",
+      "keep": "Mantenir oberta"
+    },
+    "result_label": "Resultat",
+    "results": {
+      "positive": "Positiu",
+      "neutral": "Neutre",
+      "negative": "Negatiu"
+    },
+    "reminder_label": "Notes addicionals",
+    "reminder_placeholder": "Qualsevol observació rellevant sobre la gestió d'aquest client...",
+    "cancel": "Cancel·lar",
+    "submit": "Guardar gestió"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "Descartar aquesta alerta?",
+    "description": "L'alerta passarà a la pestanya de descartades.",
+    "reason_label": "Motiu (opcional)",
+    "reason_placeholder": "Motiu del descart (opcional)...",
+    "confirm": "Confirmar descart",
+    "cancel": "Cancel·lar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestions",
+    "empty": "Sense historial de gestions.",
+    "phone": "Trucada",
+    "visit": "Visita",
+    "email": "Correu",
+    "other": "Altres",
+    "answered": "Contestat",
+    "not_answered": "No contestat",
+    "visit_ok": "Visita realitzada",
+    "visit_fail": "No disponible",
+    "email_received": "Resposta rebuda",
+    "email_no_response": "Sense resposta",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "result_positive": "Resultat positiu",
+    "result_neutral": "Resultat neutre",
+    "result_negative": "Resultat negatiu",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "event_closed": "Alerta tancada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
+  },
+  "regional_dashboard": {
+    "title": "Dashboard de direcció regional",
+    "subtitle": "Control executiu de les alertes per regió, mànagers, agents i clients.",
+    "loading": "Carregant dades regionals...",
+    "error": "No s'han pogut carregar les dades regionals.",
+    "scope": "Àrea seleccionada · {{region}}",
+    "scope_all": "Totes les regions",
+    "all_regions": "Totes les regions",
+    "regions": {
+      "est": "Est",
+      "north": "Nord",
+      "south": "Sud"
+    },
+    "status": {
+      "good": "Execució saludable",
+      "warning": "Requereix seguiment",
+      "critical": "Risc operatiu"
+    },
+    "kpis": {
+      "execution_score": "Eficiència de resposta",
+      "pending": "Pendents",
+      "pending_desc": "Alertes encara obertes",
+      "attended_rate": "Taxa d'atenció",
+      "attended_desc": "Percentatge d'alertes ateses",
+      "overdue": "Vençudes",
+      "overdue_desc": "Seguiments fora de termini",
+      "response_time": "Temps resposta",
+      "response_desc": "Mitjana fins a primera gestió",
+      "high_risk": "Alt risc"
+    },
+    "map": {
+      "title": "Mapa Regional",
+      "subtitle": "Selecciona una àrea per veure el detall operatiu.",
+      "aria": "Mapa interactiu d'Espanya per zones comercials",
+      "score": "Índex {{score}}"
+    },
+    "snapshot": {
+      "title": "Estat de l'àrea"
+    },
+    "managers": {
+      "title": "Mànagers de l'àrea"
+    },
+    "agents": {
+      "title": "Agents del mànager"
+    },
+    "clients": {
+      "title": "Clients de l'agent",
+      "alerts": "Alertes"
+    },
+    "underperformers": {
+      "title": "Focus de risc",
+      "subtitle": "Equips que necessiten revisió prioritària.",
+      "manager_level": "Mànager regional",
+      "role_manager": "Mànager",
+      "role_agent": "Delegat"
+    },
+    "table": {
+      "name": "Nom",
+      "action": "Acció"
+    },
+    "actions": {
+      "zoom": "Aprofundir",
+      "collapse": "Col·lapsar",
+      "open_detail": "Veure detalls",
+      "back_region": "Tornar a l'àrea",
+      "back_manager": "Tornar al mànager",
+      "retry": "Reintentar"
+    }
+  }
+}

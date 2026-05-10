@@ -2,13 +2,17 @@ services:
   backend:
     build:
       context: ./back
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
-      APP_NAME: ${APP_NAME:-InterHack API}
-      DATABASE_URL: ${DATABASE_URL:-sqlite+aiosqlite:///./app.db}
-      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:5173}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-in-development}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: ${DATABASE_URL}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      ELEVEN_LABS_API_KEY: ${ELEVEN_LABS_API_KEY}
     volumes:
       - ./back:/app
     ports:
@@ -32,7 +36,7 @@ services:
     command: npm run dev -- --host 0.0.0.0 --port 5173
     environment:
       CHOKIDAR_USEPOLLING: "true"
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: ${VITE_API_URL}
       WATCHPACK_POLLING: "true"
     volumes:
       - ./front:/app

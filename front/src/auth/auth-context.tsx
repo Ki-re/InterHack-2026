@@ -2,22 +2,32 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
-import {
-  getCurrentUser,
-  login as loginRequest,
-  register as registerRequest,
-  type AuthCredentials,
-  type AuthResponse,
-  type AuthUser,
-} from "@/api/auth";
+const STORAGE_KEY = "inibsa.salesDelegateSession";
 
-const STORAGE_KEY = "interhack.accessToken";
+export type UserRole = "sales_delegate" | "regional_manager";
+
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+};
+
+export type AuthCredentials = {
+  email: string;
+  password: string;
+  role?: UserRole;
+};
+
+type StoredSession = {
+  token: string;
+  user: AuthUser;
+};
 
 type AuthContextValue = {
   user: AuthUser | null;
@@ -30,87 +40,94 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(STORAGE_KEY));
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(() => Boolean(token));
+function readStoredSession(): StoredSession | null {
+  const rawSession = localStorage.getItem(STORAGE_KEY);
 
-  const clearSession = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setToken(null);
-    setUser(null);
-    setIsLoading(false);
-  }, []);
+  if (!rawSession) {
+    return null;
+  }
 
-  const saveSession = useCallback((response: AuthResponse) => {
-    localStorage.setItem(STORAGE_KEY, response.access_token);
-    setToken(response.access_token);
-    setUser(response.user);
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    let isCurrent = true;
-
-    if (!token) {
-      setUser(null);
-      setIsLoading(false);
-      return () => {
-        isCurrent = false;
-      };
-    }
-
-    setIsLoading(true);
-    getCurrentUser(token)
-      .then((currentUser) => {
-        if (isCurrent) {
-          setUser(currentUser);
-        }
-      })
-      .catch(() => {
-        if (isCurrent) {
-          clearSession();
-        }
-      })
-      .finally(() => {
-        if (isCurrent) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isCurrent = false;
+  try {
+    const parsed = JSON.parse(rawSession) as StoredSession;
+    const role = parsed.user.role === "regional_manager" ? "regional_manager" : "sales_delegate";
+    return {
+      ...parsed,
+      user: {
+        ...parsed.user,
+        role,
+      },
     };
-  }, [clearSession, token]);
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
+
+function createMockUser(email: string, role: UserRole): AuthUser {
+  return {
+    id: role === "regional_manager" ? "regional-001" : "delegate-001",
+    name: role === "regional_manager" ? "Regional Manager" : "Delegado de Ventas",
+    email,
+    role,
+  };
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const storedSession = readStoredSession();
+  const [token, setToken] = useState<string | null>(storedSession?.token ?? null);
+  const [user, setUser] = useState<AuthUser | null>(storedSession?.user ?? null);
+
+  const saveSession = useCallback((nextUser: AuthUser) => {
+    const nextSession = {
+      token: `mock-token-${Date.now()}`,
+      user: nextUser,
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSession));
+    setToken(nextSession.token);
+    setUser(nextSession.user);
+  }, []);
 
   const login = useCallback(
     async (credentials: AuthCredentials) => {
-      const response = await loginRequest(credentials);
-      saveSession(response);
-      return response.user;
+      const role = credentials.role ?? "sales_delegate";
+      const fallbackEmail =
+        role === "regional_manager" ? "regional@inibsa.local" : "delegado@inibsa.local";
+      const nextUser = createMockUser(credentials.email.trim() || fallbackEmail, role);
+      saveSession(nextUser);
+      return nextUser;
     },
     [saveSession],
   );
 
   const register = useCallback(
     async (credentials: AuthCredentials) => {
-      const response = await registerRequest(credentials);
-      saveSession(response);
-      return response.user;
+      const role = credentials.role ?? "sales_delegate";
+      const fallbackEmail =
+        role === "regional_manager" ? "regional@inibsa.local" : "delegado@inibsa.local";
+      const nextUser = createMockUser(credentials.email.trim() || fallbackEmail, role);
+      saveSession(nextUser);
+      return nextUser;
     },
     [saveSession],
   );
+
+  const logout = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setToken(null);
+    setUser(null);
+  }, []);
 
   const value = useMemo(
     () => ({
       user,
       token,
-      isLoading,
+      isLoading: false,
       login,
       register,
-      logout: clearSession,
+      logout,
     }),
-    [clearSession, isLoading, login, register, token, user],
+    [login, logout, register, token, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
