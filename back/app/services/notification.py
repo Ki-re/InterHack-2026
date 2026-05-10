@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import async_session_factory
+from app.db import AsyncSessionLocal as async_session_factory
 from app.models.notification import Notification
 from app.models.user import User
 
