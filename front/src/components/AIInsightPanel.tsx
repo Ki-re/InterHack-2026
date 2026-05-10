@@ -44,7 +44,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [mode, setMode] = useState<RecordingMode>("idle");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [liveBars, setLiveBars] = useState<number[]>(Array(BARS).fill(0));
