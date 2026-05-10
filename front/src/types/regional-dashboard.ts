@@ -1,4 +1,4 @@
-export type RegionSlug = "est" | "north" | "south";
+export type RegionSlug = "est" | "north" | "south" | "baleares" | "canarias";
 
 export type ExecutionStatus = "attended" | "pending" | "dismissed";
 
