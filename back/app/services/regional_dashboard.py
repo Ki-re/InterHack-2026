@@ -13,6 +13,7 @@ from app.models.regional_dashboard import (
 from app.schemas.regional_dashboard import (
     AgentPerformance,
     AlertExecution,
+    CcaaKpis,
     ClientExecution,
     ExecutionKpis,
     ManagerPerformance,
@@ -52,6 +53,7 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
 
     for region in regions:
         region_alerts: list[RegionalAlert] = []
+        alerts_by_ccaa: dict[str, list[RegionalAlert]] = {}
         manager_summaries: list[ManagerPerformance] = []
 
         for manager in managers_by_region.get(region.id, []):
@@ -67,6 +69,8 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
                     agent_alerts.extend(client_alerts)
                     client_summaries.append(_build_client(client, client_alerts))
 
+                if agent.cod_ccaa:
+                    alerts_by_ccaa.setdefault(agent.cod_ccaa, []).extend(agent_alerts)
                 agent_kpis = _calculate_kpis(agent_alerts)
                 agent_summaries.append(
                     AgentPerformance(
@@ -111,6 +115,10 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
             region_alerts.extend(manager_alerts)
 
         all_alerts.extend(region_alerts)
+        ccaa_kpis_list = [
+            CcaaKpis(cod_ccaa=cod, kpis=_calculate_kpis(alerts))
+            for cod, alerts in alerts_by_ccaa.items()
+        ]
         region_summaries.append(
             RegionSummary(
                 id=region.id,
@@ -118,6 +126,7 @@ async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None 
                 name=region.name,
                 kpis=_calculate_kpis(region_alerts),
                 managers=manager_summaries,
+                ccaa_kpis=ccaa_kpis_list,
             )
         )
 
