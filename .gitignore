@@ -220,6 +220,7 @@ __marimo__/
 
 # Project runtime
 .env
+.env.prod
 back/app.db
 *.db
 node_modules/

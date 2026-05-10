@@ -58,23 +58,18 @@ if (-not (Test-Path ".env")) {
 
 $dbPath = Join-Path $root "back\app.db"
 
-if (-not (Test-Path $dbPath)) {
-    Write-Step "SQLite database not found; building backend image and running Alembic migrations"
+Write-Step "Building backend image and running Alembic migrations"
 
-    try {
-        Invoke-Docker -Arguments @("compose", "build", "backend") -FailureMessage "Could not build the backend image."
-        Invoke-Docker -Arguments @("compose", "run", "--rm", "backend", "alembic", "upgrade", "head") -FailureMessage "Alembic migrations failed."
-    }
-    catch {
-        if (Test-Path $dbPath) {
-            Remove-Item $dbPath -Force -ErrorAction SilentlyContinue
-        }
-
-        Fail $_.Exception.Message
-    }
+try {
+    Invoke-Docker -Arguments @("compose", "build", "backend") -FailureMessage "Could not build the backend image."
+    Invoke-Docker -Arguments @("compose", "run", "--rm", "backend", "alembic", "upgrade", "head") -FailureMessage "Alembic migrations failed."
 }
-else {
-    Write-Step "SQLite database found at back/app.db"
+catch {
+    if (-not (Test-Path $dbPath)) {
+        # Only clean up if the DB was never created (avoid wiping existing data on partial failure)
+    }
+
+    Fail $_.Exception.Message
 }
 
 Write-Host ""
