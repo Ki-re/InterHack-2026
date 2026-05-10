@@ -4,7 +4,9 @@
     "subtitle": "Espacio del delegado de ventas",
     "logout": "Salir",
     "alerts": "Alertas",
-    "challenge": "Reto INIBSA"
+    "challenge": "Reto INIBSA",
+    "delegate_dashboard": "Delegados",
+    "regional_dashboard": "Dirección regional"
   },
   "login": {
     "title": "Panel de Alertas de Ventas",
@@ -21,6 +23,13 @@
       "churn": "Riesgo fuga",
       "buy": "Compra",
       "clients": "Clientes"
+    },
+    "role_selector": {
+      "label": "Perfil de acceso",
+      "regional": "Dirección regional",
+      "regional_desc": "Vista agregada por zona, mánagers y agentes.",
+      "delegate": "Delegado de ventas",
+      "delegate_desc": "Gestión operativa de alertas de clientes."
     }
   },
   "dashboard": {
@@ -35,7 +44,9 @@
       "avg_churn": "Fuga media",
       "avg_churn_desc": "Promedio de cartera alertada",
       "attended": "Atendidas",
-      "attended_desc": "Gestiones registradas"
+      "attended_desc": "Gestiones registradas",
+      "dismissed": "Descartadas",
+      "dismissed_desc": "Alertas descartadas manualmente"
     },
     "table": {
       "title": "Alertas comerciales",
@@ -58,8 +69,10 @@
         "hide_detail": "Ocultar detalle",
         "pending": "Pendiente",
         "attended": "Atendida",
+        "dismissed": "Descartada",
         "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atendida",
+        "dismiss": "Descartar",
         "full_explanation": "Explicación completa",
         "status_mgmt": "Estado de gestión",
         "no_mgmt": "Sin gestión registrada todavía.",
@@ -109,6 +122,26 @@
       "email": "Correo electrónico",
       "other": "Otros"
     },
+    "answered": {
+      "label": "¿Ha contestado?",
+      "yes": "Contestado",
+      "no": "No contestado"
+    },
+    "visit_ok": {
+      "label": "¿Visita realizada?",
+      "yes": "Visita realizada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "¿Ha respondido?",
+      "yes": "Respuesta recibida",
+      "no": "Sin respuesta"
+    },
+    "keep_open": {
+      "label": "Estado de la alerta",
+      "close": "Cerrar alerta",
+      "keep": "Mantener abierta"
+    },
     "result_label": "Resultado",
     "results": {
       "positive": "Positivo",
@@ -118,6 +151,107 @@
     "reminder_label": "Notas adicionales",
     "reminder_placeholder": "Cualquier observación relevante sobre la gestión de este cliente...",
     "cancel": "Cancelar",
-    "submit": "Marcar como atendida"
+    "submit": "Guardar gestión"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "¿Descartar esta alerta?",
+    "description": "La alerta pasará a la pestaña de descartadas.",
+    "reason_label": "Motivo (opcional)",
+    "reason_placeholder": "Motivo del descarte (opcional)...",
+    "confirm": "Confirmar descarte",
+    "cancel": "Cancelar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestiones",
+    "empty": "Sin historial de gestiones.",
+    "phone": "Llamada",
+    "visit": "Visita",
+    "email": "Correo",
+    "other": "Otros",
+    "answered": "Contestado",
+    "not_answered": "No contestado",
+    "visit_ok": "Visita realizada",
+    "visit_fail": "No disponible",
+    "email_received": "Respuesta recibida",
+    "email_no_response": "Sin respuesta",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "result_positive": "Resultado positivo",
+    "result_neutral": "Resultado neutro",
+    "result_negative": "Resultado negativo",
+    "kept_open": "Alerta mantenida abierta",
+    "closed": "Alerta cerrada",
+    "event_closed": "Alerta cerrada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
+  },
+  "regional_dashboard": {
+    "title": "Panel de dirección regional",
+    "subtitle": "Control ejecutivo de las alertas por región, mánagers, agentes y clientes.",
+    "loading": "Cargando datos regionales...",
+    "error": "No se han podido cargar los datos regionales.",
+    "scope": "Área seleccionada · {{region}}",
+    "scope_all": "Todas las regiones",
+    "all_regions": "Todas las regiones",
+    "regions": {
+      "est": "Est",
+      "north": "Nord",
+      "south": "Sud"
+    },
+    "status": {
+      "good": "Ejecución saludable",
+      "warning": "Requiere seguimiento",
+      "critical": "Riesgo operativo"
+    },
+    "kpis": {
+      "execution_score": "Eficiencia de respuesta",
+      "pending": "Pendientes",
+      "pending_desc": "Alertas todavía abiertas",
+      "attended_rate": "Tasa de atención",
+      "attended_desc": "Porcentaje de alertas atendidas",
+      "overdue": "Vencidas",
+      "overdue_desc": "Seguimientos fuera de plazo",
+      "response_time": "Tiempo respuesta",
+      "response_desc": "Media hasta primera gestión",
+      "high_risk": "Alto riesgo"
+    },
+    "map": {
+      "title": "Mapa Regional",
+      "subtitle": "Selecciona un área para ver el detalle operativo.",
+      "aria": "Mapa interactivo de España por zonas comerciales",
+      "score": "Índice {{score}}"
+    },
+    "snapshot": {
+      "title": "Estado del área"
+    },
+    "managers": {
+      "title": "Mánagers del área"
+    },
+    "agents": {
+      "title": "Agentes del mánager"
+    },
+    "clients": {
+      "title": "Clientes del agente",
+      "alerts": "Alertas"
+    },
+    "underperformers": {
+      "title": "Focos de riesgo",
+      "subtitle": "Equipos que necesitan revisión prioritaria.",
+      "manager_level": "Mánager regional",
+      "role_manager": "Mánager",
+      "role_agent": "Delegado"
+    },
+    "table": {
+      "name": "Nombre",
+      "action": "Acción"
+    },
+    "actions": {
+      "zoom": "Profundizar",
+      "back_region": "Volver al área",
+      "back_manager": "Volver al mánager",
+      "retry": "Reintentar"
+    }
   }
 }

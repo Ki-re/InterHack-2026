@@ -4,7 +4,9 @@
     "subtitle": "Espai del delegat de vendes",
     "logout": "Sortir",
     "alerts": "Alertes",
-    "challenge": "Repte INIBSA"
+    "challenge": "Repte INIBSA",
+    "delegate_dashboard": "Delegats",
+    "regional_dashboard": "Direcció regional"
   },
   "login": {
     "title": "Dashboard d'Alertes de Vendes",
@@ -21,6 +23,13 @@
       "churn": "Risc de fuga",
       "buy": "Compra",
       "clients": "Clients"
+    },
+    "role_selector": {
+      "label": "Perfil d'accés",
+      "regional": "Direcció regional",
+      "regional_desc": "Visió agregada per zona, mànagers i agents.",
+      "delegate": "Delegat de vendes",
+      "delegate_desc": "Gestió operativa d'alertes de clients."
     }
   },
   "dashboard": {
@@ -35,7 +44,9 @@
       "avg_churn": "Fuga mitjana",
       "avg_churn_desc": "Mitjana de cartera alertada",
       "attended": "Ateses",
-      "attended_desc": "Gestions registrades"
+      "attended_desc": "Gestions registrades",
+      "dismissed": "Descartades",
+      "dismissed_desc": "Alertes descartades manualment"
     },
     "table": {
       "title": "Alertes comercials",
@@ -58,8 +69,10 @@
         "hide_detail": "Ocultar detall",
         "pending": "Pendent",
         "attended": "Atesa",
+        "dismissed": "Descartada",
         "ask_ai": "Consultar IA",
         "mark_attended": "Marcar atesa",
+        "dismiss": "Descartar",
         "full_explanation": "Explicació completa",
         "status_mgmt": "Estat de gestió",
         "no_mgmt": "Sense gestió registrada encara.",
@@ -70,7 +83,7 @@
   "risk": {
     "high": "Alta",
     "medium": "Mitjana",
-    "low": "Baixa"
+    "low": "Baix"
   },
   "churn_type": {
     "total": "Total",
@@ -109,6 +122,26 @@
       "email": "Correu electrònic",
       "other": "Altres"
     },
+    "answered": {
+      "label": "Ha contestat?",
+      "yes": "Contestat",
+      "no": "No contestat"
+    },
+    "visit_ok": {
+      "label": "Visita realitzada?",
+      "yes": "Visita realitzada",
+      "no": "No disponible"
+    },
+    "email_response": {
+      "label": "Ha respost?",
+      "yes": "Resposta rebuda",
+      "no": "Sense resposta"
+    },
+    "keep_open": {
+      "label": "Estat de l'alerta",
+      "close": "Tancar alerta",
+      "keep": "Mantenir oberta"
+    },
     "result_label": "Resultat",
     "results": {
       "positive": "Positiu",
@@ -118,6 +151,107 @@
     "reminder_label": "Notes addicionals",
     "reminder_placeholder": "Qualsevol observació rellevant sobre la gestió d'aquest client...",
     "cancel": "Cancel·lar",
-    "submit": "Marcar com a atesa"
+    "submit": "Guardar gestió"
+  },
+  "dismiss": {
+    "button": "Descartar",
+    "title": "Descartar aquesta alerta?",
+    "description": "L'alerta passarà a la pestanya de descartades.",
+    "reason_label": "Motiu (opcional)",
+    "reason_placeholder": "Motiu del descart (opcional)...",
+    "confirm": "Confirmar descart",
+    "cancel": "Cancel·lar",
+    "recover": "Recuperar"
+  },
+  "changelog": {
+    "title": "Historial de gestions",
+    "empty": "Sense historial de gestions.",
+    "phone": "Trucada",
+    "visit": "Visita",
+    "email": "Correu",
+    "other": "Altres",
+    "answered": "Contestat",
+    "not_answered": "No contestat",
+    "visit_ok": "Visita realitzada",
+    "visit_fail": "No disponible",
+    "email_received": "Resposta rebuda",
+    "email_no_response": "Sense resposta",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "result_positive": "Resultat positiu",
+    "result_neutral": "Resultat neutre",
+    "result_negative": "Resultat negatiu",
+    "kept_open": "Alerta mantinguda oberta",
+    "closed": "Alerta tancada",
+    "event_closed": "Alerta tancada",
+    "event_dismissed": "Alerta descartada",
+    "event_reopened": "Alerta recuperada"
+  },
+  "regional_dashboard": {
+    "title": "Dashboard de direcció regional",
+    "subtitle": "Control executiu de les alertes per regió, mànagers, agents i clients.",
+    "loading": "Carregant dades regionals...",
+    "error": "No s'han pogut carregar les dades regionals.",
+    "scope": "Àrea seleccionada · {{region}}",
+    "scope_all": "Totes les regions",
+    "all_regions": "Totes les regions",
+    "regions": {
+      "est": "Est",
+      "north": "Nord",
+      "south": "Sud"
+    },
+    "status": {
+      "good": "Execució saludable",
+      "warning": "Requereix seguiment",
+      "critical": "Risc operatiu"
+    },
+    "kpis": {
+      "execution_score": "Eficiència de resposta",
+      "pending": "Pendents",
+      "pending_desc": "Alertes encara obertes",
+      "attended_rate": "Taxa d'atenció",
+      "attended_desc": "Percentatge d'alertes ateses",
+      "overdue": "Vençudes",
+      "overdue_desc": "Seguiments fora de termini",
+      "response_time": "Temps resposta",
+      "response_desc": "Mitjana fins a primera gestió",
+      "high_risk": "Alt risc"
+    },
+    "map": {
+      "title": "Mapa Regional",
+      "subtitle": "Selecciona una àrea per veure el detall operatiu.",
+      "aria": "Mapa interactiu d'Espanya per zones comercials",
+      "score": "Índex {{score}}"
+    },
+    "snapshot": {
+      "title": "Estat de l'àrea"
+    },
+    "managers": {
+      "title": "Mànagers de l'àrea"
+    },
+    "agents": {
+      "title": "Agents del mànager"
+    },
+    "clients": {
+      "title": "Clients de l'agent",
+      "alerts": "Alertes"
+    },
+    "underperformers": {
+      "title": "Focus de risc",
+      "subtitle": "Equips que necessiten revisió prioritària.",
+      "manager_level": "Mànager regional",
+      "role_manager": "Mànager",
+      "role_agent": "Delegat"
+    },
+    "table": {
+      "name": "Nom",
+      "action": "Acció"
+    },
+    "actions": {
+      "zoom": "Aprofundir",
+      "back_region": "Tornar a l'àrea",
+      "back_manager": "Tornar al mànager",
+      "retry": "Reintentar"
+    }
   }
 }

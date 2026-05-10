@@ -4,17 +4,31 @@ export type CustomerValue = "low" | "medium" | "high";
 
 export type ChurnType = "total" | string;
 
-export type AlertStatus = "pending" | "attended";
+export type AlertStatus = "pending" | "attended" | "dismissed";
 
 export type HandlingChannel = "phone" | "visit" | "email" | "other";
 
 export type InteractionResult = "positive" | "neutral" | "negative";
 
-export type FollowUpRecord = {
+export type InteractionRecord = {
+  id: string;
   handledBy: HandlingChannel;
-  result: InteractionResult;
-  reminder: string;
+  answered?: boolean;               // phone only
+  visitSuccessful?: boolean;        // visit only
+  emailResponseReceived?: boolean;  // email only
+  result?: InteractionResult;       // only when contact was successful
+  notes?: string;
+  keepOpen: boolean;
   submittedAt: string;
+};
+
+export type SystemEventType = "closed" | "dismissed" | "reopened";
+
+export type SystemEventRecord = {
+  id: string;
+  type: SystemEventType;
+  reason?: string;
+  timestamp: string;
 };
 
 export type SalesAlert = {
@@ -27,5 +41,8 @@ export type SalesAlert = {
   explanation: string;
   churnType: ChurnType;
   status: AlertStatus;
-  followUp?: FollowUpRecord;
+  interactions: InteractionRecord[];
+  events: SystemEventRecord[];
+  dismissReason?: string;
+  dismissedAt?: string;
 };
