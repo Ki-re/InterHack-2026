@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { LanguageProvider, useTranslation } from "@/contexts/LanguageContext";
 import { Dashboard } from "@/pages/Dashboard";
 import { Login } from "@/pages/Login";
+import { RegionalDashboard } from "@/pages/RegionalDashboard";
 
 export function App() {
   return (
@@ -27,6 +28,7 @@ export function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/regional-dashboard" element={<RegionalDashboard />} />
         </Route>
         <Route path="*" element={<FallbackRedirect />} />
       </Routes>
@@ -56,7 +58,7 @@ function PublicOnlyRoute({ children }: { children: ReactNode }) {
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={getDefaultRoute(user.role)} replace />;
   }
 
   return children;
@@ -69,7 +71,11 @@ function FallbackRedirect() {
     return <AuthLoading />;
   }
 
-  return <Navigate to={user ? "/dashboard" : "/"} replace />;
+  return <Navigate to={user ? getDefaultRoute(user.role) : "/"} replace />;
+}
+
+function getDefaultRoute(role: string) {
+  return role === "regional_manager" ? "/regional-dashboard" : "/dashboard";
 }
 
 function AuthLoading() {

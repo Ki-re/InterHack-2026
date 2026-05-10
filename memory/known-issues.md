@@ -7,6 +7,7 @@
 - No automated backend tests.
 - No frontend route/auth smoke tests.
 - Sales alert data, interaction records, dismiss state, and AI responses are mock-only and reset on page refresh (no backend persistence yet).
+- Regional dashboard data comes from deterministic seed rows, not production source systems yet.
 - No password reset or email verification.
 - No refresh token or role/permission model.
 

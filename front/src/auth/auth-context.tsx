@@ -9,16 +9,19 @@ import {
 
 const STORAGE_KEY = "inibsa.salesDelegateSession";
 
+export type UserRole = "sales_delegate" | "regional_manager";
+
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: "Delegado de Ventas";
+  role: UserRole;
 };
 
 export type AuthCredentials = {
   email: string;
   password: string;
+  role?: UserRole;
 };
 
 type StoredSession = {
@@ -45,19 +48,27 @@ function readStoredSession(): StoredSession | null {
   }
 
   try {
-    return JSON.parse(rawSession) as StoredSession;
+    const parsed = JSON.parse(rawSession) as StoredSession;
+    const role = parsed.user.role === "regional_manager" ? "regional_manager" : "sales_delegate";
+    return {
+      ...parsed,
+      user: {
+        ...parsed.user,
+        role,
+      },
+    };
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return null;
   }
 }
 
-function createMockUser(email: string): AuthUser {
+function createMockUser(email: string, role: UserRole): AuthUser {
   return {
-    id: "delegate-001",
-    name: "Delegado de Ventas",
+    id: role === "regional_manager" ? "regional-001" : "delegate-001",
+    name: role === "regional_manager" ? "Regional Manager" : "Delegado de Ventas",
     email,
-    role: "Delegado de Ventas",
+    role,
   };
 }
 
@@ -79,7 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (credentials: AuthCredentials) => {
-      const nextUser = createMockUser(credentials.email.trim() || "delegado@inibsa.local");
+      const role = credentials.role ?? "sales_delegate";
+      const fallbackEmail =
+        role === "regional_manager" ? "regional@inibsa.local" : "delegado@inibsa.local";
+      const nextUser = createMockUser(credentials.email.trim() || fallbackEmail, role);
       saveSession(nextUser);
       return nextUser;
     },
@@ -88,7 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async (credentials: AuthCredentials) => {
-      const nextUser = createMockUser(credentials.email.trim() || "delegado@inibsa.local");
+      const role = credentials.role ?? "sales_delegate";
+      const fallbackEmail =
+        role === "regional_manager" ? "regional@inibsa.local" : "delegado@inibsa.local";
+      const nextUser = createMockUser(credentials.email.trim() || fallbackEmail, role);
       saveSession(nextUser);
       return nextUser;
     },
