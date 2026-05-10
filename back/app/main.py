@@ -14,12 +14,17 @@ from app.core.config import get_settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    import logging
     from app.services.notification import run_daily_notifications
 
+    logger = logging.getLogger(__name__)
     scheduler = AsyncIOScheduler()
     scheduler.add_job(run_daily_notifications, CronTrigger(hour=9, minute=0))
     scheduler.start()
-    await run_daily_notifications()
+    try:
+        await run_daily_notifications()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("run_daily_notifications failed at startup (will retry at 09:00): %s", exc)
     yield
     scheduler.shutdown(wait=False)
 
