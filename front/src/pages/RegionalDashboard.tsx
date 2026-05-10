@@ -1,5 +1,5 @@
 import { type ReactNode, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { AlertCircle, RefreshCcw, ShieldAlert } from "lucide-react";
 
@@ -35,6 +35,7 @@ export function RegionalDashboard() {
   const dashboard = useQuery({
     queryKey: ["regional-dashboard", selectedCcaa],
     queryFn: () => getRegionalDashboard(selectedCcaa),
+    placeholderData: keepPreviousData,
   });
 
   const selectedRegion = useMemo(() => {
