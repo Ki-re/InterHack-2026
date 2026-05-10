@@ -80,10 +80,12 @@
   - `purchasePropensity: int`
   - `customerValue: "low" | "medium" | "high"`
   - `explanation: string`
-  - `churnType: string` (e.g. "Total", "Producto 4566")
-  - `status: "pending"` (always pending from DB; mutations are local frontend state)
-  - `interactions: []`
-  - `events: []`
+  - `churnType: string` (e.g. "Total", "Producto 4566", "Combinat")
+  - `status: "pending" | "attended" | "dismissed"` (from DB — seeded by demo script)
+  - `interactions: InteractionRecord[]` — deserialized from `interactions_json` column; empty array if null
+  - `events: SystemEventRecord[]` — deserialized from `events_json` column; empty array if null
+  - `dismissReason: string | null`
+  - `dismissedAt: string | null` (ISO datetime)
   - `alertContextJson: string | null` (JSON blob of ML ctx_* fields for LLM enrichment)
   - `predictedNextPurchase: string | null` (ISO date string)
   - `lastOrderDate: string | null` (ISO date string)

@@ -11,8 +11,10 @@ type AlertApiRow = {
   explanation: string;
   churnType: string;
   status: string;
-  interactions: never[];
-  events: never[];
+  interactions: SalesAlert["interactions"];
+  events: SalesAlert["events"];
+  dismissReason?: string | null;
+  dismissedAt?: string | null;
   alertContextJson?: string | null;
   predictedNextPurchase?: string | null;
   lastOrderDate?: string | null;
@@ -31,8 +33,10 @@ export async function fetchAlerts(agentId?: number): Promise<SalesAlert[]> {
     explanation: r.explanation,
     churnType: r.churnType,
     status: (r.status as SalesAlert["status"]) ?? "pending",
-    interactions: [],
-    events: [],
+    interactions: r.interactions ?? [],
+    events: r.events ?? [],
+    dismissReason: r.dismissReason ?? undefined,
+    dismissedAt: r.dismissedAt ?? undefined,
     alertContextJson: r.alertContextJson ?? undefined,
     predictedNextPurchase: r.predictedNextPurchase ?? undefined,
     lastOrderDate: r.lastOrderDate ?? undefined,

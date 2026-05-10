@@ -10,9 +10,11 @@ class SalesAlertResponse(BaseModel):
     customerValue: str      # "low" | "medium" | "high"
     explanation: str
     churnType: str
-    status: str             # always "pending" from DB
-    interactions: list      # always []
-    events: list            # always []
+    status: str             # "pending" | "attended" | "dismissed"
+    interactions: list      # InteractionRecord[] — populated from DB
+    events: list            # SystemEventRecord[] — populated from DB
+    dismissReason: str | None = None
+    dismissedAt: str | None = None
     alertContextJson: str | None = None
     predictedNextPurchase: str | None = None
     lastOrderDate: str | None = None

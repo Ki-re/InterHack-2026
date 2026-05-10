@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +26,11 @@ async def get_alerts(
 
     alerts: list[SalesAlertResponse] = []
     for alert, client in rows:
+        interactions = json.loads(alert.interactions_json) if alert.interactions_json else []
+        events = json.loads(alert.events_json) if alert.events_json else []
+        dismissed_at = (
+            alert.dismissed_at.isoformat() if alert.dismissed_at else None
+        )
         alerts.append(
             SalesAlertResponse(
                 id=str(alert.id),
@@ -35,8 +42,10 @@ async def get_alerts(
                 explanation=alert.explanation or "",
                 churnType=alert.churn_type or "Total",
                 status=alert.status,
-                interactions=[],
-                events=[],
+                interactions=interactions,
+                events=events,
+                dismissReason=alert.dismiss_reason,
+                dismissedAt=dismissed_at,
                 alertContextJson=alert.alert_context_json,
                 predictedNextPurchase=alert.predicted_next_purchase,
                 lastOrderDate=alert.last_order_date,

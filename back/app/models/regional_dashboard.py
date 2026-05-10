@@ -87,6 +87,8 @@ class RegionalAlert(Base):
     predicted_next_purchase: Mapped[str | None] = mapped_column(String(20), nullable=True)
     last_order_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
     alert_context_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    interactions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    events_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     attended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
