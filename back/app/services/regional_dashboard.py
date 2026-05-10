@@ -22,7 +22,7 @@ from app.schemas.regional_dashboard import (
 )
 
 
-async def get_regional_dashboard(session: AsyncSession) -> RegionalDashboardResponse:
+async def get_regional_dashboard(session: AsyncSession, ccaa_filter: str | None = None) -> RegionalDashboardResponse:
     regions = list(
         (
             await session.execute(select(Region).order_by(Region.display_order, Region.id))
@@ -38,6 +38,9 @@ async def get_regional_dashboard(session: AsyncSession) -> RegionalDashboardResp
     alerts = list(
         (await session.execute(select(RegionalAlert).order_by(RegionalAlert.created_at))).scalars().all()
     )
+
+    if ccaa_filter:
+        agents = [a for a in agents if a.cod_ccaa == ccaa_filter]
 
     alerts_by_client = _group_by(alerts, "client_id")
     clients_by_agent = _group_by(clients, "agent_id")
@@ -70,6 +73,7 @@ async def get_regional_dashboard(session: AsyncSession) -> RegionalDashboardResp
                         id=agent.id,
                         name=agent.name,
                         email=agent.email,
+                        cod_ccaa=agent.cod_ccaa,
                         kpis=agent_kpis,
                         clients=client_summaries,
                     )

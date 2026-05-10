@@ -58,6 +58,7 @@ class AgentPerformance(CamelModel):
     id: int
     name: str
     email: str
+    cod_ccaa: str
     kpis: ExecutionKpis
     clients: list[ClientExecution]
 
