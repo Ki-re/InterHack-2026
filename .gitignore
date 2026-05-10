@@ -274,3 +274,6 @@ __pycache__/
 /OPENCODE.md.bak
 /opencode.json
 # END AI Agent Symlinks
+
+*.pt
+run_config.json

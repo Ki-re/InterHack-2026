@@ -3,12 +3,12 @@ import { AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { FollowUpForm } from "@/components/FollowUpForm";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/LanguageContext";
-import type { ChurnType, CustomerValue, FollowUpRecord, RiskLevel, SalesAlert } from "@/types/alerts";
+import type { CustomerValue, InteractionRecord, RiskLevel, SalesAlert } from "@/types/alerts";
 
 type AlertDetailModalProps = {
   alert: SalesAlert | null;
   onClose: () => void;
-  onSubmit: (alertId: string, record: FollowUpRecord) => void;
+  onSubmit: (alertId: string, record: InteractionRecord) => void;
 };
 
 export function AlertDetailModal({ alert, onClose, onSubmit }: AlertDetailModalProps) {

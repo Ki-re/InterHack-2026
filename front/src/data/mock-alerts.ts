@@ -12,6 +12,8 @@ export const mockAlerts: SalesAlert[] = [
       "Descenso del 34% en pedidos de material de restauración y ortodoncia en los últimos 45 días, sin contacto comercial registrado.",
     churnType: "total",
     status: "pending",
+    interactions: [],
+    events: [],
   },
   {
     id: "alert-002",
@@ -24,6 +26,8 @@ export const mockAlerts: SalesAlert[] = [
       "Ha sustituido dos referencias de composite de alto margen por alternativas de menor valor y frecuencia de pedido reducida.",
     churnType: "Producto 1",
     status: "pending",
+    interactions: [],
+    events: [],
   },
   {
     id: "alert-003",
@@ -36,6 +40,8 @@ export const mockAlerts: SalesAlert[] = [
       "Patrón de compra estable en implantología y buena respuesta a la última campaña de fungibles. Potencial de upsell en endodoncia.",
     churnType: "Producto 2",
     status: "pending",
+    interactions: [],
+    events: [],
   },
   {
     id: "alert-004",
@@ -48,6 +54,8 @@ export const mockAlerts: SalesAlert[] = [
       "Reducción sostenida del ticket medio en instrumental quirúrgico, retraso en reposiciones de guantes y material de esterilización.",
     churnType: "Producto 1",
     status: "pending",
+    interactions: [],
+    events: [],
   },
   {
     id: "alert-005",
@@ -60,12 +68,31 @@ export const mockAlerts: SalesAlert[] = [
       "Alta afinidad con la línea de blanqueamiento profesional, aunque ha reducido la frecuencia base en materiales de obturación.",
     churnType: "Producto 2",
     status: "attended",
-    followUp: {
-      handledBy: "phone",
-      result: "positive",
-      reminder: "Revisar propuesta de ampliación de surtido en blanqueamiento la próxima semana.",
-      submittedAt: "2026-05-08T10:15:00.000Z",
-    },
+    interactions: [
+      {
+        id: "int-005-1",
+        handledBy: "phone",
+        answered: false,
+        keepOpen: true,
+        submittedAt: "2026-05-07T09:00:00.000Z",
+      },
+      {
+        id: "int-005-2",
+        handledBy: "phone",
+        answered: true,
+        result: "positive",
+        notes: "Revisar propuesta de ampliación de surtido en blanqueamiento la próxima semana.",
+        keepOpen: false,
+        submittedAt: "2026-05-08T10:15:00.000Z",
+      },
+    ],
+    events: [
+      {
+        id: "evt-005-1",
+        type: "closed",
+        timestamp: "2026-05-08T10:15:30.000Z",
+      },
+    ],
   },
   {
     id: "alert-006",
@@ -78,5 +105,7 @@ export const mockAlerts: SalesAlert[] = [
       "Clínica de bajo volumen con señales de recuperación tras campaña local. Ha retomado pedidos regulares de material de higiene y prevención.",
     churnType: "total",
     status: "pending",
+    interactions: [],
+    events: [],
   },
 ];

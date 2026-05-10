@@ -1,9 +1,9 @@
-import { type FormEvent, useState } from "react";
-import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
+import { type FormEvent, type ReactNode, useState } from "react";
+import { ArrowRight, LockKeyhole, Mail, Network, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import { useAuth } from "@/auth/auth-context";
+import { useAuth, type UserRole } from "@/auth/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -16,6 +16,7 @@ export function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [role, setRole] = useState<UserRole>("regional_manager");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,8 +32,10 @@ export function Login() {
         throw new Error(t("login.error_required"));
       }
 
-      await login({ email, password });
-      navigate("/dashboard", { replace: true });
+      const user = await login({ email, password, role });
+      navigate(user.role === "regional_manager" ? "/regional-dashboard" : "/dashboard", {
+        replace: true,
+      });
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : t("login.error_failed"));
     } finally {
@@ -76,7 +79,11 @@ export function Login() {
               <div className="mb-3">
                 <img src={inibsaLogo} alt="INIBSA" className="h-8 w-auto" />
               </div>
-              <CardTitle className="text-xl">{t("login.role")}</CardTitle>
+              <CardTitle className="text-xl">
+                {role === "regional_manager"
+                  ? t("login.role_selector.regional")
+                  : t("login.role_selector.delegate")}
+              </CardTitle>
               <CardDescription>{t("login.mock_login")}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -89,14 +96,37 @@ export function Login() {
                       aria-hidden="true"
                     />
                     <input
+                      key={role}
                       className="h-10 w-full rounded-md border bg-background px-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
-                      defaultValue="delegado@inibsa.local"
+                      defaultValue={
+                        role === "regional_manager" ? "regional@inibsa.local" : "delegado@inibsa.local"
+                      }
                       name="email"
                       type="email"
                       autoComplete="email"
                     />
                   </span>
                 </label>
+
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-medium">{t("login.role_selector.label")}</legend>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <RoleOption
+                      active={role === "regional_manager"}
+                      description={t("login.role_selector.regional_desc")}
+                      icon={<Network className="size-4" aria-hidden="true" />}
+                      label={t("login.role_selector.regional")}
+                      onClick={() => setRole("regional_manager")}
+                    />
+                    <RoleOption
+                      active={role === "sales_delegate"}
+                      description={t("login.role_selector.delegate_desc")}
+                      icon={<UserRound className="size-4" aria-hidden="true" />}
+                      label={t("login.role_selector.delegate")}
+                      onClick={() => setRole("sales_delegate")}
+                    />
+                  </div>
+                </fieldset>
 
                 <label className="block space-y-2">
                   <span className="text-sm font-medium">{t("login.password")}</span>
@@ -146,5 +176,36 @@ function Signal({ label, tone, value }: { label: string; tone: "risk" | "success
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
       <p className={`mt-1 text-2xl font-semibold ${toneClassName}`}>{value}</p>
     </div>
+  );
+}
+
+function RoleOption({
+  active,
+  description,
+  icon,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  description: string;
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={[
+        "rounded-md border px-3 py-3 text-left transition-colors",
+        active ? "border-primary bg-primary/5" : "bg-background hover:bg-secondary",
+      ].join(" ")}
+      type="button"
+      onClick={onClick}
+    >
+      <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+        {icon}
+        {label}
+      </span>
+      <span className="mt-1 block text-xs leading-5 text-muted-foreground">{description}</span>
+    </button>
   );
 }
