@@ -276,3 +276,5 @@ __pycache__/
 
 *.pt
 run_config.json
+
+/.env.prod
