@@ -55,7 +55,6 @@ async def synthesize(body: SynthesizeRequest) -> StreamingResponse:
             voice_id=voice_id,
             text=body.text,
             model_id=ELEVENLABS_MODEL,
-            language_code=body.lang,
         )
         return b"".join(chunks)
 

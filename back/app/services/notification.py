@@ -12,7 +12,7 @@ from app.models.regional_dashboard import Client, RegionalAlert, SalesAgent
 
 logger = logging.getLogger(__name__)
 
-_HIGH_RISK_THRESHOLD_DAYS = 2
+_HIGH_RISK_THRESHOLD_DAYS = 0
 
 
 async def get_notifications_for_agent(session: AsyncSession, agent_id: int) -> list[Notification]:
