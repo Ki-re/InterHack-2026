@@ -18,8 +18,9 @@ type AlertApiRow = {
   lastOrderDate?: string | null;
 };
 
-export async function fetchAlerts(): Promise<SalesAlert[]> {
-  const rows = await apiRequest<AlertApiRow[]>("/alerts");
+export async function fetchAlerts(agentId?: number): Promise<SalesAlert[]> {
+  const qs = agentId !== undefined ? `?agent_id=${agentId}` : "";
+  const rows = await apiRequest<AlertApiRow[]>(`/alerts${qs}`);
   return rows.map((r) => ({
     id: r.id,
     clientName: r.clientName,

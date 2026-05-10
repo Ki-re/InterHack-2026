@@ -8,6 +8,7 @@ import { AlertTable } from "@/components/AlertTable";
 import { DismissModal } from "@/components/DismissModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { useAgents } from "@/hooks/useAgents";
 import { useAlerts } from "@/hooks/useAlerts";
 import type { AlertStatus, InteractionRecord, SalesAlert, SystemEventRecord } from "@/types/alerts";
 
@@ -23,14 +24,31 @@ const itemVariants = {
 
 export function Dashboard() {
   const { t } = useTranslation();
-  const { data: fetchedAlerts, isLoading } = useAlerts();
+  const { data: agents, isLoading: agentsLoading } = useAgents();
+
+  // Auto-select the first agent once agents load
+  const [selectedAgentId, setSelectedAgentId] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    if (agents && agents.length > 0 && selectedAgentId === undefined) {
+      setSelectedAgentId(agents[0].id);
+    }
+  }, [agents, selectedAgentId]);
+
+  const { data: fetchedAlerts, isLoading: alertsLoading } = useAlerts(selectedAgentId);
+  const isLoading = agentsLoading || alertsLoading;
+
   const [alerts, setAlerts] = useState<SalesAlert[]>([]);
   const [activeTab, setActiveTab] = useState<AlertStatus>("pending");
   const [selectedAlert, setSelectedAlert] = useState<SalesAlert | null>(null);
   const [dismissTarget, setDismissTarget] = useState<SalesAlert | null>(null);
   const [insightAlert, setInsightAlert] = useState<SalesAlert | null>(null);
 
-  // Seed local state once when API data arrives; preserves local mutations on re-renders
+  // Reset alerts when agent changes, then seed from API
+  useEffect(() => {
+    setAlerts([]);
+    setActiveTab("pending");
+  }, [selectedAgentId]);
+
   useEffect(() => {
     if (fetchedAlerts && fetchedAlerts.length > 0) {
       setAlerts(fetchedAlerts);
@@ -125,17 +143,53 @@ export function Dashboard() {
     { key: "dismissed", label: t("dashboard.metrics.dismissed"), count: metrics.dismissed },
   ];
 
+  const zoneLabel = (zone: string) =>
+    t(`dashboard.zone_${zone}`) !== `dashboard.zone_${zone}` ? t(`dashboard.zone_${zone}`) : zone;
+
+  const selectedAgent = agents?.find((a) => a.id === selectedAgentId);
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
 
-      {isLoading && (
+      {/* Delegate selector bar */}
+      <motion.div variants={itemVariants} className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3">
+        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+          {t("dashboard.delegate_label")}:
+        </span>
+        {agentsLoading ? (
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Loader2 className="size-3.5 animate-spin" />
+            {t("dashboard.loading_agents")}
+          </span>
+        ) : (
+          <select
+            value={selectedAgentId ?? ""}
+            onChange={(e) => setSelectedAgentId(Number(e.target.value))}
+            className="flex-1 max-w-xs rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            {(agents ?? []).map((agent) => (
+              <option key={agent.id} value={agent.id}>
+                {agent.name} · {zoneLabel(agent.zone)}
+              </option>
+            ))}
+          </select>
+        )}
+        {selectedAgent && (
+          <span className="ml-auto text-xs text-muted-foreground">
+            {selectedAgent.email}
+          </span>
+        )}
+      </motion.div>
+
+      {alertsLoading && (
         <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
           <Loader2 className="size-5 animate-spin" />
           <span className="text-sm">{t("dashboard.loading") ?? "Carregant alertes..."}</span>
         </div>
       )}
 
-      {!isLoading && (
+
+      {!alertsLoading && (
       <>
       <motion.section variants={itemVariants} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard

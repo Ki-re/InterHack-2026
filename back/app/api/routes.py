@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.agents import router as agents_router
 from app.api.alerts import router as alerts_router
 from app.api.audio import router as audio_router
 from app.api.auth import router as auth_router
@@ -16,3 +17,4 @@ api_router.include_router(audio_router)
 api_router.include_router(regional_dashboard_router)
 api_router.include_router(notifications_router)
 api_router.include_router(alerts_router)
+api_router.include_router(agents_router)

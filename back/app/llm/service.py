@@ -28,8 +28,22 @@ def _build_context_block(alert: AlertContext) -> str:
                 lines.append(f"Annual spend (expected): {ctx['ctx_gasto_esperado']}€")
             if ctx.get("ctx_dias_desde_compra"):
                 lines.append(f"Days since last purchase: {ctx['ctx_dias_desde_compra']}")
+            if ctx.get("ctx_tiempo_medio_recompra"):
+                try:
+                    avg_days = round(float(ctx["ctx_tiempo_medio_recompra"]))
+                    lines.append(f"Avg. days between purchases (this product): {avg_days}")
+                except (ValueError, TypeError):
+                    pass
+            if ctx.get("ctx_zscore_momento"):
+                lines.append(f"Purchase momentum z-score: {ctx['ctx_zscore_momento']}")
             if ctx.get("ctx_potencial_clase"):
                 lines.append(f"Potential class: {ctx['ctx_potencial_clase']}")
+            if ctx.get("ctx_num_compras_anteriores"):
+                lines.append(f"Prior purchases (this product): {ctx['ctx_num_compras_anteriores']}")
+            vuelve = ctx.get("ctx_vuelve_a_comprar", "")
+            if vuelve != "":
+                repurchase = "yes" if str(vuelve) == "1" else "no"
+                lines.append(f"Model predicts repurchase: {repurchase}")
         except (json.JSONDecodeError, TypeError):
             pass
     if not lines:

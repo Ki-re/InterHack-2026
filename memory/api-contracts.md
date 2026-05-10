@@ -70,7 +70,7 @@
 
 ## `GET /alerts`
 - Auth: none for current MVP.
-- Request: none.
+- Query params: `agent_id?: int` — filter alerts to a specific sales agent.
 - Response `200`: `SalesAlertResponse[]`
 - `SalesAlertResponse`:
   - `id: string`
@@ -87,7 +87,18 @@
   - `alertContextJson: string | null` (JSON blob of ML ctx_* fields for LLM enrichment)
   - `predictedNextPurchase: string | null` (ISO date string)
   - `lastOrderDate: string | null` (ISO date string)
-- Data source: `regional_alerts` JOIN `clients`, ordered by `created_at DESC`.
+- Data source: `regional_alerts` JOIN `clients`, ordered by `created_at DESC`. Filtered by `clients.agent_id` if `agent_id` query param provided.
+
+## `GET /agents`
+- Auth: none for current MVP.
+- Request: none.
+- Response `200`: `AgentResponse[]`
+  - `id: int`
+  - `name: string`
+  - `email: string`
+  - `zone: "north" | "east" | "south" | "canary" | "balearic"`
+  - `managerId: int`
+- Data source: `sales_agents` JOIN `regional_managers` JOIN `regions`, ordered by agent id.
 
 ## `GET /auth/me`
 - Auth: `Authorization: Bearer <token>`.

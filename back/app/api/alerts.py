@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
@@ -13,5 +13,9 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
 @router.get("", response_model=list[SalesAlertResponse])
-async def read_alerts(session: SessionDep) -> list[SalesAlertResponse]:
-    return await get_alerts(session)
+async def read_alerts(
+    session: SessionDep,
+    agent_id: int | None = Query(default=None, description="Filter alerts by sales agent ID"),
+) -> list[SalesAlertResponse]:
+    return await get_alerts(session, agent_id=agent_id)
+

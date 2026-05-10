@@ -129,6 +129,40 @@ RECENCY_EXCLUSION_MONTHS = 3   # Exclude the most recent N months (orders too fr
 LOOKBACK_MONTHS          = 18  # Maximum staleness in months (1.5 years)
 
 # =============================================================================
+# DISPLAY SCORE RESCALING PARAMETERS
+# =============================================================================
+# After the final alert set is capped and sorted, both churn_probability and
+# purchase_propensity are min-max rescaled to a human-readable range.
+# This prevents all alerts from clustering at extreme values (e.g. 96–100%)
+# and creates meaningful visual spread across the dashboard.
+#
+# DISPLAY_SCORE_MIN: the lowest displayed % for the least-risky alert in the set
+# DISPLAY_SCORE_MAX: the highest displayed % for the most-risky alert in the set
+# Increasing the range gives more visual spread; adjust to taste.
+
+DISPLAY_SCORE_MIN = 38.0  # lowest churn% shown on dashboard (for least-risky alert)
+DISPLAY_SCORE_MAX = 94.0  # highest churn% shown on dashboard (for most-risky alert)
+
+DISPLAY_PROPENSITY_MIN = 30.0  # lowest propensity% shown on dashboard
+DISPLAY_PROPENSITY_MAX = 92.0  # highest propensity% shown on dashboard
+
+# =============================================================================
+# RISK LEVEL DISTRIBUTION PARAMETERS
+# =============================================================================
+# After capping, risk levels are assigned by within-set percentile of alert_score
+# (rather than absolute composite thresholds) so every agent always sees a
+# realistic mix of Alto / Medio / Bajo alerts.
+#
+# RISK_LEVEL_HIGH_PCT:   top fraction of alerts that receive "Alto" (high) label
+# RISK_LEVEL_MEDIUM_PCT: next fraction that receives "Medio" (medium) label
+# The remaining fraction receives "Bajo" (low) label.
+# Must sum to ≤ 1.0. The fractions below give ~1/3 of each level.
+
+RISK_LEVEL_HIGH_PCT   = 0.33  # top 33 % → "Alto"
+RISK_LEVEL_MEDIUM_PCT = 0.42  # next 42 % → "Medio"
+# remainder (≈ 25 %) → "Bajo"
+
+# =============================================================================
 # PROVINCE → COMUNIDAD AUTÓNOMA MAPPING
 # =============================================================================
 
@@ -460,12 +494,24 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
           f"P75: {latest['risk_percentile'].quantile(0.75):.1f}  "
           f"P90: {latest['risk_percentile'].quantile(0.90):.1f}")
 
+    # ── Step 3c: Percentile-rank the propensity score ────────────────────────
+    # Applies the same treatment as risk: raw score_potencial_0_100 also
+    # clusters at 87–99, so replacing it with its percentile rank ensures
+    # displayed propensity values have meaningful spread.
+    print("[4c] Computing propensity percentile ranks within window candidates…")
+    latest["propensity_percentile"] = latest["score_potencial_0_100"].rank(pct=True) * 100
+    print(f"      propensity_percentile distribution — "
+          f"P25: {latest['propensity_percentile'].quantile(0.25):.1f}  "
+          f"P50: {latest['propensity_percentile'].quantile(0.50):.1f}  "
+          f"P75: {latest['propensity_percentile'].quantile(0.75):.1f}  "
+          f"P90: {latest['propensity_percentile'].quantile(0.90):.1f}")
+
     # ── Step 4: Per-tier alert scoring & filtering ───────────────────────────
     print("[5/8] Filtering candidates with per-tier risk thresholds…")
     latest["alert_score"] = latest.apply(
         lambda r: compute_alert_score(
             r["risk_percentile"],
-            r["score_potencial_0_100"],
+            r["propensity_percentile"],
             r["client_value"],
         ),
         axis=1,
@@ -519,8 +565,8 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
         if n_products >= MULTI_PRODUCT_THRESHOLD:
             # ── TOTAL alert — use average risk percentile/propensity across products
             avg_risk_pct = group["risk_percentile"].mean()
-            avg_prop = group["score_potencial_0_100"].mean()
-            risk_level = assign_risk_level(avg_risk_pct, avg_prop, client_value)
+            avg_prop_pct = group["propensity_percentile"].mean()
+            risk_level = assign_risk_level(avg_risk_pct, avg_prop_pct, client_value)
             product_list = sorted(group["Id. Producto"].astype(str).tolist())
             explanation = build_explanation(rep, "Total")
             rec = {
@@ -536,7 +582,7 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
                 "risk_level":             risk_level,
                 "client_value":           client_value,
                 "churn_probability":      round(avg_risk_pct, 2),
-                "purchase_propensity":    round(avg_prop, 2),
+                "purchase_propensity":    round(avg_prop_pct, 2),
                 "predicted_next_purchase": rep["prediccion_fecha_proxima_compra"],
                 "last_order_date":        rep["Fecha"].strftime("%Y-%m-%d")
                                           if pd.notna(rep["Fecha"]) else None,
@@ -561,8 +607,8 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
             # ── COMBINED alert — 2+ products but below Total threshold ──
             # Collapse into a single alert to avoid flooding the dashboard.
             avg_risk_pct = group["risk_percentile"].mean()
-            avg_prop = group["score_potencial_0_100"].mean()
-            risk_level = assign_risk_level(avg_risk_pct, avg_prop, client_value)
+            avg_prop_pct = group["propensity_percentile"].mean()
+            risk_level = assign_risk_level(avg_risk_pct, avg_prop_pct, client_value)
             product_list = sorted(group["Id. Producto"].astype(str).tolist())
             alert_type = "Combinat"
             explanation = build_explanation(rep, "Combinat")
@@ -579,7 +625,7 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
                 "risk_level":             risk_level,
                 "client_value":           client_value,
                 "churn_probability":      round(avg_risk_pct, 2),
-                "purchase_propensity":    round(avg_prop, 2),
+                "purchase_propensity":    round(avg_prop_pct, 2),
                 "predicted_next_purchase": rep["prediccion_fecha_proxima_compra"],
                 "last_order_date":        rep["Fecha"].strftime("%Y-%m-%d")
                                           if pd.notna(rep["Fecha"]) else None,
@@ -606,7 +652,7 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
             product_id = row["Id. Producto"]
             risk_level = assign_risk_level(
                 row["risk_percentile"],
-                row["score_potencial_0_100"],
+                row["propensity_percentile"],
                 client_value,
             )
             explanation = build_explanation(row, f"Producto {product_id}")
@@ -623,7 +669,7 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
                 "risk_level":             risk_level,
                 "client_value":           client_value,
                 "churn_probability":      round(row["risk_percentile"], 2),
-                "purchase_propensity":    round(row["score_potencial_0_100"], 2),
+                "purchase_propensity":    round(row["propensity_percentile"], 2),
                 "predicted_next_purchase": row["prediccion_fecha_proxima_compra"],
                 "last_order_date":        row["Fecha"].strftime("%Y-%m-%d")
                                           if pd.notna(row["Fecha"]) else None,
@@ -657,6 +703,47 @@ def run_pipeline(input_csv: str, output_csv: str) -> None:
         capped_parts.append(tier_df)
         print(f"      {tier}: {len(tier_df):,} alerts (cap={cap})")
     alerts_df = pd.concat(capped_parts, ignore_index=True)
+
+    # ── Step 6b: Assign risk levels by within-set percentile ────────────────
+    # Use alert_score rank within the FINAL capped set so every agent's list
+    # has a realistic mix of Alto / Medio / Bajo regardless of absolute values.
+    print("[6b] Assigning risk levels by within-alert-set percentile of alert_score…")
+    n_total  = len(alerts_df)
+    n_high   = max(1, int(round(n_total * RISK_LEVEL_HIGH_PCT)))
+    n_medium = max(1, int(round(n_total * RISK_LEVEL_MEDIUM_PCT)))
+    alerts_df = alerts_df.sort_values("alert_score", ascending=False).reset_index(drop=True)
+    alerts_df["risk_level"] = "Bajo"
+    alerts_df.loc[:n_high - 1, "risk_level"] = "Alto"
+    alerts_df.loc[n_high: n_high + n_medium - 1, "risk_level"] = "Medio"
+    print(f"      Alto: {(alerts_df['risk_level']=='Alto').sum()}  "
+          f"Medio: {(alerts_df['risk_level']=='Medio').sum()}  "
+          f"Bajo: {(alerts_df['risk_level']=='Bajo').sum()}")
+
+    # ── Step 6c: Rescale churn_probability and purchase_propensity ──────────
+    # Min-max scale within the final set so displayed values span a human-readable
+    # range instead of clustering at 95-100%. Preserves relative ordering.
+    print("[6c] Rescaling churn_probability and purchase_propensity for display…")
+
+    def minmax_rescale(series: pd.Series, lo: float, hi: float) -> pd.Series:
+        s_min, s_max = series.min(), series.max()
+        if s_max == s_min:
+            return series.apply(lambda _: round((lo + hi) / 2, 2))
+        return ((series - s_min) / (s_max - s_min) * (hi - lo) + lo).round(2)
+
+    alerts_df["churn_probability"]   = minmax_rescale(
+        alerts_df["churn_probability"],   DISPLAY_SCORE_MIN,      DISPLAY_SCORE_MAX)
+    alerts_df["purchase_propensity"] = minmax_rescale(
+        alerts_df["purchase_propensity"], DISPLAY_PROPENSITY_MIN, DISPLAY_PROPENSITY_MAX)
+
+    print(f"      churn_probability   — min: {alerts_df['churn_probability'].min():.1f}  "
+          f"max: {alerts_df['churn_probability'].max():.1f}  "
+          f"mean: {alerts_df['churn_probability'].mean():.1f}  "
+          f"std: {alerts_df['churn_probability'].std():.1f}")
+    print(f"      purchase_propensity — min: {alerts_df['purchase_propensity'].min():.1f}  "
+          f"max: {alerts_df['purchase_propensity'].max():.1f}  "
+          f"mean: {alerts_df['purchase_propensity'].mean():.1f}  "
+          f"std: {alerts_df['purchase_propensity'].std():.1f}")
+
     # Final sort: risk level first, then alert_score (priority within tier)
     risk_order = {"Alto": 0, "Medio": 1, "Bajo": 2}
     alerts_df["_risk_sort"] = alerts_df["risk_level"].map(risk_order)

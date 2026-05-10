@@ -7,12 +7,19 @@ from app.schemas.alerts import SalesAlertResponse
 _RISK_TO_FRONTEND = {"high": "high", "medium": "medium", "low": "low"}
 
 
-async def get_alerts(session: AsyncSession) -> list[SalesAlertResponse]:
-    result = await session.execute(
+async def get_alerts(
+    session: AsyncSession,
+    agent_id: int | None = None,
+) -> list[SalesAlertResponse]:
+    query = (
         select(RegionalAlert, Client)
         .join(Client, RegionalAlert.client_id == Client.id)
         .order_by(RegionalAlert.created_at.desc())
     )
+    if agent_id is not None:
+        query = query.where(Client.agent_id == agent_id)
+
+    result = await session.execute(query)
     rows = result.all()
 
     alerts: list[SalesAlertResponse] = []
@@ -36,3 +43,4 @@ async def get_alerts(session: AsyncSession) -> list[SalesAlertResponse]:
             )
         )
     return alerts
+
