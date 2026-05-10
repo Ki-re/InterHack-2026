@@ -33,8 +33,8 @@ export function RegionalDashboard() {
   const [selectedCcaa, setSelectedCcaa] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const dashboard = useQuery({
-    queryKey: ["regional-dashboard"],
-    queryFn: getRegionalDashboard,
+    queryKey: ["regional-dashboard", selectedCcaa],
+    queryFn: () => getRegionalDashboard(selectedCcaa),
   });
 
   const selectedRegion = useMemo(() => {

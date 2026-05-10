@@ -46,6 +46,7 @@ export type AgentPerformance = {
   id: number;
   name: string;
   email: string;
+  codCcaa: string;
   kpis: ExecutionKpis;
   clients: ClientExecution[];
 };
