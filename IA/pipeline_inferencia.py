@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 
 TARGET_COLS = ["vuelve_a_comprar", "dias_hasta_proxima_compra", "target_potencial_cliente"]
-ID_COLS = ["Num.Fact", "Fecha", "Id. Cliente", "Id. Producto"]
+ID_COLS = ["Num.Fact", "Fecha", "Id. Cliente", "Provincia", "Id. Producto"]
 LEAKAGE_COLS = [
     "gasto_base_anual_fidelizacion",
     "gasto_futuro_anual_fidelizacion",
@@ -391,6 +391,12 @@ def main() -> None:
     pred_dates = fechas + pd.to_timedelta(np.rint(pred_days), unit="D")
     output["prediccion_fecha_proxima_compra"] = pred_dates.dt.date.astype("string")
     output["prediccion_mes_proxima_compra"] = pred_dates.dt.to_period("M").astype("string")
+    output["prediccion_dia_proxima_compra"] = pred_dates.dt.day.astype("Int64")
+
+    aux_names = dias_ckpt.get("aux_class_names", [])
+    output["prediccion_bucket_mes_modelo_dias"] = [
+        aux_names[idx] if 0 <= idx < len(aux_names) else pd.NA for idx in pred_aux
+    ]
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     output.to_csv(args.output, index=False, encoding="utf-8-sig")
