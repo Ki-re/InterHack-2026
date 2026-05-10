@@ -1,0 +1,261 @@
+{
+  "dataset": "IA\\dataset.csv",
+  "max_rows": 5000,
+  "reports": [
+    {
+      "name": "fuga_model.pt",
+      "objective": "Estimar la probabilidad de que el cliente no vuelva a comprar a partir del modelo binario de recompra.",
+      "architecture": "Red neuronal feed-forward con capas densas, BatchNorm, activacion SiLU y dropout; salida logit binaria.",
+      "metric_name": "incremento_bce",
+      "baseline": {
+        "bce": 0.11984768524169923,
+        "accuracy": 0.9672
+      },
+      "rows": 5000,
+      "top_variables": [
+        {
+          "variable": "tiempo_medio_entre_compras_dias",
+          "importance": 3.5388979202270505,
+          "max_feature_importance": 3.5388979202270505,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "numero_compras_anteriores_producto",
+          "importance": 2.9878849319458007,
+          "max_feature_importance": 2.9878849319458007,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "gasto_medio_anual_cliente_categoria_producto",
+          "importance": 1.4838050003051757,
+          "max_feature_importance": 1.4838050003051757,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "gasto_anual_real_cliente_producto",
+          "importance": 0.9061810256958007,
+          "max_feature_importance": 0.9061810256958007,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Valores_H",
+          "importance": 0.6778185745239258,
+          "max_feature_importance": 0.6778185745239258,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "n_anios_cliente_categoria",
+          "importance": 0.5133120315551758,
+          "max_feature_importance": 0.5133120315551758,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Familia_H",
+          "importance": 0.4034160034179687,
+          "max_feature_importance": 0.20994166412353513,
+          "encoded_features": 5.0
+        },
+        {
+          "variable": "Categoria_H",
+          "importance": 0.34140438385009764,
+          "max_feature_importance": 0.12669955291748047,
+          "encoded_features": 4.0
+        },
+        {
+          "variable": "std_entre_compras_dias",
+          "importance": 0.16355758819580077,
+          "max_feature_importance": 0.16355758819580077,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Bloque analítico",
+          "importance": 0.14679579925537106,
+          "max_feature_importance": 0.08988650665283202,
+          "encoded_features": 3.0
+        },
+        {
+          "variable": "dias_desde_compra_anterior_producto",
+          "importance": 0.12879941864013672,
+          "max_feature_importance": 0.12879941864013672,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "zscore_momento_recompra_general",
+          "importance": 0.11311323394775391,
+          "max_feature_importance": 0.11311323394775391,
+          "encoded_features": 1.0
+        }
+      ]
+    },
+    {
+      "name": "potencial_model.pt",
+      "objective": "Clasificar el potencial futuro del cliente-producto en cinco clases ordenadas y convertirlo en score 0-100.",
+      "architecture": "Modelo secuencial GRU que resume el historial cliente-producto y aplica una cabeza densa multiclase.",
+      "metric_name": "incremento_cross_entropy",
+      "baseline": {
+        "cross_entropy": 3.66903486328125,
+        "accuracy": 0.2184
+      },
+      "rows": 5000,
+      "top_variables": [
+        {
+          "variable": "Categoria_H",
+          "importance": 3.312089404296875,
+          "max_feature_importance": 3.08236318359375,
+          "encoded_features": 4.0
+        },
+        {
+          "variable": "Familia_H",
+          "importance": 1.1544691406250007,
+          "max_feature_importance": 0.7658851562500004,
+          "encoded_features": 5.0
+        },
+        {
+          "variable": "Bloque analítico",
+          "importance": 0.32004057617187476,
+          "max_feature_importance": 0.2641148925781249,
+          "encoded_features": 3.0
+        },
+        {
+          "variable": "zscore_momento_cliente_producto",
+          "importance": 0.27381484374999987,
+          "max_feature_importance": 0.27381484374999987,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "n_anios_cliente_categoria",
+          "importance": 0.12839208984375006,
+          "max_feature_importance": 0.12839208984375006,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "peso_producto_en_categoria",
+          "importance": 0.12650932617187527,
+          "max_feature_importance": 0.12650932617187527,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "numero_compras_anteriores_producto",
+          "importance": 0.045029296875000124,
+          "max_feature_importance": 0.045029296875000124,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "zscore_momento_recompra_general",
+          "importance": 0.025114453125000047,
+          "max_feature_importance": 0.025114453125000047,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Unidades",
+          "importance": 0.024332177734375016,
+          "max_feature_importance": 0.024332177734375016,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "numero_devoluciones_producto",
+          "importance": 0.01847563476562497,
+          "max_feature_importance": 0.01847563476562497,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "dias_desde_compra_anterior_producto",
+          "importance": 0.016550927734375165,
+          "max_feature_importance": 0.016550927734375165,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "std_entre_compras_dias",
+          "importance": 0.00947890625000003,
+          "max_feature_importance": 0.00947890625000003,
+          "encoded_features": 1.0
+        }
+      ]
+    },
+    {
+      "name": "dias_model.pt",
+      "objective": "Predecir los dias hasta la proxima compra y una clase auxiliar de mes de recompra.",
+      "architecture": "Modelo secuencial GRU con una representacion compartida y dos cabezas: regresion de dias en escala log y clasificacion auxiliar.",
+      "metric_name": "incremento_loss",
+      "baseline": {
+        "loss": 4.95240986328125,
+        "mae_days": 132.22696875
+      },
+      "rows": 5000,
+      "top_variables": [
+        {
+          "variable": "ratio_recompra_vs_cliente",
+          "importance": 0.2051415039062494,
+          "max_feature_importance": 0.2051415039062494,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Familia_H",
+          "importance": 0.09606718749999921,
+          "max_feature_importance": 0.08334892578124986,
+          "encoded_features": 5.0
+        },
+        {
+          "variable": "Categoria_H",
+          "importance": 0.0750672851562495,
+          "max_feature_importance": 0.0750672851562495,
+          "encoded_features": 4.0
+        },
+        {
+          "variable": "ratio_recencia_vs_producto",
+          "importance": 0.056511230468749396,
+          "max_feature_importance": 0.056511230468749396,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "dias_desde_compra_anterior_producto",
+          "importance": 0.05518818359374933,
+          "max_feature_importance": 0.05518818359374933,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "fecha_dia_anio_cos",
+          "importance": 0.05496289062499926,
+          "max_feature_importance": 0.05496289062499926,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Bloque analítico",
+          "importance": 0.0319819335937499,
+          "max_feature_importance": 0.0319819335937499,
+          "encoded_features": 3.0
+        },
+        {
+          "variable": "peso_producto_en_categoria",
+          "importance": 0.02146357421874967,
+          "max_feature_importance": 0.02146357421874967,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "n_anios_cliente_categoria",
+          "importance": 0.014826269531249991,
+          "max_feature_importance": 0.014826269531249991,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "std_entre_compras_dias",
+          "importance": 0.012392871093749314,
+          "max_feature_importance": 0.012392871093749314,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "tiempo_medio_entre_compras_dias",
+          "importance": 0.005526367187499659,
+          "max_feature_importance": 0.005526367187499659,
+          "encoded_features": 1.0
+        },
+        {
+          "variable": "Unidades",
+          "importance": 0.002767675781250034,
+          "max_feature_importance": 0.002767675781250034,
+          "encoded_features": 1.0
+        }
+      ]
+    }
+  ]
+}
