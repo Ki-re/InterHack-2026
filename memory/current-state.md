@@ -28,6 +28,7 @@
 - Added subtle UI animations using Framer Motion (fade-ins, staggered lists, smooth row expansion).
 - Branding: INIBSA full logo (`front/src/assets/logo.png`) used in AppLayout header and Login card. Icon only (`front/src/assets/icon.png`) used as favicon (`front/public/icon.png`) and in login badge. Page title is "INIBSA".
 - "Alertas" nav button removed. App subtitle hidden from AppLayout header.
+- Role nav links (Delegats / Direcció Regional) removed from AppLayout header entirely — each role only has one page so the nav links are unnecessary.
 - "Alertes INIBSA" eyebrow label removed from dashboard page header.
 - ChurnType is open-ended (`"total" | string`); mock data uses "total", "Producto 1", "Producto 2".
 - Percentage columns (churn risk, purchase propensity) display as color-coded pill badges (red/amber/green) instead of progress bars.
