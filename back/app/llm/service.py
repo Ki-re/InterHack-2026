@@ -40,7 +40,7 @@ def _call_gemini(system_prompt: str, contents: list[types.Content]) -> str:
     settings = get_settings()
     client = genai.Client(api_key=settings.gemini_api_key)
     response = client.models.generate_content(
-        model="gemini-3.1-flash-lite",
+        model="gemini-3-flash-preview",
         contents=contents,
         config=types.GenerateContentConfig(system_instruction=system_prompt),
     )
