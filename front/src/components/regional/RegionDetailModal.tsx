@@ -52,7 +52,7 @@ export function RegionDetailModal({ region, onClose, t }: RegionDetailModalProps
                 {t("regional_dashboard.managers.title")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {"Regió " + getRegionLabel(region.slug, t)}
+                {t("regional_dashboard.region_prefix") + getRegionLabel(region.slug, t)}
               </p>
             </div>
           </div>

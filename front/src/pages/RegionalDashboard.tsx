@@ -190,7 +190,7 @@ function RegionSnapshot({
             accent="green"
           />
           <SnapshotStat label={t("regional_dashboard.kpis.response_time")} value={kpis.averageResponseHours ?? 0} suffix="h" />
-          <SnapshotStat label="Total" value={kpis.totalAlerts} />
+          <SnapshotStat label={t("regional_dashboard.kpis.total_alerts")} value={kpis.totalAlerts} />
         </div>
       </CardContent>
     </Card>
@@ -272,7 +272,7 @@ function UnderperformersCard({
                     </span>
                   ) : item.parentName ? (
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      Màn: {item.parentName}
+                      {t("regional_dashboard.underperformers.manager_label")} {item.parentName}
                     </p>
                   ) : null}
                 </div>
