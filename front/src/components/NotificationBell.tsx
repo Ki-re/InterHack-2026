@@ -7,21 +7,25 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { Notification } from "@/types/notifications";
 
-function formatRelativeTime(isoString: string): string {
+type TFn = (path: string, params?: Record<string, string | number>) => string;
+
+function formatRelativeTime(isoString: string, t: TFn): string {
   const diff = Date.now() - new Date(isoString).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 60) return `fa ${minutes}m`;
+  if (minutes < 60) return t("time.minutes_ago", { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `fa ${hours}h`;
-  return `fa ${Math.floor(hours / 24)}d`;
+  if (hours < 24) return t("time.hours_ago", { n: hours });
+  return t("time.days_ago", { n: Math.floor(hours / 24) });
 }
 
 function NotificationItem({
   notification,
   onRead,
+  t,
 }: {
   notification: Notification;
   onRead: (id: number) => void;
+  t: TFn;
 }) {
   const isUnread = notification.read_at === null;
 
@@ -36,7 +40,7 @@ function NotificationItem({
         <p className="text-sm font-medium leading-snug">{notification.title}</p>
         <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">{notification.body}</p>
         <p className="mt-1 text-xs text-muted-foreground/70">
-          {formatRelativeTime(notification.created_at)}
+          {formatRelativeTime(notification.created_at, t)}
         </p>
       </div>
     </div>
@@ -90,7 +94,7 @@ export function NotificationBell() {
               </p>
             ) : (
               notifications.map((n) => (
-                <NotificationItem key={n.id} notification={n} onRead={markRead} />
+                <NotificationItem key={n.id} notification={n} onRead={markRead} t={t} />
               ))
             )}
           </div>
