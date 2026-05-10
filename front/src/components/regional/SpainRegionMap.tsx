@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { geoMercator, geoPath } from "d3-geo";
-import { MapPinned } from "lucide-react";
+import { Info, MapPinned } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ type SpainRegionMapProps = {
   regions: RegionSummary[];
   selectedSlug: RegionSlug | null;
   onSelect: (slug: RegionSlug) => void;
+  onOpenDetail?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 };
 
@@ -49,7 +50,7 @@ const CCAA_TO_REGION: Record<string, RegionSlug | null> = {
   "19": null,      // Melilla — skip
 };
 
-export function SpainRegionMap({ regions, selectedSlug, onSelect, t }: SpainRegionMapProps) {
+export function SpainRegionMap({ regions, selectedSlug, onSelect, onOpenDetail, t }: SpainRegionMapProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const features = useMemo(() => (spainGeoJson as any).features as any[], []);
 
@@ -60,8 +61,22 @@ export function SpainRegionMap({ regions, selectedSlug, onSelect, t }: SpainRegi
           <CardTitle>{t("regional_dashboard.map.title")}</CardTitle>
           <p className="mt-1 text-sm text-muted-foreground">{t("regional_dashboard.map.subtitle")}</p>
         </div>
-        <div className="flex size-10 items-center justify-center rounded-md bg-secondary">
-          <MapPinned className="size-5 text-primary" aria-hidden="true" />
+        <div className="flex items-center gap-2">
+          {/* Detail button — shown only when a region is selected, takes the place of the icon */}
+          {selectedSlug && onOpenDetail ? (
+            <button
+              type="button"
+              onClick={onOpenDetail}
+              className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+            >
+              <Info className="size-3.5" aria-hidden="true" />
+              {t("regional_dashboard.actions.open_detail")}
+            </button>
+          ) : (
+            <div className="flex size-10 items-center justify-center rounded-md bg-secondary">
+              <MapPinned className="size-5 text-primary" aria-hidden="true" />
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="p-0">

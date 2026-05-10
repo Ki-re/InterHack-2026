@@ -1,6 +1,5 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type {
@@ -106,19 +105,23 @@ function ManagersTable({
                       <td className="px-4 py-3 text-sm">{manager.kpis.attendedRate}%</td>
                       <td className="px-4 py-3 text-sm">{manager.kpis.highRiskBacklog}</td>
                       <td className="px-4 py-3">
-                        <Button
+                        <button
                           type="button"
-                          variant={isExpanded ? "default" : "outline"}
-                          size="sm"
+                          aria-label={isExpanded ? t("regional_dashboard.actions.collapse") : t("regional_dashboard.actions.zoom")}
+                          className={cn(
+                            "inline-flex size-8 items-center justify-center rounded-md border transition-colors",
+                            isExpanded
+                              ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+                              : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground",
+                          )}
                           onClick={() => (isExpanded ? onResetManager() : onSelectManager(manager))}
                         >
-                          {t("regional_dashboard.actions.zoom")}
                           {isExpanded ? (
                             <ChevronDown className="size-4" aria-hidden="true" />
                           ) : (
                             <ChevronRight className="size-4" aria-hidden="true" />
                           )}
-                        </Button>
+                        </button>
                       </td>
                     </tr>
                     {isExpanded && (
@@ -195,19 +198,23 @@ function AgentsSubTable({
                     <td className="px-4 py-2 text-sm">{agent.kpis.attendedRate}%</td>
                     <td className="px-4 py-2 text-sm">{agent.kpis.highRiskBacklog}</td>
                     <td className="px-4 py-2">
-                      <Button
+                      <button
                         type="button"
-                        variant={isExpanded ? "default" : "outline"}
-                        size="sm"
+                        aria-label={isExpanded ? t("regional_dashboard.actions.collapse") : t("regional_dashboard.actions.zoom")}
+                        className={cn(
+                          "inline-flex size-8 items-center justify-center rounded-md border transition-colors",
+                          isExpanded
+                            ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+                            : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground",
+                        )}
                         onClick={() => (isExpanded ? onResetAgent() : onSelectAgent(agent))}
                       >
-                        {t("regional_dashboard.actions.zoom")}
                         {isExpanded ? (
                           <ChevronDown className="size-4" aria-hidden="true" />
                         ) : (
                           <ChevronRight className="size-4" aria-hidden="true" />
                         )}
-                      </Button>
+                      </button>
                     </td>
                   </tr>
                   {isExpanded && (
