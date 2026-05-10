@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "title": "Alertes INIBSA",
     "subtitle": "Espai del delegat de vendes",
@@ -245,11 +245,11 @@
     "scope_all": "Totes les regions",
     "all_regions": "Totes les regions",
     "regions": {
-      "est": "Est",
+      "east": "Est",
       "north": "Nord",
       "south": "Sud",
-      "baleares": "Balears",
-      "canarias": "Canàries"
+      "balearic": "Balears",
+      "canary": "Canàries"
     },
     "status": {
       "good": "Execució saludable",

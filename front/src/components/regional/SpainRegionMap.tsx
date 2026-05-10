@@ -44,19 +44,19 @@ const pathGenCanarias = geoPath().projection(projectionCanarias);
 
 const CCAA_TO_REGION: Record<string, RegionSlug | null> = {
   "01": "south",    // Andalucía
-  "02": "est",      // Aragón
+  "02": "east",     // Aragón
   "03": "north",    // Asturias
-  "04": "baleares", // Islas Baleares
-  "05": "canarias", // Canarias
+  "04": "balearic", // Islas Baleares
+  "05": "canary",   // Canarias
   "06": "north",    // Cantabria
   "07": "north",    // Castilla-León
   "08": "south",    // Castilla-La Mancha
-  "09": "est",      // Catalunya
-  "10": "est",      // Comunitat Valenciana
+  "09": "east",     // Catalunya
+  "10": "east",     // Comunitat Valenciana
   "11": "south",    // Extremadura
   "12": "north",    // Galicia
   "13": "south",    // Madrid
-  "14": "est",      // Murcia
+  "14": "east",     // Murcia
   "15": "north",    // Navarra
   "16": "north",    // País Basc
   "17": "north",    // La Rioja
@@ -246,14 +246,14 @@ export function SpainRegionMap({
               fill="transparent"
               rx={2}
               style={{ cursor: "pointer" }}
-              onClick={() => handlePathClick("05", "canarias")}
+              onClick={() => handlePathClick("05", "canary")}
               onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === "Enter" || e.key === " ") handlePathClick("05", "canarias");
+                if (e.key === "Enter" || e.key === " ") handlePathClick("05", "canary");
               }}
               tabIndex={0}
               role="button"
               aria-label={t(`ccaa.05`)}
-              aria-pressed={selectedSlug === "canarias"}
+              aria-pressed={selectedSlug === "canary"}
               className="focus:outline-none"
             />
           </svg>

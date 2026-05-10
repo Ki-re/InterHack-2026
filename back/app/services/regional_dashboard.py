@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -172,6 +172,13 @@ def _build_client(client: Client, alerts: list[RegionalAlert]) -> ClientExecutio
     )
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """Return a timezone-aware UTC datetime regardless of whether dt has tzinfo."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 def _calculate_kpis(alerts: list[RegionalAlert]) -> ExecutionKpis:
     total_alerts = len(alerts)
     pending_alerts = sum(1 for alert in alerts if alert.status == "pending")
@@ -180,12 +187,12 @@ def _calculate_kpis(alerts: list[RegionalAlert]) -> ExecutionKpis:
     high_risk_backlog = sum(
         1 for alert in alerts if alert.status == "pending" and alert.risk_level == "high"
     )
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     overdue_followups = sum(
-        1 for alert in alerts if alert.status == "pending" and alert.due_at < now
+        1 for alert in alerts if alert.status == "pending" and _as_utc(alert.due_at) < now
     )
     response_hours = [
-        (alert.attended_at - alert.created_at).total_seconds() / 3600
+        (_as_utc(alert.attended_at) - _as_utc(alert.created_at)).total_seconds() / 3600
         for alert in alerts
         if alert.status == "attended" and alert.attended_at is not None
     ]
