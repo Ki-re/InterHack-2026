@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/contexts/LanguageContext";
 import type { Notification } from "@/types/notifications";
 
 function formatRelativeTime(isoString: string): string {
@@ -46,6 +47,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const panelRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useOnClickOutside(panelRef, () => setOpen(false));
 
@@ -57,7 +59,7 @@ export function NotificationBell() {
         type="button"
         className="relative"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Notificacions"
+        aria-label={t("notification.bell_aria")}
       >
         <Bell className="size-4" />
         {unreadCount > 0 && (
@@ -70,13 +72,13 @@ export function NotificationBell() {
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border bg-card shadow-lg">
           <div className="flex items-center justify-between border-b px-4 py-3">
-            <span className="text-sm font-semibold">Notificacions</span>
+            <span className="text-sm font-semibold">{t("notification.title")}</span>
             {unreadCount > 0 && (
               <button
                 className="text-xs text-blue-500 hover:underline"
                 onClick={markAllRead}
               >
-                Marcar totes com llegides
+                {t("notification.mark_all_read")}
               </button>
             )}
           </div>
@@ -84,7 +86,7 @@ export function NotificationBell() {
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                No hi ha notificacions
+                {t("notification.empty")}
               </p>
             ) : (
               notifications.map((n) => (
