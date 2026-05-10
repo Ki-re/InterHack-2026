@@ -1,4 +1,4 @@
-export type RegionSlug = "est" | "north" | "south";
+export type RegionSlug = "est" | "north" | "south" | "baleares" | "canarias";
 
 export type ExecutionStatus = "attended" | "pending" | "dismissed";
 
@@ -46,6 +46,7 @@ export type AgentPerformance = {
   id: number;
   name: string;
   email: string;
+  codCcaa: string;
   kpis: ExecutionKpis;
   clients: ClientExecution[];
 };
@@ -58,12 +59,18 @@ export type ManagerPerformance = {
   agents: AgentPerformance[];
 };
 
+export type CcaaKpis = {
+  codCcaa: string;
+  kpis: ExecutionKpis;
+};
+
 export type RegionSummary = {
   id: number;
   slug: RegionSlug;
   name: string;
   kpis: ExecutionKpis;
   managers: ManagerPerformance[];
+  ccaaKpis: CcaaKpis[];
 };
 
 export type Underperformer = {

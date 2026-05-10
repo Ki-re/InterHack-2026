@@ -58,6 +58,7 @@ class AgentPerformance(CamelModel):
     id: int
     name: str
     email: str
+    cod_ccaa: str
     kpis: ExecutionKpis
     clients: list[ClientExecution]
 
@@ -70,12 +71,18 @@ class ManagerPerformance(CamelModel):
     agents: list[AgentPerformance]
 
 
+class CcaaKpis(CamelModel):
+    cod_ccaa: str
+    kpis: ExecutionKpis
+
+
 class RegionSummary(CamelModel):
     id: int
     slug: str
     name: str
     kpis: ExecutionKpis
     managers: list[ManagerPerformance]
+    ccaa_kpis: list[CcaaKpis]
 
 
 class Underperformer(CamelModel):

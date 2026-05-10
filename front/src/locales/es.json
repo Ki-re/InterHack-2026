@@ -185,6 +185,25 @@
     "event_dismissed": "Alerta descartada",
     "event_reopened": "Alerta recuperada"
   },
+  "ccaa": {
+    "01": "Andalucía",
+    "02": "Aragón",
+    "03": "Asturias",
+    "04": "Islas Baleares",
+    "05": "Canarias",
+    "06": "Cantabria",
+    "07": "Castilla y León",
+    "08": "Castilla-La Mancha",
+    "09": "Cataluña",
+    "10": "Comunitat Valenciana",
+    "11": "Extremadura",
+    "12": "Galicia",
+    "13": "Madrid",
+    "14": "Murcia",
+    "15": "Navarra",
+    "16": "País Vasco",
+    "17": "La Rioja"
+  },
   "time": {
     "minutes_ago": "hace {{n}}m",
     "hours_ago": "hace {{n}}h",
@@ -220,7 +239,9 @@
     "regions": {
       "est": "Este",
       "north": "Norte",
-      "south": "Sur"
+      "south": "Sur",
+      "baleares": "Baleares",
+      "canarias": "Canarias"
     },
     "status": {
       "good": "Ejecución saludable",
@@ -247,7 +268,11 @@
       "score": "Índice {{score}}"
     },
     "snapshot": {
-      "title": "Estado del área"
+      "title": "Estado del área",
+      "region_data_note": "Datos agregados por región"
+    },
+    "ccaa_filter": {
+      "deselect": "Volver a la región"
     },
     "managers": {
       "title": "Mánagers del área"

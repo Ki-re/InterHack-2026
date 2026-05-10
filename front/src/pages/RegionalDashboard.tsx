@@ -1,5 +1,5 @@
 import { type ReactNode, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { AlertCircle, RefreshCcw, ShieldAlert } from "lucide-react";
 
@@ -30,38 +30,60 @@ const itemVariants = {
 export function RegionalDashboard() {
   const { t } = useTranslation();
   const [selectedRegionSlug, setSelectedRegionSlug] = useState<RegionSlug | null>(null);
+  const [selectedCcaa, setSelectedCcaa] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  const dashboard = useQuery({
-    queryKey: ["regional-dashboard"],
-    queryFn: getRegionalDashboard,
+  // Global query — always unfiltered, used for map colors and region list
+  const globalDashboard = useQuery({
+    queryKey: ["regional-dashboard", null],
+    queryFn: () => getRegionalDashboard(null),
   });
+
+  // Filtered query — used for KPI cards and snapshot when a CCAA is selected
+  const dashboard = useQuery({
+    queryKey: ["regional-dashboard", selectedCcaa],
+    queryFn: () => getRegionalDashboard(selectedCcaa),
+    placeholderData: keepPreviousData,
+    enabled: selectedCcaa !== null,
+  });
+
+  // Active data: filtered when CCAA selected, global otherwise
+  const activeData = selectedCcaa ? (dashboard.data ?? globalDashboard.data) : globalDashboard.data;
 
   const selectedRegion = useMemo(() => {
     if (!selectedRegionSlug) return null;
-    return dashboard.data?.regions.find((region) => region.slug === selectedRegionSlug) ?? null;
-  }, [dashboard.data?.regions, selectedRegionSlug]);
+    return activeData?.regions.find((region) => region.slug === selectedRegionSlug) ?? null;
+  }, [activeData?.regions, selectedRegionSlug]);
 
-  function handleSelectRegion(slug: RegionSlug) {
-    // Clicking the already-selected region deselects it (shows global view)
-    setSelectedRegionSlug((prev) => {
-      if (prev === slug) {
-        setDetailOpen(false);
-        return null;
-      }
-      return slug;
-    });
+  function handleDeselect() {
+    if (selectedCcaa) {
+      setSelectedCcaa(null);
+    } else if (selectedRegionSlug) {
+      setSelectedRegionSlug(null);
+      setDetailOpen(false);
+    }
   }
 
-  if (dashboard.isLoading) {
+  function handleSelectRegion(slug: RegionSlug) {
+    if (selectedRegionSlug === slug) {
+      setSelectedRegionSlug(null);
+      setSelectedCcaa(null);
+      setDetailOpen(false);
+    } else {
+      setSelectedRegionSlug(slug);
+      setSelectedCcaa(null);
+    }
+  }
+
+  if (globalDashboard.isLoading) {
     return <RegionalDashboardState message={t("regional_dashboard.loading")} />;
   }
 
-  if (dashboard.isError || !dashboard.data) {
+  if (globalDashboard.isError || !globalDashboard.data) {
     return (
       <RegionalDashboardState
         message={t("regional_dashboard.error")}
         action={
-          <Button type="button" variant="outline" onClick={() => dashboard.refetch()}>
+          <Button type="button" variant="outline" onClick={() => globalDashboard.refetch()}>
             <RefreshCcw className="size-4" aria-hidden="true" />
             {t("regional_dashboard.actions.retry")}
           </Button>
@@ -74,7 +96,7 @@ export function RegionalDashboard() {
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={itemVariants}>
         <RegionalKpiCards
-          kpis={selectedRegion ? selectedRegion.kpis : dashboard.data.kpis}
+          kpis={selectedRegion ? selectedRegion.kpis : activeData?.kpis ?? globalDashboard.data.kpis}
           t={t}
         />
       </motion.div>
@@ -89,9 +111,12 @@ export function RegionalDashboard() {
         <div className="grid gap-5 xl:grid-cols-[1.6fr_0.7fr_1fr] xl:items-stretch">
           {/* Map — direct grid item, natural height sets the row */}
           <SpainRegionMap
-            regions={dashboard.data.regions}
+            regions={globalDashboard.data.regions}
             selectedSlug={selectedRegionSlug}
+            selectedCcaa={selectedCcaa}
             onSelect={handleSelectRegion}
+            onSelectCcaa={setSelectedCcaa}
+            onDeselect={handleDeselect}
             onOpenDetail={selectedRegion ? () => setDetailOpen(true) : undefined}
             t={t}
           />
@@ -101,7 +126,8 @@ export function RegionalDashboard() {
             <div className="absolute inset-0">
               <RegionSnapshot
                 regionName={selectedRegion ? getRegionLabel(selectedRegion.slug, t) : t("regional_dashboard.all_regions")}
-                kpis={selectedRegion ? selectedRegion.kpis : dashboard.data.kpis}
+                ccaaName={selectedCcaa ? t(`ccaa.${selectedCcaa}`) : undefined}
+                kpis={selectedRegion ? selectedRegion.kpis : activeData?.kpis ?? globalDashboard.data.kpis}
                 t={t}
               />
             </div>
@@ -111,7 +137,7 @@ export function RegionalDashboard() {
           <div className="relative min-h-[300px] overflow-hidden xl:min-h-0">
             <div className="absolute inset-0">
               <UnderperformersCard
-                underperformers={dashboard.data.underperformers}
+                underperformers={globalDashboard.data.underperformers}
                 t={t}
               />
             </div>
@@ -123,6 +149,8 @@ export function RegionalDashboard() {
       {detailOpen && selectedRegion && (
         <RegionDetailModal
           region={selectedRegion}
+          ccaaName={selectedCcaa ? t(`ccaa.${selectedCcaa}`) : undefined}
+          isFetching={selectedCcaa !== null && dashboard.isFetching}
           onClose={() => setDetailOpen(false)}
           t={t}
         />
@@ -134,10 +162,12 @@ export function RegionalDashboard() {
 function RegionSnapshot({
   kpis,
   regionName,
+  ccaaName,
   t,
 }: {
   kpis: ExecutionKpis;
   regionName: string;
+  ccaaName?: string;
   t: (path: string, params?: Record<string, string | number>) => string;
 }) {
   const scoreColor =
@@ -160,7 +190,20 @@ function RegionSnapshot({
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("regional_dashboard.snapshot.title")}
         </p>
-        <h2 className="mt-0.5 text-lg font-semibold text-foreground">{regionName}</h2>
+        {ccaaName ? (
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">
+            <span className="text-muted-foreground">{regionName}</span>
+            {" › "}
+            {ccaaName}
+          </h2>
+        ) : (
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{regionName}</h2>
+        )}
+        {ccaaName && (
+          <p className="mt-1 inline-block rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">
+            {t("regional_dashboard.snapshot.region_data_note")}
+          </p>
+        )}
 
         {/* Score gauge */}
         <div className="mt-3 flex items-center gap-3">
