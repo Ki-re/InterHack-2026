@@ -279,4 +279,8 @@ __pycache__/
 
 /IA/gemini*
 
-!/IA/recompra.pt
+*.pt
+
+!/IA/models/fuga_model.pt
+!/IA/models/potencial_model.pt
+!/IA/models/dias_model.pt

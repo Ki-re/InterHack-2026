@@ -1,323 +1,470 @@
-"""Train a dedicated regression model for target_potencial_cliente.
-
-Key differences from the combined model:
-  - Per-sample inverse-frequency bucket-weighted MSE loss
-    to counter the heavy skew toward negative values (69% in {muy_neg, neg})
-  - Tanh output bounded to [-1, 1]
-
-Target distribution (training data):
-  muy_neg  [-1.0, -0.5)  ~39%
-  neg      [-0.5, -0.05) ~30%
-  estable  [-0.05, 0.05)  ~8%
-  pos      [0.05, 0.5)   ~11%
-  muy_pos  [0.5, 1.0]    ~12%
-
-Usage:
-    conda run -n interhack python IA/train_potencial.py \
-        --csv IA/dataset_modelo.csv \
-        --epochs 250 --batch-size 2048 --lr 5e-4 \
-        --weight-decay 5e-4 --hidden-sizes "512,256,128,64" \
-        --dropout 0.25 --checkpoint-dir IA/checkpoints_potencial \
-        --checkpoint-every 10 --grad-clip 1.0 --device auto --amp
-"""
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
 from torch import nn
-
-from ia_utils import (
-    build_features,
-    build_trunk,
-    describe_device,
-    finalize_totals,
-    get_device,
-    make_dataloader,
-    make_json_safe_config,
-    parse_hidden_sizes,
-    save_checkpoint,
-    split_dataframe,
-    update_totals,
-)
-
-MODEL_TARGET = "target_potencial_cliente"
-
-# Bucket boundaries (same as print_target_analysis in ia_utils)
-BUCKET_BINS = torch.tensor([-0.5, -0.05, 0.05, 0.5])  # 4 boundaries → 5 buckets
-N_BUCKETS = 5
+from torch.utils.data import DataLoader, Dataset
 
 
-class PotencialModel(nn.Module):
-    """Regression model for target_potencial_cliente ∈ [-1, 1]."""
+TARGET_COL = "target_potencial_cliente"
+POTENCIAL_CLASS_NAMES = [
+    "muy_negativo",
+    "negativo",
+    "estable",
+    "positivo",
+    "muy_positivo",
+]
+POTENCIAL_BINS = [-1.01, -0.5, -0.1, 0.1, 0.5, 1.01]
 
-    def __init__(self, input_size: int, hidden_sizes: list[int], dropout: float = 0.25) -> None:
+TARGET_COLS = [
+    "vuelve_a_comprar",
+    "dias_hasta_proxima_compra",
+    "target_potencial_cliente",
+]
+
+ID_COLS = [
+    "Num.Fact",
+    "Fecha",
+    "Id. Cliente",
+    "Id. Producto",
+]
+
+LEAKAGE_COLS = [
+    "gasto_base_anual_fidelizacion",
+    "gasto_futuro_anual_fidelizacion",
+    "frecuencia_base_anual_fidelizacion",
+    "frecuencia_futura_anual_fidelizacion",
+]
+
+INTERNAL_COLS = [
+    "__dataset_source__",
+    "target_class",
+]
+
+
+@dataclass(frozen=True)
+class SequenceSample:
+    end_idx: int
+    start_idx: int
+    length: int
+    cut_date: pd.Timestamp
+    target_class: int
+
+
+class PotentialSequenceDataset(Dataset):
+    def __init__(self, features: np.ndarray, samples: list[SequenceSample]):
+        self.features = features
+        self.samples = samples
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        sample = self.samples[idx]
+        x = self.features[sample.start_idx : sample.end_idx + 1]
+        return (
+            torch.tensor(x, dtype=torch.float32),
+            torch.tensor(sample.length, dtype=torch.long),
+            torch.tensor(sample.target_class, dtype=torch.long),
+        )
+
+
+def collate_sequences(
+    batch: list[tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    xs, lengths, y = zip(*batch)
+    padded = nn.utils.rnn.pad_sequence(xs, batch_first=True)
+    return padded, torch.stack(lengths), torch.stack(y)
+
+
+class SequentialPotentialModel(nn.Module):
+    def __init__(self, input_size: int, hidden_size: int = 64, num_layers: int = 1, dropout: float = 0.25):
         super().__init__()
-        self.trunk, out_features = build_trunk(input_size, hidden_sizes, dropout)
-        self.head = nn.Linear(out_features, 1)
+        self.gru = nn.GRU(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True,
+            dropout=dropout if num_layers > 1 else 0.0,
+        )
+        self.head = nn.Sequential(
+            nn.LayerNorm(hidden_size),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_size, 64),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(32, len(POTENCIAL_CLASS_NAMES)),
+        )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return torch.tanh(self.head(self.trunk(x)).squeeze(1))
-
-
-def compute_bucket_weights(targets: torch.Tensor) -> torch.Tensor:
-    """Compute per-sample inverse-frequency weights based on 5 value buckets.
-
-    Weight for bucket b = total_samples / (N_BUCKETS * count_b).
-    This ensures each bucket contributes equally to the total loss.
-    """
-    bucket_idx = torch.bucketize(targets, BUCKET_BINS.to(targets.device))
-    counts = torch.bincount(bucket_idx, minlength=N_BUCKETS).float()
-    # Avoid div-by-zero for empty buckets
-    counts = counts.clamp(min=1)
-    weights_per_bucket = targets.size(0) / (N_BUCKETS * counts)
-    # Normalize so mean weight == 1 (keeps loss scale comparable)
-    weights_per_bucket = weights_per_bucket / weights_per_bucket.mean()
-    return weights_per_bucket[bucket_idx]
-
-
-def compute_loss(
-    pred: torch.Tensor,
-    target: torch.Tensor,
-    sample_weights: torch.Tensor,
-) -> tuple[torch.Tensor, dict[str, float]]:
-    """Weighted MSE loss."""
-    sq_err = (pred - target) ** 2
-    loss = (sample_weights * sq_err).mean()
-    unweighted_mse = sq_err.mean()
-    return loss, {
-        "loss": float(loss.detach().cpu()),
-        "mse_potencial": float(unweighted_mse.detach().cpu()),
-    }
+    def forward(self, x: torch.Tensor, lengths: torch.Tensor) -> torch.Tensor:
+        packed = nn.utils.rnn.pack_padded_sequence(
+            x,
+            lengths.cpu(),
+            batch_first=True,
+            enforce_sorted=False,
+        )
+        _, hidden = self.gru(packed)
+        return self.head(hidden[-1])
 
 
-@torch.no_grad()
-def compute_metrics(
-    pred: torch.Tensor,
-    target: torch.Tensor,
-    potential_tolerance: float = 0.2,
-) -> dict[str, float]:
-    acc_pm02 = (torch.abs(pred - target) <= potential_tolerance).float().mean()
-    mae = torch.abs(pred - target).mean()
+def potential_to_class(series: pd.Series) -> pd.Series:
+    return pd.cut(
+        series.clip(-1, 1),
+        bins=POTENCIAL_BINS,
+        labels=False,
+        include_lowest=True,
+    ).astype("int64")
 
-    # Per-bucket accuracy (informational)
-    bucket_idx = torch.bucketize(target, BUCKET_BINS.to(target.device))
-    bucket_names = ["muy_neg", "neg", "estable", "pos", "muy_pos"]
-    bucket_accs: dict[str, float] = {}
-    for b, name in enumerate(bucket_names):
-        mask = bucket_idx == b
-        if mask.sum() > 0:
-            bucket_accs[f"acc_pm02_{name}"] = float(
-                (torch.abs(pred[mask] - target[mask]) <= potential_tolerance).float().mean().cpu()
+
+def load_datasets(csv_paths: list[Path]) -> pd.DataFrame:
+    frames = []
+    for csv_path in csv_paths:
+        frame = pd.read_csv(csv_path)
+        frame["__dataset_source__"] = csv_path.stem
+        frames.append(frame)
+    return pd.concat(frames, axis=0, ignore_index=True, sort=False)
+
+
+def build_feature_frame(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    excluded = set(TARGET_COLS) | set(ID_COLS) | set(LEAKAGE_COLS)
+    feature_cols = [col for col in df.columns if col not in excluded and col not in INTERNAL_COLS]
+    features = df[feature_cols].copy()
+    features["dataset_source"] = df["__dataset_source__"].astype("object")
+    categorical_cols = features.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
+    features = pd.get_dummies(features, columns=categorical_cols, dummy_na=True)
+    features = features.replace([np.inf, -np.inf], np.nan).fillna(0)
+    return features, features.columns.tolist()
+
+
+def normalize_features_by_train_rows(
+    features: pd.DataFrame,
+    train_row_mask: np.ndarray,
+) -> tuple[np.ndarray, pd.Series, pd.Series]:
+    train_features = features.loc[train_row_mask]
+    means = train_features.mean()
+    stds = train_features.std().replace(0, 1)
+    normalized = ((features - means) / stds).astype("float32")
+    return normalized.to_numpy(dtype=np.float32), means, stds
+
+
+def build_sequence_samples(
+    df: pd.DataFrame,
+    max_seq_len: int,
+    min_history: int,
+) -> list[SequenceSample]:
+    samples: list[SequenceSample] = []
+    group_cols = ["__dataset_source__", "Id. Cliente", "Id. Producto"]
+
+    for _, group in df.groupby(group_cols, sort=False):
+        if len(group) < min_history:
+            continue
+        idxs = group.index.to_numpy()
+        target_classes = group["target_class"].to_numpy(dtype=np.int64)
+        dates = group["Fecha"].to_numpy()
+
+        for pos in range(min_history - 1, len(group)):
+            start_pos = max(0, pos - max_seq_len + 1)
+            samples.append(
+                SequenceSample(
+                    end_idx=int(idxs[pos]),
+                    start_idx=int(idxs[start_pos]),
+                    length=int(pos - start_pos + 1),
+                    cut_date=pd.Timestamp(dates[pos]),
+                    target_class=int(target_classes[pos]),
+                )
             )
 
-    return {
-        "acc_potencial_pm02": float(acc_pm02.cpu()),
-        "mae_potencial": float(mae.cpu()),
-        **bucket_accs,
-    }
+    return samples
+
+
+def split_samples_by_date(
+    samples: list[SequenceSample],
+    train_ratio: float = 0.8,
+    val_ratio: float = 0.1,
+) -> tuple[list[SequenceSample], list[SequenceSample], list[SequenceSample]]:
+    ordered = sorted(samples, key=lambda sample: sample.cut_date)
+    n = len(ordered)
+    n_train = int(n * train_ratio)
+    n_val = int(n * val_ratio)
+    return (
+        ordered[:n_train],
+        ordered[n_train : n_train + n_val],
+        ordered[n_train + n_val :],
+    )
+
+
+def split_samples_stratified(
+    samples: list[SequenceSample],
+    train_ratio: float = 0.8,
+    val_ratio: float = 0.1,
+    seed: int = 42,
+) -> tuple[list[SequenceSample], list[SequenceSample], list[SequenceSample]]:
+    rng = np.random.default_rng(seed)
+    train_samples: list[SequenceSample] = []
+    val_samples: list[SequenceSample] = []
+    test_samples: list[SequenceSample] = []
+
+    for class_idx in range(len(POTENCIAL_CLASS_NAMES)):
+        class_samples = [sample for sample in samples if sample.target_class == class_idx]
+        class_indices = np.arange(len(class_samples))
+        rng.shuffle(class_indices)
+
+        n = len(class_indices)
+        n_train = int(n * train_ratio)
+        n_val = int(n * val_ratio)
+        train_samples.extend(class_samples[idx] for idx in class_indices[:n_train])
+        val_samples.extend(class_samples[idx] for idx in class_indices[n_train : n_train + n_val])
+        test_samples.extend(class_samples[idx] for idx in class_indices[n_train + n_val :])
+
+    rng.shuffle(train_samples)
+    rng.shuffle(val_samples)
+    rng.shuffle(test_samples)
+    return train_samples, val_samples, test_samples
+
+
+def class_distribution(samples: list[SequenceSample]) -> str:
+    counts = np.bincount(
+        [sample.target_class for sample in samples],
+        minlength=len(POTENCIAL_CLASS_NAMES),
+    )
+    ratios = counts / max(counts.sum(), 1)
+    return ", ".join(
+        f"{name}={count:,} ({ratio:.2%})"
+        for name, count, ratio in zip(POTENCIAL_CLASS_NAMES, counts, ratios)
+    )
+
+
+def macro_precision_recall_f1(
+    pred_label: torch.Tensor,
+    target_label: torch.Tensor,
+    num_classes: int,
+) -> tuple[float, float, float]:
+    precisions = []
+    recalls = []
+    f1s = []
+    for class_idx in range(num_classes):
+        pred_bool = pred_label == class_idx
+        target_bool = target_label == class_idx
+        tp = (pred_bool & target_bool).sum().float()
+        fp = (pred_bool & ~target_bool).sum().float()
+        fn = (~pred_bool & target_bool).sum().float()
+        precision = tp / (tp + fp + 1e-9)
+        recall = tp / (tp + fn + 1e-9)
+        f1 = 2 * precision * recall / (precision + recall + 1e-9)
+        precisions.append(float(precision.detach().cpu()))
+        recalls.append(float(recall.detach().cpu()))
+        f1s.append(float(f1.detach().cpu()))
+    return float(np.mean(precisions)), float(np.mean(recalls)), float(np.mean(f1s))
+
+
+def compute_loss(logits: torch.Tensor, target: torch.Tensor) -> tuple[torch.Tensor, dict[str, float]]:
+    loss = nn.functional.cross_entropy(logits, target)
+    return loss, {"loss": float(loss.detach().cpu()), "ce_potencial": float(loss.detach().cpu())}
 
 
 @torch.no_grad()
-def evaluate(
-    model: nn.Module,
-    loader: Any,
-    device: torch.device,
-    potential_tolerance: float,
-) -> dict[str, float]:
+def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> dict[str, float]:
     model.eval()
     totals: dict[str, float] = {}
-    n_samples = 0
-    for x_batch, y_batch in loader:
-        x_batch = x_batch.to(device, non_blocking=True)
-        y_batch = y_batch.to(device, non_blocking=True)
-        pred = model(x_batch)
-        weights = compute_bucket_weights(y_batch)
-        _, loss_m = compute_loss(pred, y_batch, weights)
-        acc_m = compute_metrics(pred, y_batch, potential_tolerance)
-        update_totals(totals, {**loss_m, **acc_m}, x_batch.size(0))
-        n_samples += x_batch.size(0)
-    return finalize_totals(totals, n_samples)
+    n_batches = 0
+    for x, lengths, target in loader:
+        x = x.to(device)
+        lengths = lengths.to(device)
+        target = target.to(device)
+        logits = model(x, lengths)
+        _, metrics = compute_loss(logits, target)
+        pred_label = logits.argmax(dim=1)
+        acc = (pred_label == target).float().mean()
+        precision, recall, f1 = macro_precision_recall_f1(
+            pred_label,
+            target,
+            len(POTENCIAL_CLASS_NAMES),
+        )
+        metrics.update(
+            {
+                "acc_potencial": float(acc.detach().cpu()),
+                "precision_potencial_macro": precision,
+                "recall_potencial_macro": recall,
+                "f1_potencial_macro": f1,
+            }
+        )
+        for key, value in metrics.items():
+            totals[key] = totals.get(key, 0.0) + value
+        n_batches += 1
+    return {key: value / max(n_batches, 1) for key, value in totals.items()}
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train regression model for target_potencial_cliente")
-    parser.add_argument("--csv", type=Path, default=Path("IA/dataset_modelo.csv"))
-    parser.add_argument("--epochs", type=int, default=250)
-    parser.add_argument("--batch-size", type=int, default=2048)
-    parser.add_argument("--lr", type=float, default=5e-4)
-    parser.add_argument("--weight-decay", type=float, default=5e-4)
-    parser.add_argument("--hidden-sizes", type=parse_hidden_sizes, default=parse_hidden_sizes("512,256,128,64"))
+    parser = argparse.ArgumentParser(description="Train sequential potential model")
+    parser.add_argument("--csv", type=Path, nargs="+", default=[Path("dataset_v2.csv")])
+    parser.add_argument("--output", type=Path, default=Path("models/potential_model.pt"))
+    parser.add_argument("--split", choices=["stratified", "temporal"], default="stratified")
+    parser.add_argument("--max-seq-len", type=int, default=12)
+    parser.add_argument("--min-history", type=int, default=2)
+    parser.add_argument("--epochs", type=int, default=120)
+    parser.add_argument("--batch-size", type=int, default=512)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument("--hidden-size", type=int, default=64)
+    parser.add_argument("--num-layers", type=int, default=1)
     parser.add_argument("--dropout", type=float, default=0.25)
+    parser.add_argument("--early-stopping-patience", type=int, default=16)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
-    parser.add_argument("--checkpoint-dir", type=Path, default=Path("IA/checkpoints_potencial"))
-    parser.add_argument("--checkpoint-every", type=int, default=10)
-    parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--grad-clip", type=float, default=1.0)
-    parser.add_argument("--metric-potential-tolerance", type=float, default=0.2)
-    parser.add_argument("--sample-rows", type=int, default=0)
-    parser.add_argument("--amp", action="store_true")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
 
-    df = pd.read_csv(args.csv)
-    df = df.dropna(subset=[MODEL_TARGET]).reset_index(drop=True)
-    if args.sample_rows > 0 and args.sample_rows < len(df):
-        df = df.sample(n=args.sample_rows, random_state=args.seed).reset_index(drop=True)
-        print(f"Using sampled dataset: rows={len(df):,}")
+    df = load_datasets(args.csv)
+    required = ["Fecha", "Id. Cliente", "Id. Producto", TARGET_COL]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
 
-    print(f"Loaded {args.csv}: {len(df):,} rows")
-    print(f"\ntarget_potencial_cliente stats:")
-    print(df[MODEL_TARGET].describe(percentiles=[0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99]))
-    buckets = pd.cut(
-        df[MODEL_TARGET],
-        bins=[-1.01, -0.5, -0.05, 0.05, 0.5, 1.01],
-        labels=["muy_neg", "neg", "estable", "pos", "muy_pos"],
+    df = df.dropna(subset=required).copy()
+    df["Fecha"] = pd.to_datetime(df["Fecha"])
+    df["target_class"] = potential_to_class(df[TARGET_COL])
+    df = df.sort_values(
+        ["__dataset_source__", "Id. Cliente", "Id. Producto", "Fecha", "Num.Fact"],
+        kind="mergesort",
+    ).reset_index(drop=True)
+    print(
+        "Loaded datasets: "
+        f"{', '.join(str(path) for path in args.csv)}; rows={len(df):,}; columns={len(df.columns):,}"
     )
-    print("\nBucket distribution:")
-    print(buckets.value_counts().sort_index())
 
-    train_df, val_df, test_df = split_dataframe(df, seed=args.seed)
-    print(f"\nSplit: train={len(train_df):,} val={len(val_df):,} test={len(test_df):,}")
-
-    x_train, x_val, x_test, feature_names, feature_means, feature_stds = build_features(
-        train_df, val_df, test_df
+    raw_samples = build_sequence_samples(
+        df,
+        max_seq_len=args.max_seq_len,
+        min_history=args.min_history,
     )
-    y_train = torch.tensor(train_df[MODEL_TARGET].clip(-1, 1).to_numpy(dtype=np.float32))
-    y_val = torch.tensor(val_df[MODEL_TARGET].clip(-1, 1).to_numpy(dtype=np.float32))
-    y_test = torch.tensor(test_df[MODEL_TARGET].clip(-1, 1).to_numpy(dtype=np.float32))
+    if not raw_samples:
+        raise ValueError("No sequence samples were created. Lower --min-history or check client-product history.")
 
-    print(f"\nInput size: {x_train.shape[1]}  Hidden sizes: {args.hidden_sizes}")
+    if args.split == "stratified":
+        train_samples, val_samples, test_samples = split_samples_stratified(raw_samples, seed=args.seed)
+    else:
+        train_samples, val_samples, test_samples = split_samples_by_date(raw_samples)
 
-    # Print bucket weights so user can verify they look reasonable
-    w = compute_bucket_weights(y_train)
-    print(f"Sample weight stats — min: {w.min():.3f}  max: {w.max():.3f}  mean: {w.mean():.3f}")
+    train_end_indices = {sample.end_idx for sample in train_samples}
+    train_row_mask = df.index.isin(train_end_indices)
+    feature_frame, feature_names = build_feature_frame(df)
+    features, feature_means, feature_stds = normalize_features_by_train_rows(feature_frame, train_row_mask)
 
-    device = get_device(args.device)
-    if device.type == "cuda":
-        torch.backends.cudnn.benchmark = True
-    pin_memory = device.type == "cuda"
-    BUCKET_BINS.to(device)  # pre-move for GPU use in loss
+    print(
+        "Samples: "
+        f"train={len(train_samples):,}, val={len(val_samples):,}, test={len(test_samples):,}; "
+        f"features={features.shape[1]:,}; max_seq_len={args.max_seq_len}"
+    )
+    print(f"Train potential distribution: {class_distribution(train_samples)}")
+    print(f"Val potential distribution:   {class_distribution(val_samples)}")
+    print(f"Test potential distribution:  {class_distribution(test_samples)}")
 
-    train_loader = make_dataloader(x_train, y_train, args.batch_size, shuffle=True,
-                                   num_workers=args.num_workers, pin_memory=pin_memory)
-    val_loader = make_dataloader(x_val, y_val, args.batch_size,
-                                 num_workers=args.num_workers, pin_memory=pin_memory)
-    test_loader = make_dataloader(x_test, y_test, args.batch_size,
-                                  num_workers=args.num_workers, pin_memory=pin_memory)
+    train_loader = DataLoader(
+        PotentialSequenceDataset(features, train_samples),
+        batch_size=args.batch_size,
+        shuffle=True,
+        collate_fn=collate_sequences,
+    )
+    val_loader = DataLoader(
+        PotentialSequenceDataset(features, val_samples),
+        batch_size=args.batch_size,
+        collate_fn=collate_sequences,
+    )
+    test_loader = DataLoader(
+        PotentialSequenceDataset(features, test_samples),
+        batch_size=args.batch_size,
+        collate_fn=collate_sequences,
+    )
 
-    model = PotencialModel(x_train.shape[1], args.hidden_sizes, args.dropout).to(device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = SequentialPotentialModel(
+        input_size=features.shape[1],
+        hidden_size=args.hidden_size,
+        num_layers=args.num_layers,
+        dropout=args.dropout,
+    ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", factor=0.5, patience=10, min_lr=1e-6
-    )
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=3)
 
-    amp_enabled = args.amp and device.type == "cuda"
-    scaler = torch.amp.GradScaler("cuda", enabled=amp_enabled)
-    config = make_json_safe_config(args, args.hidden_sizes)
-    args.checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    (args.checkpoint_dir / "run_config.json").write_text(
-        __import__("json").dumps(config, indent=2, sort_keys=True), encoding="utf-8"
-    )
-
-    print(f"Device: {describe_device(device)}  AMP: {amp_enabled}")
-    print(f"Checkpoint dir: {args.checkpoint_dir}")
-
-    best_val_loss = float("inf")
+    best_state = None
     best_epoch = 0
-    last_train_m: dict[str, float] = {}
-    last_val_m: dict[str, float] = {}
+    best_val_loss = float("inf")
 
     for epoch in range(1, args.epochs + 1):
         model.train()
-        train_totals: dict[str, float] = {}
-        n_train = 0
-        for x_batch, y_batch in train_loader:
-            x_batch = x_batch.to(device, non_blocking=True)
-            y_batch = y_batch.to(device, non_blocking=True)
-            optimizer.zero_grad(set_to_none=True)
-            with torch.amp.autocast(device_type="cuda", enabled=amp_enabled):
-                pred = model(x_batch)
-                weights = compute_bucket_weights(y_batch)
-                loss, loss_m = compute_loss(pred, y_batch, weights)
-            scaler.scale(loss).backward()
-            if args.grad_clip > 0:
-                scaler.unscale_(optimizer)
-                nn.utils.clip_grad_norm_(model.parameters(), max_norm=args.grad_clip)
-            scaler.step(optimizer)
-            scaler.update()
-            update_totals(train_totals, loss_m, x_batch.size(0))
-            n_train += x_batch.size(0)
+        for x, lengths, target in train_loader:
+            x = x.to(device)
+            lengths = lengths.to(device)
+            target = target.to(device)
+            optimizer.zero_grad()
+            loss, _ = compute_loss(model(x, lengths), target)
+            loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+            optimizer.step()
 
-        train_m = finalize_totals(train_totals, n_train)
-        val_m = evaluate(model, val_loader, device, args.metric_potential_tolerance)
-        scheduler.step(val_m["loss"])
-        current_lr = optimizer.param_groups[0]["lr"]
-        last_train_m, last_val_m = train_m, val_m
+        train_metrics = evaluate(model, train_loader, device)
+        val_metrics = evaluate(model, val_loader, device)
+        scheduler.step(val_metrics["loss"])
 
-        improved = val_m["loss"] < best_val_loss
-        if improved:
-            best_val_loss = val_m["loss"]
+        if val_metrics["loss"] < best_val_loss:
+            best_val_loss = val_metrics["loss"]
             best_epoch = epoch
-            save_checkpoint(
-                args.checkpoint_dir / "best_model.pt",
-                model=model, optimizer=optimizer, scheduler=scheduler,
-                epoch=epoch, train_metrics=train_m, val_metrics=val_m,
-                feature_names=feature_names, feature_means=feature_means,
-                feature_stds=feature_stds, config=config,
-                best_val_loss=best_val_loss, target_cols=[MODEL_TARGET],
-            )
-
-        if args.checkpoint_every > 0 and epoch % args.checkpoint_every == 0:
-            save_checkpoint(
-                args.checkpoint_dir / f"checkpoint_epoch_{epoch:04d}.pt",
-                model=model, optimizer=optimizer, scheduler=scheduler,
-                epoch=epoch, train_metrics=train_m, val_metrics=val_m,
-                feature_names=feature_names, feature_means=feature_means,
-                feature_stds=feature_stds, config=config,
-                best_val_loss=best_val_loss, target_cols=[MODEL_TARGET],
-            )
-
-        # Print per-bucket accs every 10 epochs to track per-class progress
-        bucket_str = ""
-        if epoch % 10 == 0:
-            b_accs = {k: v for k, v in val_m.items() if k.startswith("acc_pm02_")}
-            bucket_str = " " + " ".join(f"{k.split('_')[-1]}={v:.3f}" for k, v in b_accs.items())
+            best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
 
         print(
-            f"Epoch {epoch:03d} lr={current_lr:.2e} "
-            f"train_loss={train_m['loss']:.4f} val_loss={val_m['loss']:.4f} "
-            f"val_mse={val_m['mse_potencial']:.4f} "
-            f"val_acc_pm02={val_m['acc_potencial_pm02']:.4f} "
-            f"val_mae={val_m['mae_potencial']:.4f} "
-            f"best_epoch={best_epoch:03d}"
-            f"{bucket_str}"
+            f"Epoch {epoch:03d} "
+            f"train_loss={train_metrics['loss']:.4f} "
+            f"train_acc={train_metrics['acc_potencial']:.4f} "
+            f"train_f1_macro={train_metrics['f1_potencial_macro']:.4f} "
+            f"val_loss={val_metrics['loss']:.4f} "
+            f"val_acc={val_metrics['acc_potencial']:.4f} "
+            f"val_f1_macro={val_metrics['f1_potencial_macro']:.4f} "
+            f"lr={optimizer.param_groups[0]['lr']:.6f}"
         )
 
-    test_m = evaluate(model, test_loader, device, args.metric_potential_tolerance)
-    print("\n=== Test metrics ===")
-    for key, value in test_m.items():
-        print(f"  {key}: {value:.4f}")
+        if epoch - best_epoch >= args.early_stopping_patience:
+            print(f"Early stopping at epoch {epoch}; best epoch was {best_epoch}.")
+            break
 
-    save_checkpoint(
-        args.checkpoint_dir / "last_model.pt",
-        model=model, optimizer=optimizer, scheduler=scheduler,
-        epoch=args.epochs, train_metrics=last_train_m, val_metrics=last_val_m,
-        test_metrics=test_m, feature_names=feature_names,
-        feature_means=feature_means, feature_stds=feature_stds,
-        config=config, best_val_loss=best_val_loss, target_cols=[MODEL_TARGET],
+    if best_state is not None:
+        model.load_state_dict(best_state)
+
+    test_metrics = evaluate(model, test_loader, device)
+    print("\n=== Test metrics ===")
+    for key, value in test_metrics.items():
+        print(f"{key}: {value:.4f}")
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "input_size": features.shape[1],
+            "feature_names": feature_names,
+            "feature_means": feature_means,
+            "feature_stds": feature_stds,
+            "target_col": TARGET_COL,
+            "potencial_class_names": POTENCIAL_CLASS_NAMES,
+            "potencial_bins": POTENCIAL_BINS,
+            "csv_paths": [str(path) for path in args.csv],
+            "max_seq_len": args.max_seq_len,
+            "min_history": args.min_history,
+            "hidden_size": args.hidden_size,
+            "num_layers": args.num_layers,
+            "dropout": args.dropout,
+            "best_epoch": best_epoch,
+        },
+        args.output,
     )
-    print(f"\nBest model → {args.checkpoint_dir / 'best_model.pt'}")
-    print(f"Last model → {args.checkpoint_dir / 'last_model.pt'}")
+    print(f"\nSaved model to {args.output}")
 
 
 if __name__ == "__main__":
