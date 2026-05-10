@@ -231,9 +231,29 @@ export function SpainRegionMap({
               fontSize={7}
               fill="#64748b"
               fontFamily="sans-serif"
+              style={{ pointerEvents: "none" }}
             >
               Canarias
             </text>
+            {/* Transparent hitbox covering the full inset — intercepts all clicks */}
+            <rect
+              x={INSET_X - 1}
+              y={INSET_Y - 1}
+              width={INSET_W + 2}
+              height={INSET_H + 2}
+              fill="transparent"
+              rx={2}
+              style={{ cursor: "pointer" }}
+              onClick={() => handlePathClick("05", "canarias")}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === " ") handlePathClick("05", "canarias");
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label={t(`ccaa.05`)}
+              aria-pressed={selectedSlug === "canarias"}
+              className="focus:outline-none"
+            />
           </svg>
         </div>
 
