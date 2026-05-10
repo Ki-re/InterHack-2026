@@ -418,11 +418,14 @@ def _resolve_db_path(argv: list[str]) -> str:
     if len(argv) > 1:
         return argv[1]
     raw = os.environ.get("DATABASE_URL", "")
-    if raw.startswith("sqlite:///"):
-        candidate = raw[len("sqlite:///"):]
-        if not os.path.isabs(candidate):
-            candidate = os.path.join("/app", candidate.lstrip("./"))
-        return candidate
+    # Handle both plain sqlite:/// and the aiosqlite driver prefix
+    for prefix in ("sqlite+aiosqlite:///", "sqlite:///"):
+        if raw.startswith(prefix):
+            candidate = raw[len(prefix):]
+            # Resolve relative path against /app (Docker working dir)
+            if not os.path.isabs(candidate):
+                candidate = os.path.join("/app", candidate.lstrip("./"))
+            return candidate
     return "/app/app.db"
 
 
