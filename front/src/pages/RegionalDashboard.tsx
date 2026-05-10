@@ -32,16 +32,27 @@ export function RegionalDashboard() {
   const [selectedRegionSlug, setSelectedRegionSlug] = useState<RegionSlug | null>(null);
   const [selectedCcaa, setSelectedCcaa] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  // Global query — always unfiltered, used for map colors and region list
+  const globalDashboard = useQuery({
+    queryKey: ["regional-dashboard", null],
+    queryFn: () => getRegionalDashboard(null),
+  });
+
+  // Filtered query — used for KPI cards and snapshot when a CCAA is selected
   const dashboard = useQuery({
     queryKey: ["regional-dashboard", selectedCcaa],
     queryFn: () => getRegionalDashboard(selectedCcaa),
     placeholderData: keepPreviousData,
+    enabled: selectedCcaa !== null,
   });
+
+  // Active data: filtered when CCAA selected, global otherwise
+  const activeData = selectedCcaa ? (dashboard.data ?? globalDashboard.data) : globalDashboard.data;
 
   const selectedRegion = useMemo(() => {
     if (!selectedRegionSlug) return null;
-    return dashboard.data?.regions.find((region) => region.slug === selectedRegionSlug) ?? null;
-  }, [dashboard.data?.regions, selectedRegionSlug]);
+    return activeData?.regions.find((region) => region.slug === selectedRegionSlug) ?? null;
+  }, [activeData?.regions, selectedRegionSlug]);
 
   function handleSelectRegion(slug: RegionSlug) {
     if (selectedRegionSlug === slug) {
@@ -54,16 +65,16 @@ export function RegionalDashboard() {
     }
   }
 
-  if (dashboard.isLoading) {
+  if (globalDashboard.isLoading) {
     return <RegionalDashboardState message={t("regional_dashboard.loading")} />;
   }
 
-  if (dashboard.isError || !dashboard.data) {
+  if (globalDashboard.isError || !globalDashboard.data) {
     return (
       <RegionalDashboardState
         message={t("regional_dashboard.error")}
         action={
-          <Button type="button" variant="outline" onClick={() => dashboard.refetch()}>
+          <Button type="button" variant="outline" onClick={() => globalDashboard.refetch()}>
             <RefreshCcw className="size-4" aria-hidden="true" />
             {t("regional_dashboard.actions.retry")}
           </Button>
@@ -76,7 +87,7 @@ export function RegionalDashboard() {
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={itemVariants}>
         <RegionalKpiCards
-          kpis={selectedRegion ? selectedRegion.kpis : dashboard.data.kpis}
+          kpis={selectedRegion ? selectedRegion.kpis : activeData?.kpis ?? globalDashboard.data.kpis}
           t={t}
         />
       </motion.div>
@@ -91,7 +102,7 @@ export function RegionalDashboard() {
         <div className="grid gap-5 xl:grid-cols-[1.6fr_0.7fr_1fr] xl:items-stretch">
           {/* Map — direct grid item, natural height sets the row */}
           <SpainRegionMap
-            regions={dashboard.data.regions}
+            regions={globalDashboard.data.regions}
             selectedSlug={selectedRegionSlug}
             selectedCcaa={selectedCcaa}
             onSelect={handleSelectRegion}
@@ -106,7 +117,7 @@ export function RegionalDashboard() {
               <RegionSnapshot
                 regionName={selectedRegion ? getRegionLabel(selectedRegion.slug, t) : t("regional_dashboard.all_regions")}
                 ccaaName={selectedCcaa ? t(`ccaa.${selectedCcaa}`) : undefined}
-                kpis={selectedRegion ? selectedRegion.kpis : dashboard.data.kpis}
+                kpis={selectedRegion ? selectedRegion.kpis : activeData?.kpis ?? globalDashboard.data.kpis}
                 t={t}
               />
             </div>
@@ -116,7 +127,7 @@ export function RegionalDashboard() {
           <div className="relative min-h-[300px] overflow-hidden xl:min-h-0">
             <div className="absolute inset-0">
               <UnderperformersCard
-                underperformers={dashboard.data.underperformers}
+                underperformers={globalDashboard.data.underperformers}
                 t={t}
               />
             </div>
@@ -125,9 +136,9 @@ export function RegionalDashboard() {
       </motion.section>
 
       {/* Region detail modal */}
-      {detailOpen && selectedRegion && (
+      {detailOpen && selectedRegionSlug && (
         <RegionDetailModal
-          region={selectedRegion}
+          region={globalDashboard.data.regions.find((r) => r.slug === selectedRegionSlug)!}
           onClose={() => setDetailOpen(false)}
           t={t}
         />
