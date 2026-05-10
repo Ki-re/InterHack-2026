@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type {
   AgentPerformance,
@@ -34,7 +34,6 @@ export function RegionalPerformanceTables({
     <div className="space-y-0">
       <ManagersTable
         managers={region.managers}
-        regionName={region.name}
         selectedManager={selectedManager}
         selectedAgent={selectedAgent}
         onSelectManager={onSelectManager}
@@ -49,7 +48,6 @@ export function RegionalPerformanceTables({
 
 function ManagersTable({
   managers,
-  regionName,
   selectedManager,
   selectedAgent,
   onSelectManager,
@@ -59,7 +57,6 @@ function ManagersTable({
   t,
 }: {
   managers: ManagerPerformance[];
-  regionName: string;
   selectedManager: ManagerPerformance | null;
   selectedAgent: AgentPerformance | null;
   onSelectManager: (m: ManagerPerformance) => void;
@@ -70,10 +67,6 @@ function ManagersTable({
 }) {
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle>{t("regional_dashboard.managers.title")}</CardTitle>
-        <p className="mt-1 text-sm text-muted-foreground">{regionName}</p>
-      </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-left">
