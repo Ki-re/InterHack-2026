@@ -3,6 +3,7 @@ import { Loader2, Mic, Square } from "lucide-react";
 
 import { postTranscribe } from "@/api/ai";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 type VoiceTextareaProps = {
@@ -16,6 +17,7 @@ type VoiceTextareaProps = {
 const BARS = 32;
 
 export function VoiceTextarea({ value, onChange, placeholder, className, disabled }: VoiceTextareaProps) {
+  const { t } = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [waveformBars, setWaveformBars] = useState<number[]>(Array(BARS).fill(0));
@@ -118,13 +120,13 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
 
         {/* Stop button — always visible, never displaced */}
         <button
-          aria-label="Parar grabación"
+          aria-label={t("audio.stop")}
           type="button"
           className="flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-destructive py-1.5 text-sm font-medium text-destructive-foreground shadow-md transition-transform active:scale-95 hover:bg-destructive/90"
           onClick={stopRecording}
         >
           <Square className="size-3.5 fill-current" />
-          Parar grabación
+          {t("audio.stop")}
         </button>
       </div>
     );
@@ -138,13 +140,13 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
           className,
         )}
         disabled={busy}
-        placeholder={isTranscribing ? "Transcribiendo…" : placeholder}
+        placeholder={isTranscribing ? t("audio.transcribing") : placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
 
       <Button
-        aria-label={isTranscribing ? "Transcribiendo…" : "Grabar nota de voz"}
+        aria-label={isTranscribing ? t("audio.transcribing") : t("audio.record_note")}
         className="absolute bottom-2 right-2 size-7"
         disabled={busy}
         size="icon"
