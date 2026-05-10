@@ -129,6 +129,8 @@ export function SpainRegionMap({
               if (!slug) return null;
 
               const region = regions.find((r) => r.slug === slug);
+              const ccaaKpi = region?.ccaaKpis?.find((c) => c.codCcaa === cod);
+              const fillStatus = ccaaKpi?.kpis.status ?? region?.kpis.status;
               const isSelectedRegion = selectedSlug === slug;
               const isSelectedCcaa = selectedCcaa === cod;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,7 +166,7 @@ export function SpainRegionMap({
                 <path
                   key={cod}
                   d={d}
-                  fill={region ? getStatusFill(region.kpis.status) : "#e2e8f0"}
+                  fill={fillStatus ? getStatusFill(fillStatus) : "#e2e8f0"}
                   stroke={stroke}
                   strokeWidth={strokeWidth}
                   opacity={opacity}

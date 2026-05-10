@@ -59,12 +59,18 @@ export type ManagerPerformance = {
   agents: AgentPerformance[];
 };
 
+export type CcaaKpis = {
+  codCcaa: string;
+  kpis: ExecutionKpis;
+};
+
 export type RegionSummary = {
   id: number;
   slug: RegionSlug;
   name: string;
   kpis: ExecutionKpis;
   managers: ManagerPerformance[];
+  ccaaKpis: CcaaKpis[];
 };
 
 export type Underperformer = {
