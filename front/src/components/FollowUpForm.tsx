@@ -70,12 +70,11 @@ export function FollowUpForm({ onCancel, onSubmit }: FollowUpFormProps) {
     { value: "negative", label: t("form.results.negative") },
   ];
 
-  // Whether the contact was successful (i.e. show Result + Notes)
   const contactMade =
     handledBy === "phone" ? answered :
     handledBy === "visit" ? visitSuccessful :
     handledBy === "email" ? emailResponseReceived :
-    true; // "other" always shows result
+    true;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -94,7 +93,6 @@ export function FollowUpForm({ onCancel, onSubmit }: FollowUpFormProps) {
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
-      {/* Channel selector */}
       <label className="block space-y-2">
         <span className="text-sm font-medium text-foreground">{t("form.handled_label")}</span>
         <select
@@ -108,34 +106,13 @@ export function FollowUpForm({ onCancel, onSubmit }: FollowUpFormProps) {
         </select>
       </label>
 
-      <fieldset className="space-y-3">
-        <legend className="text-sm font-medium text-foreground">{t("form.result_label")}</legend>
-        <div className="grid gap-2 sm:grid-cols-3">
-          {resultOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5"
-            >
-              <input
-                checked={result === option.value}
-                className="size-4 accent-primary"
-                name="result"
-                type="radio"
-                value={option.value}
-                onChange={() => setResult(option.value)}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <label className="block space-y-2">
-        <span className="text-sm font-medium text-foreground">{t("form.reminder_label")}</span>
-        <VoiceTextarea
-          placeholder={t("form.reminder_placeholder")}
-          value={reminder}
-          onChange={setReminder}
+      {handledBy === "phone" && (
+        <OutcomeToggle
+          label={t("form.answered.label")}
+          value={answered}
+          onChange={setAnswered}
+          yesLabel={t("form.answered.yes")}
+          noLabel={t("form.answered.no")}
         />
       )}
       {handledBy === "visit" && (
@@ -157,7 +134,6 @@ export function FollowUpForm({ onCancel, onSubmit }: FollowUpFormProps) {
         />
       )}
 
-      {/* Result + Notes — only when contact was made */}
       {contactMade && (
         <>
           <fieldset className="space-y-3">
@@ -184,17 +160,15 @@ export function FollowUpForm({ onCancel, onSubmit }: FollowUpFormProps) {
 
           <label className="block space-y-2">
             <span className="text-sm font-medium text-foreground">{t("form.reminder_label")}</span>
-            <textarea
-              className="min-h-20 w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
+            <VoiceTextarea
               placeholder={t("form.reminder_placeholder")}
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={setNotes}
             />
           </label>
         </>
       )}
 
-      {/* Keep open toggle */}
       <OutcomeToggle
         label={t("form.keep_open.label")}
         value={keepOpen}
