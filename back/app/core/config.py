@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     groq_api_key: str = ""
     eleven_labs_api_key: str = ""
+    assemblyai_api_key: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
