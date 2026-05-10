@@ -1,9 +1,10 @@
 import asyncio
+import io
 
+import assemblyai as aai
 from elevenlabs.client import ElevenLabs
 from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-from groq import Groq
 from pydantic import BaseModel
 
 from app.core.config import get_settings
@@ -20,21 +21,21 @@ class SynthesizeRequest(BaseModel):
 @router.post("/transcribe")
 async def transcribe(file: UploadFile) -> dict[str, str]:
     settings = get_settings()
-    if not settings.groq_api_key:
+    if not settings.assemblyai_api_key:
         raise HTTPException(status_code=503, detail="STT not configured")
 
     audio_bytes = await file.read()
-    filename = file.filename or "audio.webm"
 
     def _transcribe() -> str:
-        client = Groq(api_key=settings.groq_api_key)
-        transcription = client.audio.transcriptions.create(
-            file=(filename, audio_bytes),
-            model="whisper-large-v3",
-            temperature=0,
-            response_format="verbose_json",
+        aai.settings.api_key = settings.assemblyai_api_key
+        config = aai.TranscriptionConfig(
+            speech_models=["universal-3-pro", "universal-2"],
+            language_detection=True,
         )
-        return transcription.text
+        transcript = aai.Transcriber(config=config).transcribe(io.BytesIO(audio_bytes))
+        if transcript.status == aai.TranscriptStatus.error:
+            raise RuntimeError(transcript.error)
+        return transcript.text or ""
 
     text = await asyncio.to_thread(_transcribe)
     return {"text": text}
