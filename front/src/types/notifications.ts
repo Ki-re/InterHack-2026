@@ -1,5 +1,6 @@
 export type Notification = {
   id: number;
+  agent_id: number | null;
   alert_id: string;
   title: string;
   body: string;

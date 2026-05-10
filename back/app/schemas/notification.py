@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class NotificationOut(BaseModel):
     id: int
+    agent_id: int | None
     alert_id: str
     title: str
     body: str

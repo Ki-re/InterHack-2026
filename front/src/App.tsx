@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { AgentProvider } from "@/contexts/AgentContext";
 import { LanguageProvider, useTranslation } from "@/contexts/LanguageContext";
 import { Dashboard } from "@/pages/Dashboard";
 import { Login } from "@/pages/Login";
@@ -11,6 +12,7 @@ import { RegionalDashboard } from "@/pages/RegionalDashboard";
 export function App() {
   return (
     <LanguageProvider>
+      <AgentProvider>
       <Routes>
         <Route
           path="/"
@@ -32,6 +34,7 @@ export function App() {
         </Route>
         <Route path="*" element={<FallbackRedirect />} />
       </Routes>
+      </AgentProvider>
     </LanguageProvider>
   );
 }

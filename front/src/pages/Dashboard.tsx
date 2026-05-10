@@ -7,6 +7,7 @@ import { AlertDetailModal } from "@/components/AlertDetailModal";
 import { AlertTable } from "@/components/AlertTable";
 import { DismissModal } from "@/components/DismissModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAgent } from "@/contexts/AgentContext";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useAgents } from "@/hooks/useAgents";
 import { useAlerts } from "@/hooks/useAlerts";
@@ -25,14 +26,16 @@ const itemVariants = {
 export function Dashboard() {
   const { t } = useTranslation();
   const { data: agents, isLoading: agentsLoading } = useAgents();
+  const { setSelectedAgentId: setGlobalAgentId } = useAgent();
 
   // Auto-select the first agent once agents load
   const [selectedAgentId, setSelectedAgentId] = useState<number | undefined>(undefined);
   useEffect(() => {
     if (agents && agents.length > 0 && selectedAgentId === undefined) {
       setSelectedAgentId(agents[0].id);
+      setGlobalAgentId(agents[0].id);
     }
-  }, [agents, selectedAgentId]);
+  }, [agents, selectedAgentId, setGlobalAgentId]);
 
   const { data: fetchedAlerts, isLoading: alertsLoading } = useAlerts(selectedAgentId);
   const isLoading = agentsLoading || alertsLoading;
@@ -164,7 +167,7 @@ export function Dashboard() {
         ) : (
           <select
             value={selectedAgentId ?? ""}
-            onChange={(e) => setSelectedAgentId(Number(e.target.value))}
+            onChange={(e) => { const id = Number(e.target.value); setSelectedAgentId(id); setGlobalAgentId(id); }}
             className="flex-1 max-w-xs rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             {(agents ?? []).map((agent) => (
