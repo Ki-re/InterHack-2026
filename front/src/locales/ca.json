@@ -185,6 +185,11 @@
     "event_dismissed": "Alerta descartada",
     "event_reopened": "Alerta recuperada"
   },
+  "time": {
+    "minutes_ago": "fa {{n}}m",
+    "hours_ago": "fa {{n}}h",
+    "days_ago": "fa {{n}}d"
+  },
   "notification": {
     "bell_aria": "Notificacions",
     "title": "Notificacions",
@@ -223,6 +228,7 @@
       "critical": "Risc operatiu"
     },
     "kpis": {
+      "total_alerts": "Total",
       "execution_score": "Eficiència de resposta",
       "pending": "Pendents",
       "pending_desc": "Alertes encara obertes",
@@ -256,6 +262,7 @@
     "underperformers": {
       "title": "Focus de risc",
       "subtitle": "Equips que necessiten revisió prioritària.",
+      "manager_label": "Màn.",
       "manager_level": "Mànager regional",
       "role_manager": "Mànager",
       "role_agent": "Delegat"

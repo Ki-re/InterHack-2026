@@ -185,6 +185,11 @@
     "event_dismissed": "Alerta descartada",
     "event_reopened": "Alerta recuperada"
   },
+  "time": {
+    "minutes_ago": "hace {{n}}m",
+    "hours_ago": "hace {{n}}h",
+    "days_ago": "hace {{n}}d"
+  },
   "notification": {
     "bell_aria": "Notificaciones",
     "title": "Notificaciones",
@@ -223,6 +228,7 @@
       "critical": "Riesgo operativo"
     },
     "kpis": {
+      "total_alerts": "Total",
       "execution_score": "Eficiencia de respuesta",
       "pending": "Pendientes",
       "pending_desc": "Alertas todavía abiertas",
@@ -256,6 +262,7 @@
     "underperformers": {
       "title": "Focos de riesgo",
       "subtitle": "Equipos que necesitan revisión prioritaria.",
+      "manager_label": "Mán.",
       "manager_level": "Mánager regional",
       "role_manager": "Mánager",
       "role_agent": "Delegado"
