@@ -277,3 +277,6 @@ __pycache__/
 
 *.pt
 run_config.json
+/IA/Datasets.xlsx
+
+/IA/gemini*
