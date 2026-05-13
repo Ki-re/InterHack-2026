@@ -51,12 +51,23 @@ jobs:
           cd /opt/interhack-2026
           docker compose -f docker-compose.homelab.yml --env-file .env.prod up --build -d
 
-      - name: Run Alembic migrations
+      - name: Wait for backend to be healthy
         run: |
           set -e
           cd /opt/interhack-2026
-          docker compose -f docker-compose.homelab.yml --env-file .env.prod \
-            exec -T backend alembic upgrade head
+          echo "Waiting for backend health check..."
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.homelab.yml exec -T backend \
+              python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" 2>/dev/null; then
+              echo "Backend is healthy!"
+              exit 0
+            fi
+            echo "  Attempt $i/30 — waiting 5s..."
+            sleep 5
+          done
+          echo "Backend did not become healthy in 150s"
+          docker compose -f docker-compose.homelab.yml logs backend --tail=50
+          exit 1
 
       - name: Remove dangling images
         run: docker image prune -f
