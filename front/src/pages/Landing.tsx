@@ -54,21 +54,21 @@ export function Landing() {
           className="flex flex-col gap-4 xl:min-h-0"
         >
           <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0">
-            <div>
+            <div className="xl:grow">
               <h1 className="text-5xl font-semibold leading-tight tracking-normal text-slate-950 2xl:text-6xl">
                 {t("landing.hero.title")}
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 2xl:text-base">
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 2xl:text-base 2xl:leading-7">
                 {t("landing.hero.description")}
               </p>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                <Trophy className="size-3.5" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 2xl:text-sm">
+                <Trophy className="size-3.5 2xl:size-4" aria-hidden="true" />
                 {t("landing.hero.award_inibsa")}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                <Trophy className="size-3.5" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 2xl:text-sm">
+                <Trophy className="size-3.5 2xl:size-4" aria-hidden="true" />
                 Best Use of ElevenLabs — MLH
               </span>
             </div>
@@ -90,11 +90,11 @@ export function Landing() {
           </div>
 
           <Panel className="xl:grow xl:min-h-0">
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-700">
+            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-700 2xl:text-base">
               <BarChart3 className="size-4" aria-hidden="true" />
               {t("landing.snapshot.title")}
             </div>
-            <p className="overflow-hidden text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+            <p className="text-sm leading-6 text-slate-600 2xl:text-base 2xl:leading-7">
               {t("landing.snapshot.description")}
             </p>
             <div className="mt-4 grid grid-cols-3 gap-2">
@@ -105,9 +105,9 @@ export function Landing() {
           </Panel>
 
           <Panel className="xl:grow xl:min-h-0 xl:overflow-hidden">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.problem.eyebrow")}</p>
-            <h2 className="mt-1 text-lg font-semibold">{t("landing.problem.title")}</h2>
-            <p className="mt-2 text-xs leading-5 text-slate-600">{t("landing.problem.description")}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.problem.eyebrow")}</p>
+            <h2 className="mt-1 text-lg font-semibold 2xl:text-xl">{t("landing.problem.title")}</h2>
+            <p className="mt-2 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{t("landing.problem.description")}</p>
           </Panel>
         </motion.div>
 
@@ -118,9 +118,9 @@ export function Landing() {
           className="flex flex-col gap-4 xl:min-h-0"
         >
           <Panel className="p-3 xl:grow xl:min-h-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.models.eyebrow")}</p>
-            <h2 className="mt-1 text-lg font-semibold leading-tight">{t("landing.models.title")}</h2>
-            <div className="mt-3 grid gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.models.eyebrow")}</p>
+            <h2 className="mt-1 text-lg font-semibold leading-tight 2xl:text-xl">{t("landing.models.title")}</h2>
+            <div className="mt-3 grid gap-2 xl:grow xl:min-h-0 xl:auto-rows-fr">
               <ModelRow icon={<BrainCircuit />} title={t("landing.models.repurchase.title")} target="vuelve_a_comprar" text={t("landing.models.repurchase.description")} />
               <ModelRow icon={<LineChart />} title={t("landing.models.days.title")} target="dias_hasta_proxima_compra" text={t("landing.models.days.description")} />
               <ModelRow icon={<Network />} title={t("landing.models.potential.title")} target="target_potencial_cliente" text={t("landing.models.potential.description")} />
@@ -128,10 +128,10 @@ export function Landing() {
           </Panel>
 
           <Panel className="xl:grow xl:min-h-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.tech.eyebrow")}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.tech.eyebrow")}</p>
+            <div className="mt-3 flex flex-wrap gap-2 xl:grow xl:content-start">
               {tech.map((item) => (
-                <span key={item} className="rounded-md border bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700">
+                <span key={item} className="rounded-md border bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 2xl:text-sm">
                   {item}
                 </span>
               ))}
@@ -151,26 +151,26 @@ export function Landing() {
           className="flex flex-col gap-4 xl:min-h-0"
         >
           <Panel className="p-3 xl:grow xl:min-h-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.team.eyebrow")}</p>
-            <h2 className="mt-1 text-lg font-semibold leading-tight">{t("landing.team.title")}</h2>
-            <div className="mt-3 grid gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.team.eyebrow")}</p>
+            <h2 className="mt-1 text-lg font-semibold leading-tight 2xl:text-xl">{t("landing.team.title")}</h2>
+            <div className="mt-3 grid gap-2 xl:grow xl:min-h-0 xl:auto-rows-fr">
               {team.map((member) => (
                 <a
                   key={member.key}
                   href={member.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg border bg-slate-50 p-3 transition-colors hover:bg-white"
+                  className="flex flex-col rounded-lg border bg-slate-50 p-3 transition-colors hover:bg-white"
                 >
                   <div className="flex items-center gap-3">
-                    <img src={member.avatar} alt={member.name} className="size-18 rounded-full border bg-white" />
+                    <img src={member.avatar} alt={member.name} className="size-18 rounded-full border bg-white 2xl:size-20" />
                     <div className="min-w-0">
-                      <h3 className="truncate text-sm font-semibold">{member.name}</h3>
-                      <p className="text-xs text-slate-500">@{member.handle}</p>
+                      <h3 className="text-sm font-semibold 2xl:text-base">{member.name}</h3>
+                      <p className="text-xs text-slate-500 2xl:text-sm">@{member.handle}</p>
                     </div>
                   </div>
-                  <p className="mt-1.5 text-xs font-semibold text-blue-700">{t(`landing.team.members.${member.key}.role`)}</p>
-                  <p className="mt-1 overflow-hidden text-xs leading-5 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                  <p className="mt-1.5 text-xs font-semibold text-blue-700 2xl:text-sm">{t(`landing.team.members.${member.key}.role`)}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">
                     {t(`landing.team.members.${member.key}.description`)}
                   </p>
                 </a>
@@ -178,7 +178,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0">
+          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">
             {t("landing.footer.event")}
           </div>
         </motion.div>
@@ -188,14 +188,14 @@ export function Landing() {
 }
 
 function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-lg border bg-white p-4 shadow-sm ${className}`}>{children}</div>;
+  return <div className={`flex flex-col rounded-lg border bg-white p-4 shadow-sm ${className}`}>{children}</div>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border bg-slate-50 px-3 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 2xl:text-xs">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-slate-950 2xl:text-2xl">{value}</p>
     </div>
   );
 }
@@ -204,22 +204,22 @@ function InfoCard({ icon, title, text }: { icon: ReactNode; title: string; text:
   return (
     <Panel>
       <div className="mb-2 flex size-8 items-center justify-center rounded-md bg-blue-50 text-blue-700">{icon}</div>
-      <h3 className="text-sm font-semibold">{title}</h3>
-      <p className="mt-1 overflow-hidden text-xs leading-5 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">{text}</p>
+      <h3 className="text-sm font-semibold 2xl:text-base">{title}</h3>
+      <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{text}</p>
     </Panel>
   );
 }
 
 function ModelRow({ icon, title, target, text }: { icon: ReactNode; title: string; target: string; text: string }) {
   return (
-    <div className="grid gap-2 rounded-lg border bg-slate-50 p-2.5 sm:grid-cols-[2rem_1fr]">
-      <div className="flex size-8 items-center justify-center rounded-md bg-green-50 text-green-700">{icon}</div>
-      <div className="min-w-0">
+    <div className="flex flex-col gap-2 rounded-lg border bg-slate-50 p-2.5 sm:flex-row">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-green-50 text-green-700">{icon}</div>
+      <div className="flex min-w-0 flex-col xl:grow">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-xs font-semibold text-slate-950">{title}</h3>
-          <span className="font-mono text-[10px] text-green-700">{target}</span>
+          <h3 className="text-xs font-semibold text-slate-950 2xl:text-sm">{title}</h3>
+          <span className="font-mono text-[10px] text-green-700 2xl:text-xs">{target}</span>
         </div>
-        <p className="mt-1 overflow-hidden text-xs leading-5 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">{text}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{text}</p>
       </div>
     </div>
   );
