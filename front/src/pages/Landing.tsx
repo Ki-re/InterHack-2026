@@ -53,8 +53,8 @@ export function Landing() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-4 xl:min-h-0"
         >
-          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0">
-            <div className="xl:grow">
+          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0 xl:overflow-hidden">
+            <div className="xl:grow xl:min-h-0">
               <h1 className="text-5xl font-semibold leading-tight tracking-normal text-slate-950 2xl:text-6xl">
                 {t("landing.hero.title")}
               </h1>
@@ -107,7 +107,7 @@ export function Landing() {
           <Panel className="xl:grow xl:min-h-0 xl:overflow-hidden">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.problem.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold 2xl:text-xl">{t("landing.problem.title")}</h2>
-            <p className="mt-2 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{t("landing.problem.description")}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">{t("landing.problem.description")}</p>
           </Panel>
         </motion.div>
 
@@ -129,7 +129,7 @@ export function Landing() {
 
           <Panel className="xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.tech.eyebrow")}</p>
-            <div className="mt-3 flex flex-wrap gap-2 xl:grow xl:content-start">
+            <div className="mt-3 flex flex-wrap gap-2 xl:grow xl:min-h-0 xl:content-start">
               {tech.map((item) => (
                 <span key={item} className="rounded-md border bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 2xl:text-sm">
                   {item}
@@ -138,7 +138,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="grid grid-cols-2 gap-3 xl:grow xl:min-h-0 xl:grid-rows-[1fr]">
+          <div className="grid grid-cols-2 gap-3 xl:grow xl:min-h-0 xl:grid-rows-[1fr] xl:overflow-hidden">
             <InfoCard icon={<Database />} title={t("landing.data.title")} text={t("landing.data.description")} />
             <InfoCard icon={<GitBranch />} title={t("landing.pipeline.title")} text={t("landing.pipeline.description")} />
           </div>
@@ -160,7 +160,7 @@ export function Landing() {
                   href={member.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex flex-col rounded-lg border bg-slate-50 p-3 transition-colors hover:bg-white"
+                  className="flex flex-col rounded-lg border bg-slate-50 p-3 transition-colors hover:bg-white xl:min-h-0 xl:overflow-hidden"
                 >
                   <div className="flex items-center gap-3">
                     <img src={member.avatar} alt={member.name} className="size-18 rounded-full border bg-white 2xl:size-20" />
@@ -170,7 +170,7 @@ export function Landing() {
                     </div>
                   </div>
                   <p className="mt-1.5 text-xs font-semibold text-blue-700 2xl:text-sm">{t(`landing.team.members.${member.key}.role`)}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">
+                  <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">
                     {t(`landing.team.members.${member.key}.description`)}
                   </p>
                 </a>
@@ -178,7 +178,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">
+          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0 xl:overflow-hidden 2xl:text-sm 2xl:leading-6">
             {t("landing.footer.event")}
           </div>
         </motion.div>
@@ -188,7 +188,7 @@ export function Landing() {
 }
 
 function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`flex flex-col rounded-lg border bg-white p-4 shadow-sm ${className}`}>{children}</div>;
+  return <div className={`flex flex-col rounded-lg border bg-white p-4 shadow-sm xl:overflow-hidden ${className}`}>{children}</div>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -205,21 +205,21 @@ function InfoCard({ icon, title, text }: { icon: ReactNode; title: string; text:
     <Panel>
       <div className="mb-2 flex size-8 items-center justify-center rounded-md bg-blue-50 text-blue-700">{icon}</div>
       <h3 className="text-sm font-semibold 2xl:text-base">{title}</h3>
-      <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{text}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">{text}</p>
     </Panel>
   );
 }
 
 function ModelRow({ icon, title, target, text }: { icon: ReactNode; title: string; target: string; text: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-slate-50 p-2.5 sm:flex-row">
+    <div className="flex flex-col gap-2 rounded-lg border bg-slate-50 p-2.5 sm:flex-row xl:min-h-0 xl:overflow-hidden">
       <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-green-50 text-green-700">{icon}</div>
-      <div className="flex min-w-0 flex-col xl:grow">
+      <div className="flex min-w-0 flex-col xl:grow xl:min-h-0">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xs font-semibold text-slate-950 2xl:text-sm">{title}</h3>
           <span className="font-mono text-[10px] text-green-700 2xl:text-xs">{target}</span>
         </div>
-        <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow 2xl:text-sm 2xl:leading-6">{text}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">{text}</p>
       </div>
     </div>
   );
