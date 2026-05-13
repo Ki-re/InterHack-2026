@@ -49,13 +49,13 @@ jobs:
         run: |
           set -e
           cd /opt/interhack-2026
-          docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+          docker compose -f docker-compose.homelab.yml --env-file .env.prod up --build -d
 
       - name: Run Alembic migrations
         run: |
           set -e
           cd /opt/interhack-2026
-          docker compose -f docker-compose.prod.yml --env-file .env.prod \
+          docker compose -f docker-compose.homelab.yml --env-file .env.prod \
             exec -T backend alembic upgrade head
 
       - name: Remove dangling images

@@ -7,6 +7,7 @@ import {
   GitBranch,
   LineChart,
   Network,
+  Trophy,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +62,17 @@ export function Landing() {
                 {t("landing.hero.description")}
               </p>
             </div>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                <Trophy className="size-3.5" aria-hidden="true" />
+                1r Premi — Repte INIBSA
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                <Trophy className="size-3.5" aria-hidden="true" />
+                Best Use of ElevenLabs — MLH
+              </span>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <Button className="h-11 px-5" onClick={() => navigate(destination)}>
                 {t("landing.hero.cta")}
                 <ArrowRight className="size-4" aria-hidden="true" />
