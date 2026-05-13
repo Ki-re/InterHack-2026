@@ -1,60 +1,60 @@
-name: Deploy to Vultr
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          APP_NAME: ${{ secrets.APP_NAME }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ELEVEN_LABS_API_KEY: ${{ secrets.ELEVEN_LABS_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
-        with:
-          host: ${{ secrets.VULTR_HOST }}
-          username: ${{ secrets.VULTR_USER }}
-          key: ${{ secrets.VULTR_SSH_KEY }}
-          envs: APP_NAME,DATABASE_URL,FRONTEND_ORIGIN,JWT_SECRET_KEY,ACCESS_TOKEN_EXPIRE_MINUTES,VITE_API_URL,GEMINI_API_KEY,ELEVEN_LABS_API_KEY,GROQ_API_KEY,ASSEMBLYAI_API_KEY
-          script: |
-            set -e
-
-            cd /opt/interhack-2026
-
-            git pull origin main
-
-            # Regenerate .env.prod from environment (passed securely via envs)
-            printf 'APP_NAME=%s\n' "$APP_NAME" > .env.prod
-            printf 'DATABASE_URL=%s\n' "$DATABASE_URL" >> .env.prod
-            printf 'FRONTEND_ORIGIN=%s\n' "$FRONTEND_ORIGIN" >> .env.prod
-            printf 'JWT_SECRET_KEY=%s\n' "$JWT_SECRET_KEY" >> .env.prod
-            printf 'ACCESS_TOKEN_EXPIRE_MINUTES=%s\n' "$ACCESS_TOKEN_EXPIRE_MINUTES" >> .env.prod
-            printf 'VITE_API_URL=%s\n' "$VITE_API_URL" >> .env.prod
-            printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" >> .env.prod
-            printf 'ELEVEN_LABS_API_KEY=%s\n' "$ELEVEN_LABS_API_KEY" >> .env.prod
-            printf 'GROQ_API_KEY=%s\n' "$GROQ_API_KEY" >> .env.prod
-            printf 'ASSEMBLYAI_API_KEY=%s\n' "$ASSEMBLYAI_API_KEY" >> .env.prod
-            chmod 600 .env.prod
-
-            # Build and restart services
-            docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
-
-            # Run Alembic migrations
-            docker compose -f docker-compose.prod.yml --env-file .env.prod \
-              exec -T backend alembic upgrade head
-
-            # Remove dangling images
-            docker image prune -f
+# name: Deploy to Vultr
+#
+# on:
+#   push:
+#     branches:
+#       - main
+#
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#       - name: Deploy via SSH
+#         uses: appleboy/ssh-action@v1.0.3
+#         env:
+#           APP_NAME: ${{ secrets.APP_NAME }}
+#           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#           FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+#           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+#           ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+#           VITE_API_URL: ${{ secrets.VITE_API_URL }}
+#           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+#           ELEVEN_LABS_API_KEY: ${{ secrets.ELEVEN_LABS_API_KEY }}
+#           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+#           ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
+#         with:
+#           host: ${{ secrets.VULTR_HOST }}
+#           username: ${{ secrets.VULTR_USER }}
+#           key: ${{ secrets.VULTR_SSH_KEY }}
+#           envs: APP_NAME,DATABASE_URL,FRONTEND_ORIGIN,JWT_SECRET_KEY,ACCESS_TOKEN_EXPIRE_MINUTES,VITE_API_URL,GEMINI_API_KEY,ELEVEN_LABS_API_KEY,GROQ_API_KEY,ASSEMBLYAI_API_KEY
+#           script: |
+#             set -e
+#
+#             cd /opt/interhack-2026
+#
+#             git pull origin main
+#
+#             # Regenerate .env.prod from environment (passed securely via envs)
+#             printf 'APP_NAME=%s\n' "$APP_NAME" > .env.prod
+#             printf 'DATABASE_URL=%s\n' "$DATABASE_URL" >> .env.prod
+#             printf 'FRONTEND_ORIGIN=%s\n' "$FRONTEND_ORIGIN" >> .env.prod
+#             printf 'JWT_SECRET_KEY=%s\n' "$JWT_SECRET_KEY" >> .env.prod
+#             printf 'ACCESS_TOKEN_EXPIRE_MINUTES=%s\n' "$ACCESS_TOKEN_EXPIRE_MINUTES" >> .env.prod
+#             printf 'VITE_API_URL=%s\n' "$VITE_API_URL" >> .env.prod
+#             printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" >> .env.prod
+#             printf 'ELEVEN_LABS_API_KEY=%s\n' "$ELEVEN_LABS_API_KEY" >> .env.prod
+#             printf 'GROQ_API_KEY=%s\n' "$GROQ_API_KEY" >> .env.prod
+#             printf 'ASSEMBLYAI_API_KEY=%s\n' "$ASSEMBLYAI_API_KEY" >> .env.prod
+#             chmod 600 .env.prod
+#
+#             # Build and restart services
+#             docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+#
+#             # Run Alembic migrations
+#             docker compose -f docker-compose.prod.yml --env-file .env.prod \
+#               exec -T backend alembic upgrade head
+#
+#             # Remove dangling images
+#             docker image prune -f
