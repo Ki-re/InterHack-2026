@@ -70,7 +70,7 @@
 - Docker named volume `frontend_node_modules` must be removed and recreated when new npm packages are added (framer-motion issue resolved this way).
 - Browser tab title is "KeepInibsa".
 - `GEMINI_API_KEY` is loaded from `.env` file at the project root via `docker-compose.yml` env_file directive (not hardcoded).
-- Project documentation updated: root `README.md` now presents Client Alert Manager for INIBSA / InterHack-2026 with badges, favicon, challenge summary, model/architecture overview, technologies, setup, endpoints, future work, and contributor roles. Added `DEVPOST.md` with a Devpost-style public submission narrative and integrations summary.
+- Project documentation updated: root `README.md` now presents KeepInibsa for INIBSA / InterHack-2026 with badges, favicon, challenge summary, model/architecture overview, technologies, setup, endpoints, future work, and contributor roles. Added `DEVPOST.md` with a Devpost-style public submission narrative and integrations summary.
 
 ## Broken / Incomplete
 - Host `front/npm run typecheck` cannot find `tsc` if not in path; Docker typecheck or local `npm run typecheck` (if tsc installed) works.

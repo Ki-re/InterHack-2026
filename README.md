@@ -2,7 +2,7 @@
   <img src="front/src/assets/logo.png" alt="INIBSA icon" width="388"/>
 </p>
 
-# Client Alert Manager
+# KeepInibsa
 
 <p align="center">
   <strong>Smart Demand Signals for INIBSA, built during InterHack-2026.</strong>
@@ -35,7 +35,7 @@ The solution is designed as a standalone application that can later integrate wi
 
 ## What We Built
 
-**Client Alert Manager** turns predictive signals into operational sales workflows.
+**KeepInibsa** turns predictive signals into operational sales workflows.
 
 - **Sales Delegate Dashboard**: a table-first alert workspace for dental-clinic clients, with priority, churn risk, purchase propensity, customer value, explanation, product-family context, status tabs, attended/dismissed workflows, and action history.
 - **Regional Manager Dashboard**: an executive dashboard with KPI cards, a Spain map by commercial area/autonomous community, regional performance status, and manager -> agent -> client drill-down.
@@ -187,8 +187,31 @@ scripts/    project automation
 
 ## Contributors
 
-| Contributor | Main role |
-| --- | --- |
-| Alvaro | AI Engineer |
-| Yearsuck | Infrastructure and Backend Engineer |
-| Ki-re | Front and Back Engineer |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Ki-re">
+        <img src="https://github.com/Ki-re.png" width="120" style="border-radius:50%" alt="Erik Batiste"/><br/>
+        <strong>Erik Batiste</strong>
+      </a><br/>
+      <em>Core Full Stack Engineer</em><br/><br/>
+      Architected the foundational full-stack app with FastAPI/React, DevOps infrastructure, DB pipelines and Gemini LLM integrations.
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Yearsuck">
+        <img src="https://github.com/Yearsuck.png" width="120" style="border-radius:50%" alt="Ernest Rull"/><br/>
+        <strong>Ernest Rull</strong>
+      </a><br/>
+      <em>DevOps & Frontend Engineer</em><br/><br/>
+      Led VPS deployment, bilingual frontend features, ElevenLabs voice cloning and agent-scoped notifications.
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Alvaroost8">
+        <img src="https://github.com/Alvaroost8.png" width="120" style="border-radius:50%" alt="Alvaro Saenz-Torre"/><br/>
+        <strong>Alvaro Saenz-Torre</strong>
+      </a><br/>
+      <em>Lead Machine Learning Engineer</em><br/><br/>
+      Designed and trained the B2B neural networks, ingestion, inference, explainability and actionable Alert routing.
+    </td>
+  </tr>
+</table>
