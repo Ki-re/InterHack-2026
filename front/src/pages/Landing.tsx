@@ -65,7 +65,7 @@ export function Landing() {
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
                 <Trophy className="size-3.5" aria-hidden="true" />
-                1r Premi — Repte INIBSA
+                {t("landing.hero.award_inibsa")}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
                 <Trophy className="size-3.5" aria-hidden="true" />
