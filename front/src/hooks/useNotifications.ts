@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { apiRequest } from "@/api/client";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import type { Notification } from "@/types/notifications";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
@@ -22,6 +23,7 @@ async function patchReadAll(agentId: number): Promise<void> {
 }
 
 export function useNotifications(agentId: number | null) {
+  const { isDemoMode } = useDemoMode();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
@@ -53,15 +55,19 @@ export function useNotifications(agentId: number | null) {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)),
     );
-    await patchRead(id, agentId).catch(() => {});
-  }, [agentId]);
+    if (!isDemoMode) {
+      await patchRead(id, agentId).catch(() => {});
+    }
+  }, [agentId, isDemoMode]);
 
   const markAllRead = useCallback(async () => {
     if (agentId === null) return;
     const now = new Date().toISOString();
     setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? now })));
-    await patchReadAll(agentId).catch(() => {});
-  }, [agentId]);
+    if (!isDemoMode) {
+      await patchReadAll(agentId).catch(() => {});
+    }
+  }, [agentId, isDemoMode]);
 
   return { notifications, unreadCount, markRead, markAllRead };
 }

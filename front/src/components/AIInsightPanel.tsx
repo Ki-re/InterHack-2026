@@ -4,6 +4,7 @@ import { Bot, Loader2, Mic, Pause, Play, Send, Sparkles, Square, Trash2, Volume2
 import { postAiChat, postSynthesize, postTranscribe, type AiChatMessage } from "@/api/ai";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { SalesAlert } from "@/types/alerts";
 
@@ -19,6 +20,7 @@ type ChatMessage = {
 };
 
 type RecordingMode = "idle" | "recording" | "preview";
+type Translate = (path: string, params?: Record<string, string | number>) => string;
 
 const BARS = 40;
 const SAMPLE_MS = 50;
@@ -38,8 +40,31 @@ function getRms(analyser: AnalyserNode): number {
   return Math.sqrt(sum / data.length);
 }
 
+function localizeChurnType(alert: SalesAlert, t: Translate) {
+  return alert.churnType.toLowerCase() === "total" ? t("churn_type.total") : alert.churnType;
+}
+
+function buildDemoAiResponse(alert: SalesAlert, question: string, t: Translate) {
+  return [
+    t("ai.demo_response.intro", { question, client: alert.clientName }),
+    t("ai.demo_response.signal", {
+      risk: t(`risk.${alert.riskLevel}`),
+      churn: alert.churnProbability,
+      propensity: alert.purchasePropensity,
+      value: t(`customer_value.${alert.customerValue}`),
+      churnType: localizeChurnType(alert, t),
+    }),
+    t("ai.demo_response.reason", { explanation: alert.explanation }),
+    alert.predictedNextPurchase
+      ? t("ai.demo_response.next_purchase", { date: alert.predictedNextPurchase })
+      : t("ai.demo_response.action"),
+    t("ai.demo_response.disclaimer"),
+  ].join("\n\n");
+}
+
 export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   const { t, language } = useTranslation();
+  const { isDemoMode, showDemoNotice } = useDemoMode();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,6 +138,11 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   }
 
   async function startRecording() {
+    if (isDemoMode) {
+      showDemoNotice(t("demo.stt_disabled"));
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
@@ -187,6 +217,7 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
   }
 
   async function playTTS(text: string) {
+    if (isDemoMode) return;
     if (isMutedRef.current) return;
     try {
       const blob = await postSynthesize(text, language);
@@ -209,12 +240,19 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
     const history: AiChatMessage[] = messages.map((m) => ({ role: m.role, content: m.content }));
 
     try {
-      const responseText = await postAiChat(alert!, history, text, language);
+      const responseText = isDemoMode
+        ? buildDemoAiResponse(alert!, text, t)
+        : await postAiChat(alert!, history, text, language);
+      if (isDemoMode) {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
       setMessages((prev) => [
         ...prev,
         { id: `assistant-${Date.now()}`, role: "assistant", content: responseText },
       ]);
-      await playTTS(responseText);
+      if (!isDemoMode) {
+        await playTTS(responseText);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -230,6 +268,11 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
     if (isLoading || isTranscribing) return;
 
     if (mode === "preview" && chunksRef.current.length > 0) {
+      if (isDemoMode) {
+        showDemoNotice(t("demo.stt_disabled"));
+        return;
+      }
+
       previewAudioRef.current?.pause();
       const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current });
       resetRecording();
@@ -278,7 +321,13 @@ export function AIInsightPanel({ alert, onClose }: AIInsightPanelProps) {
               size="icon"
               type="button"
               variant={isMuted ? "secondary" : "ghost"}
-              onClick={() => setIsMuted((m) => !m)}
+              onClick={() => {
+                if (isDemoMode) {
+                  showDemoNotice(t("demo.tts_disabled"));
+                  return;
+                }
+                setIsMuted((m) => !m);
+              }}
             >
               {isMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
             </Button>

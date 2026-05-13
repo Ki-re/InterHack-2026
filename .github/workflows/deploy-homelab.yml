@@ -1,0 +1,62 @@
+name: Deploy to Homelab
+
+# Runs in parallel with the Vultr workflow on every push to main.
+# Also triggerable manually from the Actions tab.
+#
+# REQUIRED ONE-TIME SETUP ON THE LXC CONTAINER:
+#
+#   1. Install the self-hosted runner (runner polls GitHub via outbound HTTPS — no inbound ports needed):
+#        mkdir /opt/actions-runner && cd /opt/actions-runner
+#        curl -o runner.tar.gz -L https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64-<version>.tar.gz
+#        tar xzf runner.tar.gz
+#        ./config.sh --url https://github.com/Ki-re/InterHack-2026 \
+#                    --token <REGISTRATION_TOKEN_FROM_GITHUB_SETTINGS> \
+#                    --labels homelab --name homelab-lxc
+#        sudo ./svc.sh install && sudo ./svc.sh start
+#      Get the registration token from:
+#        GitHub → Settings → Actions → Runners → New self-hosted runner
+#
+#   2. Clone the repo on the LXC:
+#        git clone https://github.com/Ki-re/InterHack-2026.git /opt/interhack-2026
+#
+#   3. Create /opt/interhack-2026/.env.prod (managed locally, never in this workflow):
+#        cp .env.prod.example /opt/interhack-2026/.env.prod
+#        # Fill in all values, then:
+#        chmod 600 /opt/interhack-2026/.env.prod
+#
+#   4. Ensure the runner user has permission to run docker:
+#        sudo usermod -aG docker <runner-user>
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Homelab LXC
+    runs-on: [self-hosted, homelab]
+
+    steps:
+      - name: Pull latest code
+        run: |
+          set -e
+          cd /opt/interhack-2026
+          git pull origin main
+
+      - name: Build and restart services
+        run: |
+          set -e
+          cd /opt/interhack-2026
+          docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+
+      - name: Run Alembic migrations
+        run: |
+          set -e
+          cd /opt/interhack-2026
+          docker compose -f docker-compose.prod.yml --env-file .env.prod \
+            exec -T backend alembic upgrade head
+
+      - name: Remove dangling images
+        run: docker image prune -f

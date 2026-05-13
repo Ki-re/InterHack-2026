@@ -10,7 +10,7 @@
 - `front/src/types`: shared frontend TypeScript domain types.
 - `front/src/api`: typed API helpers, including AI chat and regional dashboard reads.
 - `front/src/auth`: auth provider and session state.
-- `front/src/locales`: i18n JSON files (`ca.json` default, `es.json` toggle). Both fully translated with no English terms.
+- `front/src/locales`: i18n JSON files (`ca.json` default, `es.json`, `en.json`).
 - `front/public/`: static public assets — `icon.png` used as favicon.
 - `back/`: FastAPI app.
 - `back/app/api`: route modules.
@@ -23,12 +23,14 @@
 
 ## Data Flow
 - Browser loads Vite frontend from `http://localhost:5173`.
-- INIBSA sales alerts MVP uses mock frontend data from `front/src/data/mock-alerts.ts` (dental clinic clients).
+- `/` renders the public landing page; `/login` renders the mock role login. Protected dashboards live under `/dashboard` and `/regional-dashboard`.
+- INIBSA sales alerts MVP loads real alert rows from the backend `GET /alerts`, backed by the ML-generated `IA/alerts.csv`.
 - Mock auth provider stores a role-based session in `localStorage` (key: `inibsa.salesDelegateSession`); protected dashboards render when that session exists.
 - The selected frontend role (`sales_delegate` or `regional_manager`) routes users to the matching dashboard.
-- Alert attended state is held in React state inside the dashboard during the session.
+- Public demo mode is always enabled (`demo_mode=true` in localStorage). UI actions can change local React state, but alert actions and notification read state do not persist back to the DB in demo mode.
+- AI chat, TTS, and STT controls are routed through demo guards in the frontend; real backend calls are skipped in demo mode and replaced with deterministic explanations/disclaimers.
 - Regional manager dashboard calls `GET /regional-dashboard` through TanStack Query and renders seeded backend hierarchy/KPI data.
-- Existing frontend API helpers and backend auth endpoints remain in the codebase for future integration, but the MVP alert flow does not call them.
+- Existing frontend API helpers and backend auth endpoints remain in the codebase for future integration, but the public demo uses mocked local auth.
 
 ## Backend Flow
 - FastAPI includes routers from `back/app/api/routes.py`.

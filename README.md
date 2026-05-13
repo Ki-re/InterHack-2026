@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="front/public/icon.png" alt="INIBSA icon" width="88" />
+  <img src="front/src/assets/logo.png" alt="INIBSA icon" width="388"/>
 </p>
 
 # Client Alert Manager

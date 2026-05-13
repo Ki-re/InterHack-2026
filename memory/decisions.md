@@ -11,7 +11,7 @@
 - Backend database access uses `AsyncSession`; sync SQLAlchemy sessions are not used.
 - Frontend pages live in `front/src/pages`; shared UI lives in `front/src/components`.
 - shadcn UI components live in `front/src/components/ui` via the `@/components/ui` alias.
-- i18n is implemented via a lightweight React Context (`LanguageContext`) and JSON locale files in `front/src/locales`.
+- i18n is implemented via a lightweight React Context (`LanguageContext`) and JSON locale files in `front/src/locales`; supported languages are Catalan, Spanish, and English.
 
 ## AI
 - AI models use a multi-head architecture for multi-task learning to prevent gradient interference.
@@ -31,13 +31,18 @@
 - Password hashes use stdlib PBKDF2-HMAC SHA-256.
 - No OAuth, session cookies, refresh tokens, or roles in the starter auth flow.
 - INIBSA frontend MVP temporarily uses mocked localStorage auth with role selection (`sales_delegate`, `regional_manager`) and does not call backend auth endpoints.
+- Public demo mode is always enabled for the hackathon demo. User-facing actions can update the frontend state but must not persist DB mutations from the demo UI.
 
 ## INIBSA MVP
-- Sales alerts are mocked in the frontend until backend alert endpoints are defined.
+- Public `/` is a project landing page; the role login lives at `/login`.
+- The landing page is intentionally scroll-less for hackathon/demo presentation, using a dense three-column executive overview instead of stacked marketing sections.
+- Landing brand/title is KeepInibsa, while the challenge context remains INIBSA Smart Demand Signals. The landing recalc cadence is weekly.
+- Sales alerts are loaded from the backend alert endpoint, but demo management actions remain frontend-local.
 - Regional dashboard uses real backend tables and deterministic seed data as the bridge from mockups to future production data.
 - Regional manager performance is alert-execution centered: pending load, attended rate, high-risk backlog, overdue follow-ups, dismissals, and response time.
 - The interactive Spain map is a custom SVG with three commercial areas; no chart/map package is added for this MVP.
 - React local state is sufficient for attended status, follow-up questionnaire data, and AI insight panel messages.
+- LLM, TTS, and STT controls are disabled at the frontend layer in demo mode and replaced with deterministic copy plus an explicit disclaimer.
 - The UI direction is clean enterprise SaaS: neutral surfaces, dense table-first workflow, and restrained blue/green/red status accents.
 - Mock clients are dental clinics with dental supply context.
 - ChurnType is open-ended (`"total" | string`) — "total" is translated via i18n, any other string (e.g. "Producto 1") is displayed as-is.
@@ -45,6 +50,7 @@
 
 ## Branding
 - Brand name is INIBSA (not INSIBA).
+- App/demo product name is KeepInibsa.
 - `front/src/assets/logo.png`: full logo (icon + name). Used in AppLayout header and Login card.
 - `front/src/assets/icon.png`: icon only. Used as favicon (`front/public/icon.png`), page title "INIBSA", and small badge contexts in Login.
 - No nav links or subtitles shown in the AppLayout header — logo stands alone.
