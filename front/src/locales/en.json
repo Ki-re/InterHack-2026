@@ -1,0 +1,402 @@
+{
+  "app": {
+    "title": "INIBSA Alerts",
+    "subtitle": "Sales Delegate workspace",
+    "logout": "Log out",
+    "alerts": "Alerts",
+    "challenge": "INIBSA Challenge",
+    "delegate_dashboard": "Delegates",
+    "regional_dashboard": "Regional Management"
+  },
+  "demo": {
+    "badge": "Demo mode",
+    "default_notice": "Demo mode is active: actions update the interface but do not persist to the DB.",
+    "llm_disabled": "Demo mode: real LLM API queries are disabled.",
+    "tts_disabled": "Demo mode: real TTS queries are disabled.",
+    "stt_disabled": "Demo mode: real STT queries are disabled."
+  },
+  "login": {
+    "title": "Sales Alerts Dashboard",
+    "description": "Access for Sales Delegates. Review churn signals, purchase propensity and operational recommendations in a view ready for backend integration.",
+    "role": "Sales Delegate",
+    "mock_login": "Demo login. No real authentication is required.",
+    "email": "Email",
+    "password": "Password",
+    "entering": "Entering...",
+    "submit": "Enter dashboard",
+    "error_required": "Enter email and password to log in.",
+    "error_failed": "Could not log in.",
+    "signals": {
+      "churn": "Churn risk",
+      "buy": "Purchase",
+      "clients": "Clients"
+    },
+    "role_selector": {
+      "label": "Access profile",
+      "regional": "Regional Management",
+      "regional_desc": "Aggregated view by area, Managers and Agents.",
+      "delegate": "Sales Delegate",
+      "delegate_desc": "Operational management of client Alerts."
+    },
+    "back": "Home"
+  },
+  "landing": {
+    "nav": {
+      "login": "Access"
+    },
+    "hero": {
+      "badge": "InterHack-2026 · INIBSA Challenge",
+      "title": "KeepInibsa",
+      "description": "A standalone app that turns dental clinic purchase patterns into actionable Alerts for Delegates and Managers.",
+      "cta": "See the demo",
+      "demo": "Demo Mode"
+    },
+    "snapshot": {
+      "title": "Commercial signal in production shape",
+      "description": "The Dashboard shows Alerts generated from real data provided by INIBSA to train and run inference with our models.",
+      "clinics": "Clinic base",
+      "alerts": "Demo Alerts",
+      "frequency": "Refresh",
+      "weekly": "Weekly"
+    },
+    "data": {
+      "title": "INIBSA data",
+      "description": "The challenge dataset was proposed and provided by INIBSA, with commercial history used for training, inference and explainability."
+    },
+    "pipeline": {
+      "title": "Actionable pipeline",
+      "description": "The models produce priorities, explanations and activation routes for a Delegate, Manager or future automation layer."
+    },
+    "problem": {
+      "eyebrow": "Problem",
+      "title": "Detect purchase need before demand is lost",
+      "description": "Dental clinics combine recurring commodity purchases with technical products that behave irregularly. The solution estimates expected demand, identifies capture windows and separates normal variation from real churn signals."
+    },
+    "models": {
+      "eyebrow": "Models",
+      "title": "Three predictive models built for action",
+      "repurchase": {
+        "title": "Classic Neural Network",
+        "description": "Feed-forward classifier that predicts whether a client will repurchase a product family."
+      },
+      "days": {
+        "title": "Sequential Model · next purchase",
+        "description": "GRU sequence model that anticipates days until the next expected purchase and prioritizes contact timing."
+      },
+      "potential": {
+        "title": "Sequential Model · potential",
+        "description": "GRU sequence model that estimates the commercial potential class and helps prioritize Alerts."
+      }
+    },
+    "tech": {
+      "eyebrow": "Technologies",
+      "title": "Stack used during the hackathon"
+    },
+    "team": {
+      "eyebrow": "Team",
+      "title": "Contributors and responsibilities",
+      "members": {
+        "erik": {
+          "role": "Core Full Stack Engineer",
+          "description": "Architected the foundational full-stack app with FastAPI/React, DevOps infrastructure, DB pipelines and Gemini LLM integrations."
+        },
+        "ernest": {
+          "role": "DevOps & Frontend Engineer",
+          "description": "Led VPS deployment, bilingual frontend features, ElevenLabs voice cloning and agent-scoped notifications."
+        },
+        "alvaro": {
+          "role": "Lead Machine Learning Engineer",
+          "description": "Designed and trained the B2B neural networks, ingestion, inference, explainability and actionable Alert routing."
+        }
+      }
+    },
+    "footer": {
+      "event": "Project created for InterHack-2026 with INIBSA's Smart Demand Signals challenge."
+    }
+  },
+  "dashboard": {
+    "title": "Commercial Alerts Dashboard",
+    "subtitle": "Operational view to detect churn risk, purchase opportunity and next actions for prioritized clients.",
+    "mock_data": "Demo data · Ready for backend integration",
+    "delegate_label": "Sales Delegate",
+    "select_delegate": "Select a Delegate",
+    "zone_north": "North",
+    "zone_east": "East",
+    "zone_south": "South",
+    "zone_canary": "Canary Islands",
+    "zone_balearic": "Balearic Islands",
+    "loading_agents": "Loading Delegates...",
+    "metrics": {
+      "pending": "Pending",
+      "pending_desc": "Require commercial management",
+      "high_risk": "High severity",
+      "high_risk_desc": "Attention priority",
+      "avg_churn": "Average churn",
+      "avg_churn_desc": "Average alerted portfolio",
+      "attended": "Attended",
+      "attended_desc": "Registered actions",
+      "dismissed": "Dismissed",
+      "dismissed_desc": "Manually dismissed Alerts"
+    },
+    "table": {
+      "title": "Commercial Alerts",
+      "description": "Prioritize clients with churn signals, purchase opportunity and commercial value.",
+      "active_alerts": "{{count}} active Alerts",
+      "cols": {
+        "client": "Client",
+        "risk": "Priority",
+        "churn_prob": "Churn potential",
+        "buy_prop": "Purchase propensity",
+        "value": "Customer value",
+        "explanation": "Explanation",
+        "churn_type": "Churn type",
+        "actions": "Actions"
+      },
+      "row": {
+        "show_explanation": "Show explanation",
+        "hide_explanation": "Hide explanation",
+        "show_detail": "Show detail",
+        "hide_detail": "Hide detail",
+        "pending": "Pending",
+        "attended": "Attended",
+        "dismissed": "Dismissed",
+        "ask_ai": "Ask AI",
+        "mark_attended": "Mark attended",
+        "dismiss": "Dismiss",
+        "full_explanation": "Full explanation",
+        "status_mgmt": "Management status",
+        "no_mgmt": "No management registered yet.",
+        "mgmt_result": "Result {{result}}. Channel {{channel}}."
+      }
+    }
+  },
+  "risk": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "churn_type": {
+    "total": "Total",
+    "product": "Product",
+    "segment": "Segment"
+  },
+  "customer_value": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "ai": {
+    "title": "Ask AI",
+    "description": "Your intelligent sales assistant. Ask anything you need about this client.",
+    "mock_ai": "INIBSA AI",
+    "placeholder": "Ask anything about this client...",
+    "send": "Send",
+    "error": "I could not get a response. Please try again.",
+    "demo_response": {
+      "intro": "For the question \"{{question}}\", the demo reading for {{client}} is the following.",
+      "signal": "The incidence combines {{risk}} risk, {{churn}}% churn potential, {{propensity}}% purchase propensity, {{value}} value and {{churnType}} type.",
+      "reason": "The available explanation says: {{explanation}}",
+      "next_purchase": "The estimated next purchase is {{date}}, so the best use of the Alert is to review timing, affected family and commercial priority.",
+      "action": "With no visible estimated date, the demo recommendation is to review the affected family, validate the historical pattern and register the management outcome.",
+      "disclaimer": "Demo mode: real LLM API queries are disabled."
+    }
+  },
+  "modal": {
+    "risk_label": "{{label}} risk · {{churn}}% churn",
+    "close": "Close",
+    "explanation": "Explanation"
+  },
+  "form": {
+    "title": "Register management",
+    "description": "Update {{name}} status and leave a signal for internal follow-up.",
+    "handled_label": "How was it handled?",
+    "handling": {
+      "phone": "Phone",
+      "visit": "In-person visit",
+      "email": "Email",
+      "other": "Other"
+    },
+    "answered": {
+      "label": "Did they answer?",
+      "yes": "Answered",
+      "no": "Not answered"
+    },
+    "visit_ok": {
+      "label": "Was the visit completed?",
+      "yes": "Visit completed",
+      "no": "Not available"
+    },
+    "email_response": {
+      "label": "Did they respond?",
+      "yes": "Response received",
+      "no": "No response"
+    },
+    "keep_open": {
+      "label": "Alert status",
+      "close": "Close Alert",
+      "keep": "Keep open"
+    },
+    "result_label": "Result",
+    "results": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "reminder_label": "Additional notes",
+    "reminder_placeholder": "Any relevant observation about this client management...",
+    "cancel": "Cancel",
+    "submit": "Save management"
+  },
+  "dismiss": {
+    "button": "Dismiss",
+    "title": "Dismiss this Alert?",
+    "description": "The Alert will move to the dismissed tab.",
+    "reason_label": "Reason (optional)",
+    "reason_placeholder": "Reason for dismissal (optional)...",
+    "confirm": "Confirm dismissal",
+    "cancel": "Cancel",
+    "recover": "Recover"
+  },
+  "changelog": {
+    "title": "Management history",
+    "empty": "No management history.",
+    "phone": "Call",
+    "visit": "Visit",
+    "email": "Email",
+    "other": "Other",
+    "answered": "Answered",
+    "not_answered": "Not answered",
+    "visit_ok": "Visit completed",
+    "visit_fail": "Not available",
+    "email_received": "Response received",
+    "email_no_response": "No response",
+    "kept_open": "Alert kept open",
+    "closed": "Alert closed",
+    "result_positive": "Positive result",
+    "result_neutral": "Neutral result",
+    "result_negative": "Negative result",
+    "event_closed": "Alert closed",
+    "event_dismissed": "Alert dismissed",
+    "event_reopened": "Alert recovered"
+  },
+  "ccaa": {
+    "01": "Andalusia",
+    "02": "Aragon",
+    "03": "Asturias",
+    "04": "Balearic Islands",
+    "05": "Canary Islands",
+    "06": "Cantabria",
+    "07": "Castile and Leon",
+    "08": "Castile-La Mancha",
+    "09": "Catalonia",
+    "10": "Valencian Community",
+    "11": "Extremadura",
+    "12": "Galicia",
+    "13": "Madrid",
+    "14": "Murcia",
+    "15": "Navarre",
+    "16": "Basque Country",
+    "17": "La Rioja"
+  },
+  "time": {
+    "minutes_ago": "{{n}}m ago",
+    "hours_ago": "{{n}}h ago",
+    "days_ago": "{{n}}d ago"
+  },
+  "notification": {
+    "bell_aria": "Notifications",
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications"
+  },
+  "audio": {
+    "record": "Record audio",
+    "stop": "Stop recording",
+    "cancel": "Discard audio",
+    "send": "Send audio",
+    "play": "Play",
+    "pause": "Pause",
+    "mute": "Mute audio",
+    "unmute": "Enable audio",
+    "transcribing": "Transcribing...",
+    "record_note": "Record voice note"
+  },
+  "regional_dashboard": {
+    "title": "Regional Management Dashboard",
+    "subtitle": "Executive control of Alerts by region, Managers, Agents and clients.",
+    "loading": "Loading regional data...",
+    "error": "Could not load regional data.",
+    "region_prefix": "Region ",
+    "scope": "Selected area · {{region}}",
+    "scope_all": "All regions",
+    "all_regions": "All regions",
+    "regions": {
+      "east": "East",
+      "north": "North",
+      "south": "South",
+      "balearic": "Balearic Islands",
+      "canary": "Canary Islands"
+    },
+    "status": {
+      "good": "Healthy execution",
+      "warning": "Requires follow-up",
+      "critical": "Operational risk"
+    },
+    "kpis": {
+      "total_alerts": "Total",
+      "execution_score": "Response efficiency",
+      "pending": "Pending",
+      "pending_desc": "Alerts still open",
+      "attended_rate": "Attendance rate",
+      "attended_desc": "Percentage of attended Alerts",
+      "overdue": "Overdue",
+      "overdue_desc": "Follow-ups outside deadline",
+      "response_time": "Response time",
+      "response_desc": "Average time to first management",
+      "high_risk": "High risk"
+    },
+    "map": {
+      "title": "Regional Map",
+      "subtitle": "Select an area to view operational detail.",
+      "aria": "Interactive Spain map by commercial areas",
+      "score": "Index {{score}}"
+    },
+    "snapshot": {
+      "title": "Area status",
+      "region_data_note": "Aggregated data by region"
+    },
+    "ccaa_filter": {
+      "deselect": "Back to region"
+    },
+    "managers": {
+      "title": "Area Managers"
+    },
+    "agents": {
+      "title": "Manager Agents"
+    },
+    "clients": {
+      "title": "Agent clients",
+      "alerts": "Alerts"
+    },
+    "underperformers": {
+      "title": "Risk focus",
+      "subtitle": "Teams that need priority review.",
+      "manager_label": "Mgr.",
+      "manager_level": "Regional Manager",
+      "role_manager": "Manager",
+      "role_agent": "Delegate"
+    },
+    "table": {
+      "name": "Name",
+      "action": "Action"
+    },
+    "actions": {
+      "zoom": "Zoom in",
+      "collapse": "Collapse",
+      "open_detail": "View details",
+      "back_region": "Back to area",
+      "back_manager": "Back to Manager",
+      "retry": "Retry"
+    }
+  }
+}

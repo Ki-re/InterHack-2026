@@ -4,37 +4,42 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "@/auth/auth-context";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AgentProvider } from "@/contexts/AgentContext";
+import { DemoModeProvider } from "@/contexts/DemoModeContext";
 import { LanguageProvider, useTranslation } from "@/contexts/LanguageContext";
 import { Dashboard } from "@/pages/Dashboard";
+import { Landing } from "@/pages/Landing";
 import { Login } from "@/pages/Login";
 import { RegionalDashboard } from "@/pages/RegionalDashboard";
 
 export function App() {
   return (
     <LanguageProvider>
-      <AgentProvider>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <PublicOnlyRoute>
-              <Login />
-            </PublicOnlyRoute>
-          }
-        />
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/regional-dashboard" element={<RegionalDashboard />} />
-        </Route>
-        <Route path="*" element={<FallbackRedirect />} />
-      </Routes>
-      </AgentProvider>
+      <DemoModeProvider>
+        <AgentProvider>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <Login />
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/regional-dashboard" element={<RegionalDashboard />} />
+            </Route>
+            <Route path="*" element={<FallbackRedirect />} />
+          </Routes>
+        </AgentProvider>
+      </DemoModeProvider>
     </LanguageProvider>
   );
 }
@@ -47,7 +52,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

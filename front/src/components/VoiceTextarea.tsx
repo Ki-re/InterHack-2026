@@ -3,6 +3,7 @@ import { Loader2, Mic, Square } from "lucide-react";
 
 import { postTranscribe } from "@/api/ai";
 import { Button } from "@/components/ui/button";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const BARS = 32;
 
 export function VoiceTextarea({ value, onChange, placeholder, className, disabled }: VoiceTextareaProps) {
   const { t } = useTranslation();
+  const { isDemoMode, showDemoNotice } = useDemoMode();
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [waveformBars, setWaveformBars] = useState<number[]>(Array(BARS).fill(0));
@@ -41,6 +43,11 @@ export function VoiceTextarea({ value, onChange, placeholder, className, disable
   }
 
   async function startRecording() {
+    if (isDemoMode) {
+      showDemoNotice(t("demo.stt_disabled"));
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";

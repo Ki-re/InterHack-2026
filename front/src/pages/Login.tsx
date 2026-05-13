@@ -1,9 +1,10 @@
 import { type FormEvent, type ReactNode, useState } from "react";
-import { ArrowRight, LockKeyhole, Mail, Network, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, LockKeyhole, Mail, Network, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import { useAuth, type UserRole } from "@/auth/auth-context";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -45,6 +46,12 @@ export function Login() {
 
   return (
     <main className="min-h-screen bg-slate-100 text-foreground">
+      <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
+        <Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white" onClick={() => navigate("/")} aria-label="Back to landing">
+          <ArrowLeft className="size-4" />
+        </Button>
+        <LanguageSwitcher className="bg-white" />
+      </div>
       <div className="mx-auto grid min-h-screen w-full max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1fr_430px] lg:items-center lg:px-6">
         <motion.section 
           initial={{ opacity: 0, x: -20 }}

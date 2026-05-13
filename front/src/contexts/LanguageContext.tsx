@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import ca from "../locales/ca.json";
+import en from "../locales/en.json";
 import es from "../locales/es.json";
 
-type Language = "ca" | "es";
+export type Language = "ca" | "es" | "en";
 type Translations = typeof ca;
 
 interface LanguageContextType {
@@ -13,12 +14,16 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const translations: Record<Language, Translations> = { ca, es };
+const translations: Record<Language, Translations> = { ca, es, en };
+
+function isLanguage(value: string | null): value is Language {
+  return value === "ca" || value === "es" || value === "en";
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem("app_lang");
-    return (saved as Language) || "ca";
+    return isLanguage(saved) ? saved : "ca";
   });
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "title": "Alertas INIBSA",
     "subtitle": "Espacio del delegado de ventas",
@@ -7,6 +7,13 @@
     "challenge": "Reto INIBSA",
     "delegate_dashboard": "Delegados",
     "regional_dashboard": "Dirección regional"
+  },
+  "demo": {
+    "badge": "Demo mode",
+    "default_notice": "Demo mode está activo: las acciones cambian la interfaz pero no persisten en la DB.",
+    "llm_disabled": "Demo mode: las consultas reales a la LLM API están desactivadas.",
+    "tts_disabled": "Demo mode: las consultas reales de TTS están desactivadas.",
+    "stt_disabled": "Demo mode: las consultas reales de STT están desactivadas."
   },
   "login": {
     "title": "Panel de Alertas de Ventas",
@@ -30,6 +37,81 @@
       "regional_desc": "Vista agregada por zona, mánagers y agentes.",
       "delegate": "Delegado de ventas",
       "delegate_desc": "Gestión operativa de alertas de clientes."
+    },
+    "back": "Inicio"
+  },
+  "landing": {
+    "nav": {
+      "login": "Acceder"
+    },
+    "hero": {
+      "badge": "InterHack-2026 · Reto INIBSA",
+      "title": "KeepInibsa",
+      "description": "Una app standalone que transforma patrones de compra de clínicas dentales en Alerts accionables para Delegates y Managers.",
+      "cta": "See the demo",
+      "demo": "Demo Mode"
+    },
+    "snapshot": {
+      "title": "Señal comercial en producción",
+      "description": "El Dashboard muestra Alerts generadas sobre datos reales proporcionados por INIBSA para entrenar y hacer inference con los modelos.",
+      "clinics": "Clínicas base",
+      "alerts": "Alerts demo",
+      "frequency": "Recálculo",
+      "weekly": "Semanal"
+    },
+    "data": {
+      "title": "Datos INIBSA",
+      "description": "El dataset del reto fue propuesto y facilitado por INIBSA, con histórico comercial usado para entrenamiento, inference y explicabilidad."
+    },
+    "pipeline": {
+      "title": "Pipeline accionable",
+      "description": "Los modelos generan prioridades, explicaciones y rutas de actuación hacia Delegate, Manager o automatización futura."
+    },
+    "problem": {
+      "eyebrow": "Problema",
+      "title": "Detectar necesidad de compra antes de perder demanda",
+      "description": "Las clínicas combinan compras recurrentes de commodities con productos técnicos de comportamiento irregular. La solución estima demanda esperada, identifica ventanas de captura y separa variación normal de señales reales de churn."
+    },
+    "models": {
+      "eyebrow": "Modelos",
+      "title": "Tres modelos predictivos orientados a acción",
+      "repurchase": {
+        "title": "Classic Neural Network",
+        "description": "Clasificador feed-forward para predecir si el cliente volverá a comprar una familia de producto."
+      },
+      "days": {
+        "title": "Sequential Model · próxima compra",
+        "description": "Modelo GRU secuencial para anticipar los días hasta la próxima compra esperada y priorizar el momento de contacto."
+      },
+      "potential": {
+        "title": "Sequential Model · potencial",
+        "description": "Modelo GRU secuencial para estimar la clase de potencial comercial y orientar la priorización de las Alerts."
+      }
+    },
+    "tech": {
+      "eyebrow": "Tecnologías",
+      "title": "Stack usado durante el hackathon"
+    },
+    "team": {
+      "eyebrow": "Equipo",
+      "title": "Contributors y responsabilidades",
+      "members": {
+        "erik": {
+          "role": "Core Full Stack Engineer",
+          "description": "Arquitectó la aplicación full-stack base con FastAPI/React, infraestructura DevOps, pipelines de DB e integraciones Gemini LLM."
+        },
+        "ernest": {
+          "role": "DevOps & Frontend Engineer",
+          "description": "Lideró el despliegue VPS, funcionalidades frontend bilingües, voice cloning con ElevenLabs y notificaciones por agente."
+        },
+        "alvaro": {
+          "role": "Lead Machine Learning Engineer",
+          "description": "Diseñó y entrenó las neural networks B2B, ingestion, inference, explicabilidad y routing de Alerts accionables."
+        }
+      }
+    },
+    "footer": {
+      "event": "Proyecto creado para InterHack-2026 con el reto Smart Demand Signals de INIBSA."
     }
   },
   "dashboard": {
@@ -109,7 +191,15 @@
     "mock_ai": "INIBSA IA",
     "placeholder": "Pregúntame cualquier cosa sobre este cliente...",
     "send": "Enviar",
-    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo."
+    "error": "No he podido obtener respuesta. Por favor, inténtalo de nuevo.",
+    "demo_response": {
+      "intro": "Para la pregunta \"{{question}}\", la lectura demo sobre {{client}} es la siguiente.",
+      "signal": "La incidencia combina riesgo {{risk}}, {{churn}}% de potencial de fuga, {{propensity}}% de propensión a compra, valor {{value}} y tipo {{churnType}}.",
+      "reason": "La explicación disponible indica: {{explanation}}",
+      "next_purchase": "La siguiente compra estimada es {{date}}, así que el mejor uso de la Alert es revisar timing, familia afectada y prioridad comercial.",
+      "action": "Sin fecha estimada visible, la recomendación demo es revisar la familia afectada, validar el patrón histórico y registrar el resultado de la gestión.",
+      "disclaimer": "Demo mode: las consultas reales a la LLM API están desactivadas."
+    }
   },
   "modal": {
     "risk_label": "Riesgo {{label}} · {{churn}}% fuga",

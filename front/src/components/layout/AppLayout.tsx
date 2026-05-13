@@ -1,23 +1,26 @@
-import { LogOut, UserRound } from "lucide-react";
+import { LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/auth/auth-context";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAgent } from "@/contexts/AgentContext";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import { useTranslation } from "@/contexts/LanguageContext";
 import inibsaLogo from "@/assets/logo.png";
 
 
 export function AppLayout() {
   const { logout, user } = useAuth();
-  const { t, language, setLanguage } = useTranslation();
+  const { t } = useTranslation();
+  const { isDemoMode } = useDemoMode();
   const { selectedAgentId } = useAgent();
   const navigate = useNavigate();
 
   function handleLogout() {
     logout();
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   }
 
   return (
@@ -30,24 +33,13 @@ export function AppLayout() {
 
           <div className="flex min-w-0 items-center gap-2">
             {user?.role !== "regional_manager" && <NotificationBell agentId={selectedAgentId} />}
-            <div className="flex items-center gap-1 rounded-md border bg-background p-1">
-              <Button
-                variant={language === "ca" ? "secondary" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setLanguage("ca")}
-              >
-                CA
-              </Button>
-              <Button
-                variant={language === "es" ? "secondary" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setLanguage("es")}
-              >
-                ES
-              </Button>
-            </div>
+            {isDemoMode ? (
+              <span className="hidden items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-800 sm:inline-flex">
+                <ShieldCheck className="size-3.5" aria-hidden="true" />
+                {t("demo.badge")}
+              </span>
+            ) : null}
+            <LanguageSwitcher />
 
             <div className="hidden min-w-0 items-center gap-2 rounded-md border bg-background px-3 py-2 md:flex">
               <UserRound className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
