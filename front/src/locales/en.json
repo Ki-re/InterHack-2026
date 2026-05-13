@@ -49,7 +49,8 @@
       "title": "KeepInibsa",
       "description": "A standalone app that turns dental clinic purchase patterns into actionable Alerts for Delegates and Managers.",
       "cta": "See the demo",
-      "demo": "Demo Mode"
+      "demo": "Demo Mode",
+      "award_inibsa": "1st Place — INIBSA Challenge"
     },
     "snapshot": {
       "title": "Commercial signal in production shape",

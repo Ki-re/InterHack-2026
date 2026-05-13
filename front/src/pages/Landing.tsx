@@ -53,7 +53,7 @@ export function Landing() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-4 xl:min-h-0"
         >
-          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm">
+          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0">
             <div>
               <h1 className="text-5xl font-semibold leading-tight tracking-normal text-slate-950 2xl:text-6xl">
                 {t("landing.hero.title")}
@@ -65,7 +65,7 @@ export function Landing() {
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
                 <Trophy className="size-3.5" aria-hidden="true" />
-                1r Premi — Repte INIBSA
+                {t("landing.hero.award_inibsa")}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
                 <Trophy className="size-3.5" aria-hidden="true" />
@@ -89,7 +89,7 @@ export function Landing() {
             </div>
           </div>
 
-          <Panel>
+          <Panel className="xl:grow xl:min-h-0">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-700">
               <BarChart3 className="size-4" aria-hidden="true" />
               {t("landing.snapshot.title")}
@@ -104,7 +104,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <Panel className="xl:flex-1 xl:min-h-0 xl:overflow-hidden">
+          <Panel className="xl:grow xl:min-h-0 xl:overflow-hidden">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.problem.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold">{t("landing.problem.title")}</h2>
             <p className="mt-2 text-xs leading-5 text-slate-600">{t("landing.problem.description")}</p>
@@ -117,7 +117,7 @@ export function Landing() {
           transition={{ delay: 0.06 }}
           className="flex flex-col gap-4 xl:min-h-0"
         >
-          <Panel className="p-3">
+          <Panel className="p-3 xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.models.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold leading-tight">{t("landing.models.title")}</h2>
             <div className="mt-3 grid gap-2">
@@ -127,7 +127,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <Panel>
+          <Panel className="xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.tech.eyebrow")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {tech.map((item) => (
@@ -138,7 +138,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="grid grid-cols-2 gap-3 xl:flex-1 xl:grid-rows-[1fr]">
+          <div className="grid grid-cols-2 gap-3 xl:grow xl:min-h-0 xl:grid-rows-[1fr]">
             <InfoCard icon={<Database />} title={t("landing.data.title")} text={t("landing.data.description")} />
             <InfoCard icon={<GitBranch />} title={t("landing.pipeline.title")} text={t("landing.pipeline.description")} />
           </div>
@@ -150,7 +150,7 @@ export function Landing() {
           transition={{ delay: 0.12 }}
           className="flex flex-col gap-4 xl:min-h-0"
         >
-          <Panel className="p-3">
+          <Panel className="p-3 xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.team.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold leading-tight">{t("landing.team.title")}</h2>
             <div className="mt-3 grid gap-2">
@@ -178,7 +178,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:flex-1">
+          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0">
             {t("landing.footer.event")}
           </div>
         </motion.div>
