@@ -49,7 +49,7 @@ jobs:
         run: |
           set -e
           cd /opt/interhack-2026
-          docker compose -f docker-compose.homelab.yml --env-file .env.prod up --build -d
+          docker compose -f docker-compose.homelab.yml --env-file .env.prod up --build --force-recreate --remove-orphans -d
 
       - name: Wait for backend to be healthy
         run: |
