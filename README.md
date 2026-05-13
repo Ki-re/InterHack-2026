@@ -187,8 +187,31 @@ scripts/    project automation
 
 ## Contributors
 
-| Contributor | Main role |
-| --- | --- |
-| Alvaro | AI Engineer |
-| Yearsuck | Infrastructure and Backend Engineer |
-| Ki-re | Front and Back Engineer |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://github.com/Ki-re">
+        <img src="https://github.com/Ki-re.png" width="120" style="border-radius:50%" alt="Erik Batiste"/><br/>
+        <strong>Erik Batiste</strong>
+      </a><br/>
+      <em>Core Full Stack Engineer</em><br/><br/>
+      Architected the foundational full-stack app with FastAPI/React, DevOps infrastructure, DB pipelines and Gemini LLM integrations.
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Yearsuck">
+        <img src="https://github.com/Yearsuck.png" width="120" style="border-radius:50%" alt="Ernest Rull"/><br/>
+        <strong>Ernest Rull</strong>
+      </a><br/>
+      <em>DevOps & Frontend Engineer</em><br/><br/>
+      Led VPS deployment, bilingual frontend features, ElevenLabs voice cloning and agent-scoped notifications.
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Alvaroost8">
+        <img src="https://github.com/Alvaroost8.png" width="120" style="border-radius:50%" alt="Alvaro Saenz-Torre"/><br/>
+        <strong>Alvaro Saenz-Torre</strong>
+      </a><br/>
+      <em>Lead Machine Learning Engineer</em><br/><br/>
+      Designed and trained the B2B neural networks, ingestion, inference, explainability and actionable Alert routing.
+    </td>
+  </tr>
+</table>
