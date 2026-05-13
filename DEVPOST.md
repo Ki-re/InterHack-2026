@@ -1,14 +1,14 @@
-# Client Alert Manager
+# KeepInibsa
 
 ## Inspiration
 
 INIBSA challenged InterHack-2026 teams to transform dental-clinic purchase history into actionable commercial signals. The core business problem is simple to state but difficult to solve well: sales teams need to know when a clinic should buy again, when demand is drifting to competitors, and when a stable customer is starting to show abandonment risk.
 
-We built **Client Alert Manager** to turn those signals into a practical workflow for sales delegates and regional managers.
+We built **KeepInibsa** to turn those signals into a practical workflow for sales delegates and regional managers.
 
 ## What It Does
 
-Client Alert Manager is a standalone sales intelligence application for dental-clinic demand signals.
+KeepInibsa is a standalone sales intelligence application for dental-clinic demand signals.
 
 - Predicts and surfaces purchase-need alerts.
 - Detects early churn or deterioration signals.

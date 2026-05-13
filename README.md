@@ -2,7 +2,7 @@
   <img src="front/src/assets/logo.png" alt="INIBSA icon" width="388"/>
 </p>
 
-# Client Alert Manager
+# KeepInibsa
 
 <p align="center">
   <strong>Smart Demand Signals for INIBSA, built during InterHack-2026.</strong>
@@ -35,7 +35,7 @@ The solution is designed as a standalone application that can later integrate wi
 
 ## What We Built
 
-**Client Alert Manager** turns predictive signals into operational sales workflows.
+**KeepInibsa** turns predictive signals into operational sales workflows.
 
 - **Sales Delegate Dashboard**: a table-first alert workspace for dental-clinic clients, with priority, churn risk, purchase propensity, customer value, explanation, product-family context, status tabs, attended/dismissed workflows, and action history.
 - **Regional Manager Dashboard**: an executive dashboard with KPI cards, a Spain map by commercial area/autonomous community, regional performance status, and manager -> agent -> client drill-down.
