@@ -51,7 +51,7 @@ export function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 xl:min-h-0"
         >
           <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm">
             <div>
@@ -104,10 +104,10 @@ export function Landing() {
             </div>
           </Panel>
 
-          <Panel>
+          <Panel className="xl:flex-1 xl:min-h-0 xl:overflow-hidden">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.problem.eyebrow")}</p>
-            <h2 className="mt-1 text-xl font-semibold">{t("landing.problem.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("landing.problem.description")}</p>
+            <h2 className="mt-1 text-lg font-semibold">{t("landing.problem.title")}</h2>
+            <p className="mt-2 text-xs leading-5 text-slate-600">{t("landing.problem.description")}</p>
           </Panel>
         </motion.div>
 
@@ -115,7 +115,7 @@ export function Landing() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 }}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 xl:min-h-0"
         >
           <Panel className="p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.models.eyebrow")}</p>
@@ -138,7 +138,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 xl:flex-1 xl:grid-rows-[1fr]">
             <InfoCard icon={<Database />} title={t("landing.data.title")} text={t("landing.data.description")} />
             <InfoCard icon={<GitBranch />} title={t("landing.pipeline.title")} text={t("landing.pipeline.description")} />
           </div>
@@ -148,7 +148,7 @@ export function Landing() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 xl:min-h-0"
         >
           <Panel className="p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t("landing.team.eyebrow")}</p>
@@ -178,7 +178,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm">
+          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:flex-1">
             {t("landing.footer.event")}
           </div>
         </motion.div>
