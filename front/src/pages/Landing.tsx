@@ -153,24 +153,24 @@ export function Landing() {
           <Panel className="p-3 xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.team.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold leading-tight 2xl:text-xl">{t("landing.team.title")}</h2>
-            <div className="mt-3 grid gap-2 xl:grow xl:min-h-0 xl:auto-rows-fr">
+            <div className="mt-3 grid gap-1.5 xl:grow xl:min-h-0 xl:auto-rows-fr 2xl:gap-2">
               {team.map((member) => (
                 <a
                   key={member.key}
                   href={member.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex flex-col rounded-lg border bg-slate-50 p-3 transition-colors hover:bg-white xl:min-h-0 xl:overflow-hidden"
+                  className="flex flex-col rounded-lg border bg-slate-50 p-2 transition-colors hover:bg-white xl:min-h-0 xl:overflow-hidden 2xl:p-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <img src={member.avatar} alt={member.name} className="size-18 rounded-full border bg-white 2xl:size-20" />
+                  <div className="flex items-center gap-2 2xl:gap-3">
+                    <img src={member.avatar} alt={member.name} className="size-12 rounded-full border bg-white 2xl:size-14" />
                     <div className="min-w-0">
-                      <h3 className="text-sm font-semibold 2xl:text-base">{member.name}</h3>
-                      <p className="text-xs text-slate-500 2xl:text-sm">@{member.handle}</p>
+                      <h3 className="text-xs font-semibold 2xl:text-sm">{member.name}</h3>
+                      <p className="text-[10px] text-slate-500 2xl:text-xs">@{member.handle}</p>
                     </div>
                   </div>
-                  <p className="mt-1.5 text-xs font-semibold text-blue-700 2xl:text-sm">{t(`landing.team.members.${member.key}.role`)}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">
+                  <p className="mt-1 text-[10px] font-semibold text-blue-700 2xl:text-xs">{t(`landing.team.members.${member.key}.role`)}</p>
+                  <p className="mt-0.5 text-[10px] leading-4 text-slate-600 xl:grow xl:min-h-0 2xl:text-xs 2xl:leading-5">
                     {t(`landing.team.members.${member.key}.description`)}
                   </p>
                 </a>
