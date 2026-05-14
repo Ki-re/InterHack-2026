@@ -9,7 +9,7 @@ import {
   Network,
   Trophy,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -33,6 +33,20 @@ export function Landing() {
   const navigate = useNavigate();
   const destination = user?.role === "regional_manager" ? "/regional-dashboard" : user ? "/dashboard" : "/login";
 
+  // At xl the grid is viewport-height. Zoom content proportionally on shorter screens
+  // so nothing overflows — text, padding, images all scale together.
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 1280) { setZoom(1); return; }
+      const available = window.innerHeight - 56; // minus header
+      setZoom(Math.min(1, Math.max(0.6, available / 900)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-950">
       <header className="h-14 border-b bg-white/95">
@@ -47,13 +61,16 @@ export function Landing() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-[1440px] gap-4 px-4 py-4 sm:px-6 xl:h-[calc(100vh-3.5rem)] xl:overflow-hidden xl:grid-cols-[1.05fr_1.1fr_0.9fr]">
+      <section
+        style={zoom < 1 ? { zoom, height: `calc((100vh - 3.5rem) / ${zoom})` } : undefined}
+        className="mx-auto grid max-w-[1440px] gap-4 px-4 py-4 sm:px-6 xl:h-[calc(100vh-3.5rem)] xl:overflow-hidden xl:grid-cols-[1.05fr_1.1fr_0.9fr]"
+      >
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-4 xl:min-h-0"
         >
-          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0 xl:overflow-hidden">
+          <div className="flex flex-col rounded-lg border bg-white p-6 shadow-sm xl:grow xl:min-h-0">
             <div className="xl:grow xl:min-h-0">
               <h1 className="text-5xl font-semibold leading-tight tracking-normal text-slate-950 2xl:text-6xl">
                 {t("landing.hero.title")}
@@ -104,7 +121,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <Panel className="xl:grow xl:min-h-0 xl:overflow-hidden">
+          <Panel className="xl:grow xl:min-h-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 2xl:text-sm">{t("landing.problem.eyebrow")}</p>
             <h2 className="mt-1 text-lg font-semibold 2xl:text-xl">{t("landing.problem.title")}</h2>
             <p className="mt-2 text-xs leading-5 text-slate-600 xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">{t("landing.problem.description")}</p>
@@ -138,7 +155,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="grid grid-cols-2 gap-3 xl:grow xl:min-h-0 xl:grid-rows-[1fr] xl:overflow-hidden">
+          <div className="grid grid-cols-2 gap-3 xl:grow xl:min-h-0 xl:grid-rows-[1fr]">
             <InfoCard icon={<Database />} title={t("landing.data.title")} text={t("landing.data.description")} />
             <InfoCard icon={<GitBranch />} title={t("landing.pipeline.title")} text={t("landing.pipeline.description")} />
           </div>
@@ -160,7 +177,7 @@ export function Landing() {
                   href={member.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex flex-col rounded-lg border bg-slate-50 p-2 transition-colors hover:bg-white xl:min-h-0 xl:overflow-hidden 2xl:p-3"
+                  className="flex flex-col rounded-lg border bg-slate-50 p-2 transition-colors hover:bg-white xl:min-h-0 2xl:p-3"
                 >
                   <div className="flex items-center gap-2 2xl:gap-3">
                     <img src={member.avatar} alt={member.name} className="size-12 rounded-full border bg-white 2xl:size-14" />
@@ -178,7 +195,7 @@ export function Landing() {
             </div>
           </Panel>
 
-          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0 xl:overflow-hidden 2xl:text-sm 2xl:leading-6">
+          <div className="rounded-lg border bg-white px-4 py-3 text-xs leading-5 text-slate-500 shadow-sm xl:grow xl:min-h-0 2xl:text-sm 2xl:leading-6">
             {t("landing.footer.event")}
           </div>
         </motion.div>
@@ -188,7 +205,7 @@ export function Landing() {
 }
 
 function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`flex flex-col rounded-lg border bg-white p-4 shadow-sm xl:overflow-hidden ${className}`}>{children}</div>;
+  return <div className={`flex flex-col rounded-lg border bg-white p-4 shadow-sm ${className}`}>{children}</div>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -212,7 +229,7 @@ function InfoCard({ icon, title, text }: { icon: ReactNode; title: string; text:
 
 function ModelRow({ icon, title, target, text }: { icon: ReactNode; title: string; target: string; text: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-slate-50 p-2.5 sm:flex-row xl:min-h-0 xl:overflow-hidden">
+    <div className="flex flex-col gap-2 rounded-lg border bg-slate-50 p-2.5 sm:flex-row xl:min-h-0">
       <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-green-50 text-green-700">{icon}</div>
       <div className="flex min-w-0 flex-col xl:grow xl:min-h-0">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
